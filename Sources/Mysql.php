@@ -44,7 +44,7 @@ class MySQL
 
     public function get_instance($bothandle)
     {
-        $bot = Bot::get_instance($bothandle);
+        $bot = Bot::getInstance($bothandle);
         if (!isset(self::$instance[$bothandle])) {
             $class = __CLASS__;
             self::$instance[$bothandle] = new $class($bothandle);
@@ -55,7 +55,7 @@ class MySQL
 
     private function __construct($bothandle)
     {
-        $this->bot = Bot::get_instance($bothandle);
+        $this->bot = Bot::getInstance($bothandle);
         $this->botname = $this->bot->botname;
         $this->error_count = 0;
         $this->last_error = 0;
@@ -104,12 +104,12 @@ class MySQL
                 . "(internal_name VARCHAR(255) NOT NULL PRIMARY KEY, prefix VARCHAR(100), use_prefix VARCHAR(10) NOT NULL DEFAULT 'false', schemaversion INT(3) NOT NULL DEFAULT 1)"
         );
         $this->query("CREATE TABLE IF NOT EXISTS table_versions (internal_name VARCHAR(255) NOT NULL PRIMARY KEY, schemaversion INT(3) NOT NULL DEFAULT 1)");
-        $this->update_master_table();
+        $this->updateMasterTable();
         return true;
     }
 
 
-    function update_master_table()
+    function updateMasterTable()
     {
         $columns = array_flip(
             array(
@@ -186,7 +186,7 @@ class MySQL
     {
         $this->connect();
         $data = "";
-        $sql = $this->add_prefix($sql);
+        $sql = $this->addPrefix($sql);
         $result = mysql_query($sql, $this->CONN);
         if (!$result) {
             $this->error($sql);
@@ -206,7 +206,7 @@ class MySQL
     function query($sql)
     {
         $this->connect();
-        $sql = $this->add_prefix($sql);
+        $sql = $this->addPrefix($sql);
         $return = mysql_query($sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
@@ -221,7 +221,7 @@ class MySQL
     function returnQuery($sql)
     {
         $this->connect();
-        $sql = $this->add_prefix($sql);
+        $sql = $this->addPrefix($sql);
         $result = mysql_query($sql, $this->CONN);
         if (!$result) {
             return false;
@@ -235,7 +235,7 @@ class MySQL
     function dropTable($sql)
     {
         $this->connect();
-        $sql = $this->add_prefix($sql);
+        $sql = $this->addPrefix($sql);
         $result = mysql_query("DROP TABLE " . $sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
@@ -247,21 +247,21 @@ class MySQL
     }
 
 
-    function add_prefix($sql)
+    function addPrefix($sql)
     {
         $pattern = '/\w?(#___.+?)\b/';
         return preg_replace_callback(
             $pattern, array(
                 &$this,
-                'strip_prefix_control'
+                'stripPrefixControl'
             ), $sql
         );
     }
 
 
-    function strip_prefix_control($matches)
+    function stripPrefixControl($matches)
     {
-        $tablename = $this->get_tablename(substr($matches[1], 4));
+        $tablename = $this->getTableName(substr($matches[1], 4));
         return $tablename;
     }
 
@@ -271,7 +271,7 @@ class MySQL
     Creates a default name of $prefix_$table and adds this to the database if the tablename doesn't exist yet.
     For speed purposes names are cached after the first query - tablenames don't change during runtime.
     */
-    function get_tablename($table)
+    function getTableName($table)
     {
         // get name out of cached entries if possible:
         if (isset($this->tablenames[$table])) {
@@ -308,9 +308,9 @@ class MySQL
     Used for first defines of tablenames, allows to set if prefix should be used.
     If the tablename already exists, the existing name is returned - NO NAMES ARE REDEFINED!
 
-    Otherwise same as get_tablename()
+    Otherwise same as getTableName()
     */
-    function define_tablename($table, $use_prefix)
+    function defineTableName($table, $use_prefix)
     {
         // get name out of cached entries if possible:
         if (isset($this->tablenames[$table])) {
@@ -348,7 +348,7 @@ class MySQL
     }
 
 
-    function get_version($table)
+    function getVersion($table)
     {
         $version = $this->select("SELECT schemaversion, use_prefix FROM " . $this->master_tablename . " WHERE internal_name = '" . $table . "'");
         if (!empty($version)) {
@@ -366,7 +366,7 @@ class MySQL
     }
 
 
-    function set_version($table, $version)
+    function setVersion($table, $version)
     {
         if (!is_numeric($version)) {
             echo "DB Error Trying to set version: " . $version . " for table " . $table . "!\n";
@@ -385,7 +385,7 @@ class MySQL
     }
 
 
-    function update_table($table, $column, $action, $query)
+    function updateTable($table, $column, $action, $query)
     {
         $fields = $this->select("EXPLAIN #___" . $table, MYSQL_ASSOC);
         if (!empty($fields)) {

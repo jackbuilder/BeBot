@@ -49,14 +49,14 @@ class VhItems extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'items', 'GUEST');
+        $this->registerCommand('all', 'items', 'GUEST');
         $this->help['description'] = 'Searches the central database for information about an item.';
         $this->help['command']['items [ql] <item>'] = "Searches and displays information about an <item> of the optional [ql]";
         $this->help['notes'] = "This module uses the Xyphos Items Database .";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match('/^items/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('items')));

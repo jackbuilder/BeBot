@@ -32,22 +32,22 @@
 class BasePassiveModule
 {
     protected $bot; // A reference to the bot
-    public $module_name; //Name of the module extending this class.
+    public $moduleName; //Name of the module extending this class.
     protected $error; //This holds an error class.
-    protected $link_name;
+    protected $linkName;
 
 
-    function __construct(&$bot, $module_name)
+    function __construct(&$bot, $moduleName)
     {
         //Save reference to bot
         $this->bot = &$bot;
-        $this->module_name = $module_name;
-        $this->link_name = NULL;
-        $this->error = new BotError($bot, $module_name);
+        $this->moduleName = $moduleName;
+        $this->linkName = NULL;
+        $this->error = new BotError($bot, $moduleName);
     }
 
 
-    protected function register_event($event, $target = FALSE)
+    protected function registerEvent($event, $target = FALSE)
     {
         $ret = $this->bot->register_event($event, $target, $this);
         if ($ret) {
@@ -56,7 +56,7 @@ class BasePassiveModule
     }
 
 
-    protected function unregister_event($event, $target = FALSE)
+    protected function unregisterEvent($event, $target = FALSE)
     {
         $ret = $this->bot->unregister_event($event, $target, $this);
         if ($ret) {
@@ -65,24 +65,24 @@ class BasePassiveModule
     }
 
 
-    protected function register_module($name)
+    protected function registerModule($name)
     {
-        if ($this->link_name == NULL) {
-            $this->link_name = strtolower($name);
+        if ($this->linkName == NULL) {
+            $this->linkName = strtolower($name);
             $this->bot->register_module($this, strtolower($name));
         }
     }
 
 
-    protected function unregister_module()
+    protected function unregisterModule()
     {
-        if ($this->link_name != NULL) {
-            $this->bot->unregister_module($this->link_name);
+        if ($this->linkName != NULL) {
+            $this->bot->unregister_module($this->linkName);
         }
     }
 
 
-    protected function output_destination($name, $msg, $channel = FALSE)
+    protected function outputDestination($name, $msg, $channel = FALSE)
     {
         if ($channel !== FALSE) {
             if ($channel & SAME) {
@@ -110,7 +110,7 @@ class BasePassiveModule
             $this->bot->core("relay")->relay_to_pgroup($name, $msg);
         }
         if ($channel & IRC) {
-            $this->bot->send_irc($this->module_name, $name, $msg);
+            $this->bot->send_irc($this->moduleName, $name, $msg);
         }
     }
 
@@ -129,7 +129,7 @@ class BasePassiveModule
     }
 
 
-    public function debug_output($title)
+    public function debugOutput($title)
     {
         if ($this->bot->debug) {
             if ($title != "") {

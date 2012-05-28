@@ -41,9 +41,9 @@ class FlexibleSecurityGUI extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "flexible", "SUPERADMIN");
-        $this->register_command("all", "faction", "ADMIN");
-        $this->register_command("all", "minlevel", "ADMIN");
+        $this->registerCommand("all", "flexible", "SUPERADMIN");
+        $this->registerCommand("all", "faction", "ADMIN");
+        $this->registerCommand("all", "minlevel", "ADMIN");
         // The name of the group to use in the faction and minlevel commands to define guest access to the bot.
         // The group needs to be added and set to the wished access level (GUEST would be the best for the purpose).
         // Every level and faction conditions will always be replaced on some change done with minlevel or faction.
@@ -72,55 +72,55 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         // Make sure < and > are there instead of the placeholder:
         $msg = str_replace("&lt;", "<", $msg);
         $msg = str_replace("&gt;", ">", $msg);
         if (preg_match("/^flexible$/i", $msg)) {
-            return $this->show_groups();
+            return $this->showGroups();
         }
         elseif (preg_match("/^flexible create ([a-z_]+) (and|or)$/i", $msg, $info)) {
-            return $this->create_group($info[1], $info[2]);
+            return $this->createGroup($info[1], $info[2]);
         }
         elseif (preg_match("/^flexible delete ([a-z_]+)$/i", $msg, $info)) {
-            return $this->delete_group($info[1]);
+            return $this->deleteGroup($info[1]);
         }
         elseif (preg_match("/^flexible condition add ([a-z_]+) (level|rank_id|at_id) (<|<=|>|>=|=|!=) ([01-9]+)$/i", $msg, $info)) {
-            return $this->add_number_condition($info[1], $info[2], $info[3], $info[4]);
+            return $this->addNumberCondition($info[1], $info[2], $info[3], $info[4]);
         }
         elseif (preg_match("/^flexible condition add ([a-z_]+) profession (=|!=) ([a-z]+)$/i", $msg, $info)) {
-            return $this->add_prof_condition($info[1], $info[2], $info[3]);
+            return $this->addProfCondition($info[1], $info[2], $info[3]);
         }
         elseif (preg_match("/^flexible condition add ([a-z_]+) faction (=|!=) (omni|clan|neutral|all)$/i", $msg, $info)) {
-            return $this->add_faction_condition($info[1], $info[2], $info[3]);
+            return $this->addFactionCondition($info[1], $info[2], $info[3]);
         }
         elseif (preg_match("/^flexible condition add ([a-z_]+) org (=|!=) ([a-z][a-z01-9]+)$/i", $msg, $info)) {
-            return $this->add_org_condition($info[1], $info[2], $info[3]);
+            return $this->addOrgCondition($info[1], $info[2], $info[3]);
         }
         elseif (preg_match("/^flexible condition del ([a-z_]+) (level|rank_id|at_id|profession|faction|org_id) (<|<=|>|>=|=|!=) (.+)/i", $msg, $info)) {
-            return $this->del_condition($info[1], $info[2], $info[3], $info[4]);
+            return $this->delCondition($info[1], $info[2], $info[3], $info[4]);
         }
         elseif (preg_match("/^faction$/i", $msg)) {
-            return $this->show_faction();
+            return $this->showFaction();
         }
         elseif (preg_match("/^faction exclude (all|omni|clan|neutral)$/i", $msg, $info)) {
-            return $this->change_faction("!=", $info[1]);
+            return $this->changeFaction("!=", $info[1]);
         }
         elseif (preg_match("/^faction (all|omni|clan|neutral)$/i", $msg, $info)) {
-            return $this->change_faction("=", $info[1]);
+            return $this->changeFaction("=", $info[1]);
         }
         elseif (preg_match("/^minlevel$/i", $msg)) {
-            return $this->show_minlevel();
+            return $this->showMinLevel();
         }
         elseif (preg_match("/^minlevel ([1-9][01-9]*)$/i", $msg, $info)) {
-            return $this->change_minlevel($info[1]);
+            return $this->changeMinLevel($info[1]);
         }
         return FALSE;
     }
 
 
-    function show_groups()
+    function showGroups()
     {
         $grps = $this->bot->db->select(
             "SELECT t2.gid, name, description, access_level, op FROM #___security_flexible"
@@ -192,7 +192,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function create_group($grpname, $combine)
+    function createGroup($grpname, $combine)
     {
         $combine = strtolower($combine);
         $grpname = strtolower($grpname);
@@ -230,7 +230,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function exists_group($gid)
+    function existsGroup($gid)
     {
         $ret = $this->bot->db->select("SELECT * FROM #___security_flexible WHERE gid = " . $gid . " AND field = 'join'");
         if (empty($ret)) {
@@ -240,7 +240,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function delete_group($grpname)
+    function deleteGroup($grpname)
     {
         $grpname = strtolower($grpname);
         $gid = $this->bot->core("security")->get_gid($grpname);
@@ -259,7 +259,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
 
 
     // level|rank_id|at_id
-    function add_number_condition($grpname, $field, $condition, $compare)
+    function addNumberCondition($grpname, $field, $condition, $compare)
     {
         $field = strtolower($field);
         $grpname = strtolower($grpname);
@@ -267,7 +267,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
         if ($gid == -1) {
             return "No group with the name##highlight## " . $grpname . "##end## existing!";
         }
-        if (!($this->exists_group($gid))) {
+        if (!($this->existsGroup($gid))) {
             return "##error##You cannot add conditions to non-extended security groups!##end##";
         }
         // Check number ranges depending on field
@@ -324,14 +324,14 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function add_prof_condition($grpname, $condition, $compare)
+    function addProfCondition($grpname, $condition, $compare)
     {
         $grpname = strtolower($grpname);
         $gid = $this->bot->core("security")->get_gid($grpname);
         if ($gid == -1) {
             return "No group with the name##highlight## " . $grpname . "##end## existing!";
         }
-        if (!($this->exists_group($gid))) {
+        if (!($this->existsGroup($gid))) {
             return "##error##You cannot add conditions to non-extended security groups!##end##";
         }
         if (($prof = $this->bot->core("professions")
@@ -357,14 +357,14 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function add_faction_condition($grpname, $condition, $compare)
+    function addFactionCondition($grpname, $condition, $compare)
     {
         $grpname = strtolower($grpname);
         $gid = $this->bot->core("security")->get_gid($grpname);
         if ($gid == -1) {
             return "No group with the name##highlight## " . $grpname . "##end## existing!";
         }
-        if (!($this->exists_group($gid))) {
+        if (!($this->existsGroup($gid))) {
             return "##error##You cannot add conditions to non-extended security groups!##end##";
         }
         $faction = strtolower($compare);
@@ -389,21 +389,21 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function add_org_condition($grpname, $condition, $compare)
+    function addOrgCondition($grpname, $condition, $compare)
     {
         $grpname = strtolower($grpname);
         $gid = $this->bot->core("security")->get_gid($grpname);
         if ($gid == -1) {
             return "No group with the name##highlight## " . $grpname . "##end## existing!";
         }
-        if (!($this->exists_group($gid))) {
+        if (!($this->existsGroup($gid))) {
             return "##error##You cannot add conditions to non-extended security groups!##end##";
         }
         if ($condition != '=' && $condition != '!=') {
             return "##error##" . $condition . " is illegal for factions!##end##";
         }
         // Lookup player info (errors are catched in lookup())
-        $info = $this->bot->core("whois")->lookup($compare);
+        $info = $this->bot->core("whoIs")->lookup($compare);
         if ($info instanceof BotError) {
             return $info;
         }
@@ -427,7 +427,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function del_condition($grpname, $field, $condition, $compare)
+    function delCondition($grpname, $field, $condition, $compare)
     {
         $grpname = strtolower($grpname);
         // Valid values for $compare won't need escaping, but it's free user input, so better be save:
@@ -454,7 +454,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
 
 
     // Make sure the GUEST group has an AND-combined extension.
-    function check_guest_group($gid)
+    function checkGuestGroup($gid)
     {
         $cond = $this->bot->db->select("SELECT op FROM #___security_flexible WHERE gid = " . $gid . " AND field = 'join'");
         if (empty($cond)) {
@@ -472,7 +472,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function show_faction()
+    function showFaction()
     {
         $grpname = strtolower(
             $this->bot->core("settings")
@@ -482,7 +482,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
         if ($gid == -1) {
             return "The setting ##highlight##Guest_Group##end## for the module ##highlight##Flexible_Security##end## isn't set " . "to an existing security group!";
         }
-        $this->check_guest_group($gid);
+        $this->checkGuestGroup($gid);
         $fact = $this->bot->db->select("SELECT op, compareto FROM #___security_flexible WHERE gid = " . $gid . " AND field = 'faction'");
         if (empty($fact)) {
             $mode = "exclude";
@@ -504,7 +504,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function change_faction($comp, $faction)
+    function changeFaction($comp, $faction)
     {
         $grpname = strtolower(
             $this->bot->core("settings")
@@ -514,7 +514,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
         if ($gid == -1) {
             return "The setting ##highlight##Guest_Group##end## for the module ##highlight##Flexible_Security##end## isn't set " . "to an existing security group!";
         }
-        $this->check_guest_group($gid);
+        $this->checkGuestGroup($gid);
         $this->bot->db->query("DELETE FROM #___security_flexible WHERE gid = " . $gid . " AND field = 'faction'");
         $this->bot->db->query("INSERT INTO #___security_flexible (gid, field, op, compareto) VALUES " . "(" . $gid . ", 'faction', '" . $comp . "', '" . $faction . "')");
         if ($comp == '=') {
@@ -529,7 +529,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function show_minlevel()
+    function showMinLevel()
     {
         $grpname = strtolower(
             $this->bot->core("settings")
@@ -539,7 +539,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
         if ($gid == -1) {
             return "The setting ##highlight##Guest_Group##end## for the module ##highlight##Flexible_Security##end## isn't set " . "to an existing security group!";
         }
-        $this->check_guest_group($gid);
+        $this->checkGuestGroup($gid);
         $mlvl = $this->bot->db->select("SELECT compareto FROM #___security_flexible WHERE gid = " . $gid . " AND field = " . "'level' AND op = '>='");
         if (empty($mlvl)) {
             $this->bot->db->query("DELETE FROM #___security_flexible WHERE gid = " . $gid . " AND field = 'level'");
@@ -555,7 +555,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
     }
 
 
-    function change_minlevel($newlevel)
+    function changeMinLevel($newlevel)
     {
         $grpname = strtolower(
             $this->bot->core("settings")
@@ -565,7 +565,7 @@ class FlexibleSecurityGUI extends BaseActiveModule
         if ($gid == -1) {
             return "The setting ##highlight##Guest_Group##end## for the module ##highlight##Flexible_Security##end## isn't set " . "to an existing security group!";
         }
-        $this->check_guest_group($gid);
+        $this->checkGuestGroup($gid);
         if ($newlevel < 1 || $newlevel > 220) {
             return "##error##Level must be between 1 and 220!##end##";
         }

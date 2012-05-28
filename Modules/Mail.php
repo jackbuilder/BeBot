@@ -48,7 +48,7 @@ class Mail extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        //$this -> register_event("cron", "12hour");
+        //$this -> registerEvent("cron", "12hour");
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("mail_message", "true") . "
 						(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -61,10 +61,10 @@ class Mail extends BaseActiveModule
 						message TEXT)"
         );
         //Register commands for this module
-        $this->register_command('all', 'mail', 'GUEST');
+        $this->registerCommand('all', 'mail', 'GUEST');
         //Register events for this module
-        $this->register_event("logon_notify");
-        $this->register_event('connect');
+        $this->registerEvent("logon_notify");
+        $this->registerEvent('connect');
         //Create settings
         $this->bot->core("settings")
             ->create("Mail", "Max_life_read", "6_months", "How long should a read message be kept?", "1_week;2_weeks;1_month;6_months;1_year;2_years");
@@ -84,10 +84,10 @@ class Mail extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $this->error->reset();
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'sub',
@@ -98,21 +98,21 @@ class Mail extends BaseActiveModule
         switch (ucfirst($com['sub'])) {
         case 'Delete':
             if ((isset($com['target'])) && (is_int(intval($com['target'])))) {
-                return ($this->mail_delete($name, $com['target']));
+                return ($this->mailDelete($name, $com['target']));
                 unset($com['target']); //We don't want to trigger the first check below.
             }
             //No break here as we want the list to be sent after deleting a message
         case '':
         case 'Read':
             if ((isset($com['target'])) && (is_int(intval($com['target'])))) {
-                return ($this->make_item_blob("Mail item {$com['target']}", $this->mail_read($name, $com['target'])));
+                return ($this->makeItemBlob("Mail item {$com['target']}", $this->mailRead($name, $com['target'])));
             }
             else {
-                return ($this->make_item_blob('Mail list', $this->mail_list($name)));
+                return ($this->makeItemBlob('Mail list', $this->mailList($name)));
             }
             break;
         case 'Send':
-            return ($this->mail_send($name, $com['target'], $com['message']));
+            return ($this->mailSend($name, $com['target'], $com['message']));
             break;
         default:
             //No matches. Sending usage information (Another useless comment)
@@ -123,17 +123,17 @@ class Mail extends BaseActiveModule
     }
 
 
-    //Re-declaring gc() so that users always get a reply in tells (We don't want to share all our mail with everyone)
-    function gc($name, $msg)
+    //Re-declaring sendToGuildChat() so that users always get a reply in tells (We don't want to share all our mail with everyone)
+    function sendToGuildChat($name, $msg)
     {
-        $this->tell($name, $msg);
+        $this->sendTell($name, $msg);
     }
 
 
-    //Re-declaring pgmsg() so that users always get a reply in tells (We don't want to share all our mail with everyone)
-    function pgmsg($name, $msg)
+    //Re-declaring sendToGroup() so that users always get a reply in tells (We don't want to share all our mail with everyone)
+    function sendToGroup($name, $msg)
     {
-        $this->tell($name, $msg);
+        $this->sendTell($name, $msg);
     }
 
 
@@ -145,9 +145,9 @@ class Mail extends BaseActiveModule
                 ->get($name, "Mail", "Logon_notification") == TRUE)
         ) {
             $mailbox = $this->bot->core("alts")->main($name);
-            $no_of_messages = $this->new_mail_count($mailbox);
+            $no_of_messages = $this->newMailCount($mailbox);
             if ($no_of_messages != 0) {
-                $this->bot->send_tell($name, $this->make_item_blob("You've got ##error##$no_of_messages##end## new messages.", $this->mail_list($name)));
+                $this->bot->send_tell($name, $this->makeItemBlob("You've got ##error##$no_of_messages##end## new messages.", $this->mailList($name)));
             }
         }
     }
@@ -165,7 +165,7 @@ class Mail extends BaseActiveModule
     }
 
 
-    function new_mail_count($mailbox)
+    function newMailCount($mailbox)
     {
         //Getting the number of new mail (obviously)
         $query = "SELECT COUNT(id) AS no_of_messages FROM #___mail_message WHERE mailbox='$mailbox' AND is_read=0";
@@ -179,7 +179,7 @@ class Mail extends BaseActiveModule
     }
 
 
-    function mail_list($user)
+    function mailList($user)
     {
         //Returns a window containing new and read mail
         $mailbox = $this->bot->core("alts")->main($user);
@@ -219,7 +219,7 @@ class Mail extends BaseActiveModule
     }
 
 
-    function mail_read($user, $id)
+    function mailRead($user, $id)
     {
         $mailbox = $this->bot->core("alts")->main($user);
         $window = "##yellow##:::##end## Mail for ##highlight##$user##end## ($mailbox) ##yellow##:::##end##<br><br>";
@@ -251,7 +251,7 @@ class Mail extends BaseActiveModule
     }
 
 
-    function mail_send($sender, $recipient, $message)
+    function mailSend($sender, $recipient, $message)
     {
         $recipient = ucfirst(strtolower($recipient));
         $mailbox = $this->bot->core("alts")->main($recipient);
@@ -285,7 +285,7 @@ class Mail extends BaseActiveModule
             }
             if (!empty($online)) {
                 foreach ($online as $send) {
-                    $this->bot->send_tell($send, $this->make_item_blob("You've just received a new message.", $this->mail_list($send)));
+                    $this->bot->send_tell($send, $this->makeItemBlob("You've just received a new message.", $this->mailList($send)));
                 }
             }
             return ("Message sent to $recipient ($mailbox).");
@@ -293,7 +293,7 @@ class Mail extends BaseActiveModule
     }
 
 
-    function mail_delete($name, $id)
+    function mailDelete($name, $id)
     {
         $mailbox = $this->bot->core("alts")->main($name);
         $query = "DELETE FROM #___mail_message WHERE id=$id AND mailbox='$mailbox'";
@@ -308,8 +308,8 @@ class Mail extends BaseActiveModule
     }
 
 
-    //Specialized make_blob to make ITEMREFs clickable.
-    function make_item_blob($title, $content)
+    //Specialized makeBlob to make ITEMREFs clickable.
+    function makeItemBlob($title, $content)
     {
         $content = str_replace("<botname>", $this->bot->botname, $content);
         $content = str_replace("<pre>", str_replace("\\", "", $this->bot->commpre), $content);

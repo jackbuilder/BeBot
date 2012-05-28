@@ -41,7 +41,7 @@ class ModuleControlGUI extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("tell", "modules", "OWNER");
+        $this->registerCommand("sendTell", "modules", "OWNER");
         $this->help['description'] = "Allows you to enable and disable modules.";
         $this->help['command']['modules'] = "Shows the GUI to enable and disable modules.";
         $this->help['notes'] = "Changes to the module loading only take effect after a restart of the bot.";
@@ -49,12 +49,12 @@ class ModuleControlGUI extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^modules$/i", $msg)) {
-            return $this->show_stuff();
+            return $this->showStuff();
         }
         elseif (preg_match("/^modules d ([a-z01-9._]+) ([a-z01-9._]+)$/i", $msg, $info)) {
             return $this->disable($name, $info[1], $info[2]);
@@ -72,7 +72,7 @@ class ModuleControlGUI extends BaseActiveModule
     /*
     Lists all module directories and available modules:
     */
-    function show_stuff()
+    function showStuff()
     {
         $sections = $this->bot->core("ini")->listSections();
         natcasesort($sections);

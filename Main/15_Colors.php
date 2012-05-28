@@ -55,8 +55,8 @@ class Colors_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("colors");
-        $this->register_event("cron", "1hour");
+        $this->registerModule("colors");
+        $this->registerEvent("cron", "1hour");
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("colors", "false") . " (
 						name varchar(25) NOT NULL default '',
@@ -75,102 +75,102 @@ class Colors_Core extends BasePassiveModule
         $this->startup = TRUE;
         $this->bot->core("settings")
             ->create("Color", "Theme", "Default", "What is the name of the theme file to use?", "", TRUE);
-        $this->define_color("aqua", "#00FFFF", FALSE);
-        $this->define_color("beige", "#FFE3A1", FALSE);
-        $this->define_color("black", "#000000", FALSE);
-        $this->define_color("blue", "#0000FF", FALSE);
-        $this->define_color("bluegray", "#8CB6FF", FALSE);
-        $this->define_color("bluesilver", "#9AD5D9", FALSE);
-        $this->define_color("brown", "#999926", FALSE);
-        $this->define_color("darkaqua", "#2299FF", FALSE);
-        $this->define_color("darklime", "#00A651", FALSE);
-        $this->define_color("darkorange", "#DF6718", FALSE);
-        $this->define_color("darkpink", "#FF0099", FALSE);
-        $this->define_color("forestgreen", "#66AA66", FALSE);
-        $this->define_color("fuchsia", "#FF00FF", FALSE);
-        $this->define_color("gold", "#CCAA44", FALSE);
-        $this->define_color("gray", "#808080", FALSE);
-        $this->define_color("green", "#008000", FALSE);
-        $this->define_color("lightbeige", "#FFFFC9", FALSE);
-        $this->define_color("lightfuchsia", "#FF63FF", FALSE);
-        $this->define_color("lightgray", "#D9D9D2", FALSE);
-        $this->define_color("lightgreen", "#00DD44", FALSE);
-        $this->define_color("brightgreen", "#00F000", FALSE);
-        $this->define_color("lightmaroon", "#FF0040", FALSE);
-        $this->define_color("lightteal", "#15E0A0", FALSE);
-        $this->define_color("dullteal", "#30D2FF", FALSE);
-        $this->define_color("lightyellow", "#DEDE42", FALSE);
-        $this->define_color("lime", "#00FF00", FALSE);
-        $this->define_color("maroon", "#800000", FALSE);
-        $this->define_color("navy", "#000080", FALSE);
-        $this->define_color("olive", "#808000", FALSE);
-        $this->define_color("orange", "#FF7718", FALSE);
-        $this->define_color("pink", "#FF8CFC", FALSE);
-        $this->define_color("purple", "#800080", FALSE);
-        $this->define_color("red", "#FF0000", FALSE);
-        $this->define_color("redpink", "#FF61A6", FALSE);
-        $this->define_color("seablue", "#6699FF", FALSE);
-        $this->define_color("seagreen", "#66FF99", FALSE);
-        $this->define_color("silver", "#C0C0C0", FALSE);
-        $this->define_color("tan", "#DDDD44", FALSE);
-        $this->define_color("teal", "#008080", FALSE);
-        $this->define_color("white", "#FFFFFF", FALSE);
-        $this->define_color("yellow", "#FFFF00", FALSE);
-        $this->define_color("omni", "#00ffff", FALSE);
-        $this->define_color("clan", "#ff9933", FALSE);
-        $this->define_color("neutral", "#ffffff", FALSE);
-        $this->define_scheme("ao", "admin", "pink", FALSE);
-        $this->define_scheme("ao", "cash", "gold", FALSE);
-        $this->define_scheme("ao", "ccheader", "white", FALSE);
-        $this->define_scheme("ao", "cctext", "lightgray", FALSE);
-        $this->define_scheme("ao", "clan", "brightgreen", FALSE);
-        $this->define_scheme("ao", "emote", "darkpink", FALSE);
-        $this->define_scheme("ao", "error", "red", FALSE);
-        $this->define_scheme("ao", "feedback", "yellow", FALSE);
-        $this->define_scheme("ao", "gm", "redpink", FALSE);
-        $this->define_scheme("ao", "infoheader", "lightgreen", FALSE);
-        $this->define_scheme("ao", "infoheadline", "tan", FALSE);
-        $this->define_scheme("ao", "infotext", "forestgreen", FALSE);
-        $this->define_scheme("ao", "infotextbold", "white", FALSE);
-        $this->define_scheme("ao", "megotxp", "yellow", FALSE);
-        $this->define_scheme("ao", "meheald", "bluegray", FALSE);
-        $this->define_scheme("ao", "mehitbynano", "white", FALSE);
-        $this->define_scheme("ao", "mehitother", "lightgray", FALSE);
-        $this->define_scheme("ao", "menubar", "lightteal", FALSE);
-        $this->define_scheme("ao", "misc", "white", FALSE);
-        $this->define_scheme("ao", "monsterhitme", "red", FALSE);
-        $this->define_scheme("ao", "mypet", "orange", FALSE);
-        $this->define_scheme("ao", "newbie", "seagreen", FALSE);
-        $this->define_scheme("ao", "news", "brightgreen", FALSE);
-        $this->define_scheme("ao", "none", "fuchsia", FALSE);
-        $this->define_scheme("ao", "npcchat", "bluesilver", FALSE);
-        $this->define_scheme("ao", "npcdescription", "yellow", FALSE);
-        $this->define_scheme("ao", "npcemote", "lightbeige", FALSE);
-        $this->define_scheme("ao", "npcooc", "lightbeige", FALSE);
-        $this->define_scheme("ao", "npcquestion", "lightgreen", FALSE);
-        $this->define_scheme("ao", "npcsystem", "red", FALSE);
-        $this->define_scheme("ao", "npctrade", "lightbeige", FALSE);
-        $this->define_scheme("ao", "otherhitbynano", "bluesilver", FALSE);
-        $this->define_scheme("ao", "otherpet", "darkorange", FALSE);
-        $this->define_scheme("ao", "pgroup", "white", FALSE);
-        $this->define_scheme("ao", "playerhitme", "red", FALSE);
-        $this->define_scheme("ao", "seekingteam", "seablue", FALSE);
-        $this->define_scheme("ao", "seekingteam", "seablue", FALSE);
-        $this->define_scheme("ao", "shout", "lightbeige", FALSE);
-        $this->define_scheme("ao", "skillcolor", "beige", FALSE);
-        $this->define_scheme("ao", "system", "white", FALSE);
-        $this->define_scheme("ao", "team", "seagreen", FALSE);
-        $this->define_scheme("ao", "tell", "aqua", FALSE);
-        $this->define_scheme("ao", "tooltip", "black", FALSE);
-        $this->define_scheme("ao", "tower", "lightfuchsia", FALSE);
-        $this->define_scheme("ao", "vicinity", "lightyellow", FALSE);
-        $this->define_scheme("ao", "whisper", "dullteal", FALSE);
+        $this->defineColor("aqua", "#00FFFF", FALSE);
+        $this->defineColor("beige", "#FFE3A1", FALSE);
+        $this->defineColor("black", "#000000", FALSE);
+        $this->defineColor("blue", "#0000FF", FALSE);
+        $this->defineColor("bluegray", "#8CB6FF", FALSE);
+        $this->defineColor("bluesilver", "#9AD5D9", FALSE);
+        $this->defineColor("brown", "#999926", FALSE);
+        $this->defineColor("darkaqua", "#2299FF", FALSE);
+        $this->defineColor("darklime", "#00A651", FALSE);
+        $this->defineColor("darkorange", "#DF6718", FALSE);
+        $this->defineColor("darkpink", "#FF0099", FALSE);
+        $this->defineColor("forestgreen", "#66AA66", FALSE);
+        $this->defineColor("fuchsia", "#FF00FF", FALSE);
+        $this->defineColor("gold", "#CCAA44", FALSE);
+        $this->defineColor("gray", "#808080", FALSE);
+        $this->defineColor("green", "#008000", FALSE);
+        $this->defineColor("lightbeige", "#FFFFC9", FALSE);
+        $this->defineColor("lightfuchsia", "#FF63FF", FALSE);
+        $this->defineColor("lightgray", "#D9D9D2", FALSE);
+        $this->defineColor("lightgreen", "#00DD44", FALSE);
+        $this->defineColor("brightgreen", "#00F000", FALSE);
+        $this->defineColor("lightmaroon", "#FF0040", FALSE);
+        $this->defineColor("lightteal", "#15E0A0", FALSE);
+        $this->defineColor("dullteal", "#30D2FF", FALSE);
+        $this->defineColor("lightyellow", "#DEDE42", FALSE);
+        $this->defineColor("lime", "#00FF00", FALSE);
+        $this->defineColor("maroon", "#800000", FALSE);
+        $this->defineColor("navy", "#000080", FALSE);
+        $this->defineColor("olive", "#808000", FALSE);
+        $this->defineColor("orange", "#FF7718", FALSE);
+        $this->defineColor("pink", "#FF8CFC", FALSE);
+        $this->defineColor("purple", "#800080", FALSE);
+        $this->defineColor("red", "#FF0000", FALSE);
+        $this->defineColor("redpink", "#FF61A6", FALSE);
+        $this->defineColor("seablue", "#6699FF", FALSE);
+        $this->defineColor("seagreen", "#66FF99", FALSE);
+        $this->defineColor("silver", "#C0C0C0", FALSE);
+        $this->defineColor("tan", "#DDDD44", FALSE);
+        $this->defineColor("teal", "#008080", FALSE);
+        $this->defineColor("white", "#FFFFFF", FALSE);
+        $this->defineColor("yellow", "#FFFF00", FALSE);
+        $this->defineColor("omni", "#00ffff", FALSE);
+        $this->defineColor("clan", "#ff9933", FALSE);
+        $this->defineColor("neutral", "#ffffff", FALSE);
+        $this->defineScheme("ao", "admin", "pink", FALSE);
+        $this->defineScheme("ao", "cash", "gold", FALSE);
+        $this->defineScheme("ao", "ccheader", "white", FALSE);
+        $this->defineScheme("ao", "cctext", "lightgray", FALSE);
+        $this->defineScheme("ao", "clan", "brightgreen", FALSE);
+        $this->defineScheme("ao", "emote", "darkpink", FALSE);
+        $this->defineScheme("ao", "error", "red", FALSE);
+        $this->defineScheme("ao", "feedback", "yellow", FALSE);
+        $this->defineScheme("ao", "gm", "redpink", FALSE);
+        $this->defineScheme("ao", "infoheader", "lightgreen", FALSE);
+        $this->defineScheme("ao", "infoheadline", "tan", FALSE);
+        $this->defineScheme("ao", "infotext", "forestgreen", FALSE);
+        $this->defineScheme("ao", "infotextbold", "white", FALSE);
+        $this->defineScheme("ao", "megotxp", "yellow", FALSE);
+        $this->defineScheme("ao", "meheald", "bluegray", FALSE);
+        $this->defineScheme("ao", "mehitbynano", "white", FALSE);
+        $this->defineScheme("ao", "mehitother", "lightgray", FALSE);
+        $this->defineScheme("ao", "menubar", "lightteal", FALSE);
+        $this->defineScheme("ao", "misc", "white", FALSE);
+        $this->defineScheme("ao", "monsterhitme", "red", FALSE);
+        $this->defineScheme("ao", "mypet", "orange", FALSE);
+        $this->defineScheme("ao", "newbie", "seagreen", FALSE);
+        $this->defineScheme("ao", "news", "brightgreen", FALSE);
+        $this->defineScheme("ao", "none", "fuchsia", FALSE);
+        $this->defineScheme("ao", "npcchat", "bluesilver", FALSE);
+        $this->defineScheme("ao", "npcdescription", "yellow", FALSE);
+        $this->defineScheme("ao", "npcemote", "lightbeige", FALSE);
+        $this->defineScheme("ao", "npcooc", "lightbeige", FALSE);
+        $this->defineScheme("ao", "npcquestion", "lightgreen", FALSE);
+        $this->defineScheme("ao", "npcsystem", "red", FALSE);
+        $this->defineScheme("ao", "npctrade", "lightbeige", FALSE);
+        $this->defineScheme("ao", "otherhitbynano", "bluesilver", FALSE);
+        $this->defineScheme("ao", "otherpet", "darkorange", FALSE);
+        $this->defineScheme("ao", "pgroup", "white", FALSE);
+        $this->defineScheme("ao", "playerhitme", "red", FALSE);
+        $this->defineScheme("ao", "seekingteam", "seablue", FALSE);
+        $this->defineScheme("ao", "seekingteam", "seablue", FALSE);
+        $this->defineScheme("ao", "shout", "lightbeige", FALSE);
+        $this->defineScheme("ao", "skillcolor", "beige", FALSE);
+        $this->defineScheme("ao", "system", "white", FALSE);
+        $this->defineScheme("ao", "team", "seagreen", FALSE);
+        $this->defineScheme("ao", "sendTell", "aqua", FALSE);
+        $this->defineScheme("ao", "tooltip", "black", FALSE);
+        $this->defineScheme("ao", "tower", "lightfuchsia", FALSE);
+        $this->defineScheme("ao", "vicinity", "lightyellow", FALSE);
+        $this->defineScheme("ao", "whisper", "dullteal", FALSE);
         // No tags cache created yet:
         $this->startup = FALSE;
         $this->no_tags = TRUE;
         $this->theme_info = "";
         $this->theme = array();
-        $this->create_color_cache();
+        $this->createColorCache();
     }
 
 
@@ -179,7 +179,7 @@ class Colors_Core extends BasePassiveModule
     */
     function cron()
     {
-        $this->create_color_cache();
+        $this->createColorCache();
     }
 
 
@@ -206,18 +206,18 @@ class Colors_Core extends BasePassiveModule
 
 
     // defines a new color:
-    function define_color($name, $code, $cache = TRUE)
+    function defineColor($name, $code, $cache = TRUE)
     {
         $this->bot->db->query("INSERT IGNORE INTO #___colors (name, code) VALUES ('" . mysql_real_escape_string($name) . "', '" . mysql_real_escape_string($code) . "')");
         if ($cache) {
             $this->no_tags = TRUE;
-            $this->create_color_cache();
+            $this->createColorCache();
         }
     }
 
 
     // defines a new color scheme:
-    function define_scheme($module, $scheme, $color_name, $cache = TRUE)
+    function defineScheme($module, $scheme, $color_name, $cache = TRUE)
     {
         $this->bot->db->query(
             "INSERT IGNORE INTO #___color_schemes" . " (module, name, color_code) VALUES ('" . mysql_real_escape_string($module) . "', '" . mysql_real_escape_string($scheme)
@@ -225,13 +225,13 @@ class Colors_Core extends BasePassiveModule
         );
         if ($cache) {
             $this->no_tags = TRUE;
-            $this->create_color_cache();
+            $this->createColorCache();
         }
     }
 
 
     // defines a new color scheme, using a new color (at least it's assumed that the color is new):
-    function define_color_scheme($module, $scheme, $color_name, $color_code)
+    function defineColorScheme($module, $scheme, $color_name, $color_code)
     {
         // first add color:
         $this->bot->db->query(
@@ -243,24 +243,24 @@ class Colors_Core extends BasePassiveModule
                 . "', '" . mysql_real_escape_string($color_name) . "')"
         );
         $this->no_tags = TRUE;
-        $this->create_color_cache();
+        $this->createColorCache();
     }
 
 
     // changes the color reference for a scheme:
-    function update_scheme($module, $scheme, $new_color_name)
+    function updateScheme($module, $scheme, $new_color_name)
     {
         $this->bot->db->query(
             "UPDATE #___color_schemes" . " SET color_code = '" . mysql_real_escape_string($new_color_name) . "' WHERE module = '" . mysql_real_escape_string($module)
                 . "' AND name = '" . mysql_real_escape_string($scheme) . "'"
         );
         $this->no_tags = TRUE;
-        $this->create_color_cache();
+        $this->createColorCache();
     }
 
 
     // Read scheme file in, update all schemes in the bot with new information out of the file
-    function read_scheme_file($filename)
+    function readSchemeFile($filename)
     {
         $theme_dir = "./themes/";
         // Make sure filename is valid
@@ -282,13 +282,13 @@ class Colors_Core extends BasePassiveModule
             }
         }
         $this->no_tags = TRUE;
-        $this->create_color_cache();
+        $this->createColorCache();
         return "Theme file " . $filename . " read, schemes updated!";
     }
 
 
     // Creates a scheme file containing all schemes in the bot table
-    function create_scheme_file($filename, $name)
+    function createSchemeFile($filename, $name)
     {
         $theme_dir = "./themes/";
         // Make sure filename is valid
@@ -331,7 +331,7 @@ class Colors_Core extends BasePassiveModule
 
 
     // Creates default theme file with given name
-    function create_theme_file($name)
+    function createThemeFile($name)
     {
         $theme_file[] = '<theme name="Default theme for BeBot" version="1.0" author="Alreadythere" link="">';
         $theme_file[] = '<color name="normal" color="lightyellow" />';
@@ -365,7 +365,7 @@ class Colors_Core extends BasePassiveModule
 
 
     // Reads the selected theme file. If the file doesn't exist it creates one with default colors
-    function read_theme()
+    function readTheme()
     {
         $theme_dir = "./themes/";
         // Security check, theme filename HAS to be all letters or numbers, otherwise dying here for security reasons!
@@ -380,7 +380,7 @@ class Colors_Core extends BasePassiveModule
             ->get("Color", "Theme") . ".colors.xml";
         // If theme file doesn't exist try to create it
         if (!is_file($theme_file_name)) {
-            $theme_file = $this->create_theme_file($theme_file_name);
+            $theme_file = $this->createThemeFile($theme_file_name);
         }
         else {
             $theme_file = file($theme_file_name);
@@ -422,7 +422,7 @@ class Colors_Core extends BasePassiveModule
 
 
     // caches all possible color tags in the $this -> color_tags() array:
-    function create_color_cache()
+    function createColorCache()
     {
         // Don't create the cache before the initialising is done!
         if ($this->startup) {
@@ -431,7 +431,7 @@ class Colors_Core extends BasePassiveModule
         $this->no_tags = FALSE;
         $this->color_tags = array();
         // Parse theme file
-        $this->read_theme();
+        $this->readTheme();
         // Create color tags for themes
         $theme_strings = array();
         foreach ($this->theme as $color => $colorcode) {
@@ -481,7 +481,7 @@ class Colors_Core extends BasePassiveModule
     function parse($text)
     {
         if ($this->no_tags) {
-            $this->create_color_cache();
+            $this->createColorCache();
         }
         // No replacing if no tags can be in the text
         if (strpos($text, "##") === FALSE) {
@@ -495,13 +495,13 @@ class Colors_Core extends BasePassiveModule
     }
 
 
-    function get_theme()
+    function getTheme()
     {
         return $this->theme;
     }
 
 
-    function check_theme($col)
+    function checkTheme($col)
     {
         return isset($this->theme[strtolower($col)]);
     }

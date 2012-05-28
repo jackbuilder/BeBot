@@ -41,9 +41,9 @@ class Countdown extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'countdown', 'MEMBER');
-        $this->register_alias("countdown", "cd");
-        $this->register_event("timer", "countdown");
+        $this->registerCommand('all', 'countdown', 'MEMBER');
+        $this->registerAlias("countdown", "cd");
+        $this->registerEvent("timer", "countdown");
         $classid = $this->bot->core("timer")
             ->create_timer_class("Countdown", "Notify class used for countdowns, only last 5secs are shown.");
         $nextid = $this->bot->core("timer")
@@ -59,7 +59,7 @@ class Countdown extends BaseActiveModule
         $nextid = $this->bot->core("timer")
             ->create_timer_class_entry($classid, $nextid, 5, "", "[##red##--------&gt; 5 &lt;-------##end##]");
         $this->bot->core("settings")
-            ->create("Countdown", "Channel", "both", "In which channel should a countdown be shown? In the channel of origin, or in both gc and pgmsg?", "both;gc;pgmsg;origin");
+            ->create("Countdown", "Channel", "both", "In which channel should a countdown be shown? In the channel of origin, or in both sendToGuildChat and sendToGroup?", "both;sendToGuildChat;sendToGroup;origin");
         $this->help['description'] = "A simple countdown plugin.";
         $this->help['command']['countdown'] = "Counts down to zero.";
         $this->help['notes'] = "<pre>cd is a synonym for <pre>countdown.";
@@ -82,9 +82,9 @@ class Countdown extends BaseActiveModule
 
 
     /*
-    This gets called on a msg in the privgroup with the command
+    This gets called on a msg in the privateGroup with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $ret = $this->bot->core("timer")
             ->add_timer(FALSE, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");

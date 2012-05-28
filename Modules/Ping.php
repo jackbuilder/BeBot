@@ -42,8 +42,8 @@ class ping extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->verify = array();
-        $this->register_command('all', 'ping', 'OWNER');
-        $this->register_command('all', 'tracert', 'OWNER');
+        $this->registerCommand('all', 'ping', 'OWNER');
+        $this->registerCommand('all', 'tracert', 'OWNER');
         $this->help['description'] = 'Runs a ping or trace route to chat server that the bot is currently running on.';
         $this->help['command']['ping'] = "Pings the current chat server and shows the result.";
         $this->help['command']['tracert'] = "Runs a trace route to the current chat server and shows the result.";
@@ -54,23 +54,23 @@ class ping extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^ping$/i", $msg)) {
-            return $this->ping_server();
+            return $this->pingServer();
         }
         else {
             if (preg_match("/^tracert$/i", $msg)) {
-                return $this->tracert_server();
+                return $this->traceRouteServer();
             }
         }
     }
 
 
-    function ping_server()
+    function pingServer()
     {
         $count = $this->bot->core("settings")->get("Ping", "PingCount");
-        $host = $this->select_dimension(); //Dimension we're on
+        $host = $this->selectDimension(); //Dimension we're on
         // replace bad chars
         $host = preg_replace("/[^A-Za-z0-9.-]/", "", $host);
         $count = preg_replace("/[^0-9]/", "", $count);
@@ -98,10 +98,10 @@ class ping extends BaseActiveModule
     }
 
 
-    function tracert_server()
+    function traceRouteServer()
     {
         $count = $this->bot->core("settings")->get("Ping", "PingCount");
-        $host = $this->select_dimension(); //Dimension we're on
+        $host = $this->selectDimension(); //Dimension we're on
         // replace bad chars
         $host = preg_replace("/[^A-Za-z0-9.-]/", "", $host);
         $count = preg_replace("/[^0-9]/", "", $count);
@@ -131,7 +131,7 @@ class ping extends BaseActiveModule
     /*
     Pick the correct dimention
     */
-    function select_dimension()
+    function selectDimension()
     {
         switch ($this->bot->dimension) {
         case 0:

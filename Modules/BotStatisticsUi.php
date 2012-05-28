@@ -38,17 +38,17 @@ class BotStatisticsUI extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "bots", "MEMBER");
+        $this->registerCommand("all", "bots", "MEMBER");
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $var = explode(" ", $msg, 2);
         $command = $var[0];
         switch ($var[0]) {
         case 'bots':
-            $reply = $this->check_bots($name, $origin, $var[1]);
+            $reply = $this->checkBots($name, $origin, $var[1]);
             if ($reply !== FALSE) {
                 Return ($reply);
             }
@@ -58,7 +58,7 @@ class BotStatisticsUI extends BaseActiveModule
     }
 
 
-    function check_bots($name, $origin, $msg)
+    function checkBots($name, $origin, $msg)
     {
         if (!$this->bot->accessallbots) {
             $msg = $this->bot->botname . " " . $this->bot->dimension;

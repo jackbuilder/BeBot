@@ -59,7 +59,7 @@ class Symb_sql extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot = &$bot;
-        $this->register_command("all", "symb", "GUEST");
+        $this->registerCommand("all", "symb", "GUEST");
         $this->help['description'] = "Advanced search for symbiants and pocket bosses.";
         $this->help['command']['symb <level>[-<level2>]'] = "Find symbs of QL level. If [-<level2>] is specified it finds symbs between the two";
         $this->help['command']['symb <slot>'] = "Finds symbiant for the given slot.";
@@ -101,9 +101,9 @@ class Symb_sql extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     {
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'args'

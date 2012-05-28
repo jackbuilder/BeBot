@@ -59,17 +59,17 @@ class Chuck extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "chuck", "MEMBER");
+        $this->registerCommand("all", "chuck", "MEMBER");
         $this->help['description'] = 'Pwnzor.';
         $this->help['command']['beer'] = "Pwnzors you!";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $output = "";
         if (preg_match("/^chuck$/i", $msg, $info)) {
-            $output = $this->get_chuck($name);
+            $output = $this->getChuck($name);
         }
         return $output;
     }
@@ -80,7 +80,7 @@ class Chuck extends BaseActiveModule
     */
     function irc($name, $msg)
     {
-        $returnstr = $this->get_chuck($name);
+        $returnstr = $this->getChuck($name);
         $this->bot->send_gc($returnstr);
         $this->bot->send_irc("", "", "3" . $returnstr);
     }
@@ -89,7 +89,7 @@ class Chuck extends BaseActiveModule
     /*
       Build response
     */
-    function get_chuck($name)
+    function getChuck($name)
     {
         $chuck = array(
             "Guns don't kill people. Chuck Norris kills People.",
@@ -105,7 +105,7 @@ class Chuck extends BaseActiveModule
             "Chuck Norris is my Homeboy.",
             "Chuck Norris doesn't go hunting.... CHUCK NORRIS GOES KILLING",
             "When Chuck Norris calls 1-900 numbers, he doesnt get charged. He holds up the phone and money falls out.",
-            "Chuck Norris once ate a whole cake before his friends could tell him there was a stripper in it.",
+            "Chuck Norris once ate a whole cake before his friends could sendTell him there was a stripper in it.",
             "Some people like to eat frogs' legs. Chuck Norris likes to eat lizard legs. Hence, snakes.",
             "There are no races, only countries of people Chuck Norris has beaten to different shades of black and blue.",
             "When Chuck Norris was denied an Egg McMuffin at McDonald's because it was 10:35, he roundhouse kicked the store so hard it became a Wendy's.",
@@ -208,7 +208,7 @@ class Chuck extends BaseActiveModule
             "Once you go Norris, you are physically unable to go back.",
             "Ninjas want to grow up to be just like Chuck Norris. But usually they grow up just to be killed by Chuck Norris.",
             "Chuck Norris once sued Burger King after they refused to put razor wire in his Whopper Jr, insisting that that actually is \"his\" way.",
-            "The last thing you hear before Chuck Norris gives you a roundhouse kick? No one knows because dead men tell no tales.",
+            "The last thing you hear before Chuck Norris gives you a roundhouse kick? No one knows because dead men sendTell no tales.",
             "Chuck Norris doesn't play god. Playing is for children.",
             "As a teen, Chuck Norris had sex with every nun in a convent tucked away in the hills of Tuscany. Nine months later the nuns gave birth to the 1972 Miami Dolphins, the only undefeated and untied team in professional football history.",
             "Chuck Norris is the only person in the world that can actually email a roundhouse kick.",
@@ -226,7 +226,7 @@ class Chuck extends BaseActiveModule
             "When J. Robert Oppenheimer said \"I am become death, the destroyer Of worlds\", He was not referring to the atomic bomb. He was referring to the Chuck Norris halloween costume he was wearing.",
             "Chuck Norris recently had the idea to sell his urine as a canned beverage. We know this beverage as Red Bull.",
             "In a recent survey it was discovered the 94% of American women lost their virginity to Chuck Norris. The other 6% were incredibly fat or ugly.",
-            "Chuck Norris invented a language that incorporates karate and roundhouse kicks. So next time Chuck Norris is kicking your ass, don�t be offended or hurt, he may be just trying to tell you he likes your hat.",
+            "Chuck Norris invented a language that incorporates karate and roundhouse kicks. So next time Chuck Norris is kicking your ass, don�t be offended or hurt, he may be just trying to sendTell you he likes your hat.",
             "If at first you don't succeed, you're not Chuck Norris.",
             "If Chuck Norris were a calendar, every month would be named Chucktober, and every day he'd kick your ass.",
             "Fear is not the only emotion Chuck Norris can smell. He can also detect hope, as in \"I hope I don't get a roundhouse kick from Chuck Norris.\"",

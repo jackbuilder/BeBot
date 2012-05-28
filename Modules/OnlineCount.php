@@ -43,8 +43,8 @@ class OnlineCounting extends BaseActiveModule
             ->define_scheme("counting", "number", "lightgray");
         $this->bot->core("colors")
             ->define_scheme("counting", "name", "forestgreen");
-        $this->register_command("all", "count", "GUEST");
-        $this->register_command("all", "check", "GUEST");
+        $this->registerCommand("all", "count", "GUEST");
+        $this->registerCommand("all", "check", "GUEST");
         if ($this->bot->game == "aoc") {
             $this->cp = "class";
         }
@@ -65,7 +65,7 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $type)
+    function commandHandler($name, $msg, $type)
     {
         if (preg_match("/^count$/i", $msg, $info)) {
             return $this->count_all();
@@ -74,25 +74,25 @@ class OnlineCounting extends BaseActiveModule
             return $this->count_all();
         }
         elseif (preg_match("/^count org$/i", $msg, $info)) {
-            return $this->count_org();
+            return $this->countOrg();
         }
         elseif (preg_match("/^count org (.*)$/i", $msg, $info)) {
-            return $this->count_org_members($info[1]);
+            return $this->countOrgMembers($info[1]);
         }
         elseif (preg_match("/^count (.*)$/i", $msg, $info)) {
             return $this->count($info[1]);
         }
         elseif (preg_match("/^check$/i", $msg, $info)) {
-            return $this->check_all();
+            return $this->checkAll();
         }
         elseif (preg_match("/^check all$/i", $msg, $info)) {
-            return $this->check_all();
+            return $this->checkAll();
         }
         elseif (preg_match("/^check org$/i", $msg, $info)) {
-            return $this->check_org();
+            return $this->checkOrg();
         }
         elseif (preg_match("/^check org (.*)$/i", $msg, $info)) {
-            return $this->check_org_members($info[1]);
+            return $this->checkOrgMembers($info[1]);
         }
         elseif (preg_match("/^check (.*)$/i", $msg, $info)) {
             return $this->check($info[1]);
@@ -100,13 +100,13 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function make_assist($assist, $title)
+    function makeAssist($assist, $title)
     {
-        return "<a href='chatcmd://" . implode(" \\n ", $assist) . "'>" . $title . "</a>";
+        return "<a href='chatCommand://" . implode(" \\n ", $assist) . "'>" . $title . "</a>";
     }
 
 
-    function get_org_members($orgname)
+    function getOrgMembers($orgname)
     {
         return $this->bot->db->select(
             "SELECT DISTINCT(t1.nickname), t2.level, t2.defender_rank_id" . " FROM " . $this->bot
@@ -116,7 +116,7 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function get_prof($prof)
+    function getProf($prof)
     {
         if ($prof == "") {
             $profsearch = "!= ''";
@@ -132,7 +132,7 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function get_orgs()
+    function getOrgs()
     {
         $innersql = "SELECT t2.org_name as org, COUNT(DISTINCT t1.nickname) AS count " . " FROM " . $this->bot
             ->core("online")
@@ -146,9 +146,9 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function make_org_assist($orgname)
+    function makeOrgAssist($orgname)
     {
-        $org = $this->get_org_members($orgname);
+        $org = $this->getOrgMembers($orgname);
         if (empty($org)) {
             return "";
         }
@@ -156,7 +156,7 @@ class OnlineCounting extends BaseActiveModule
         foreach ($org as $mem) {
             $assist[] = "/assist " . $mem[0];
         }
-        return $this->make_assist($assist, "Check " . $orgname);
+        return $this->makeAssist($assist, "Check " . $orgname);
     }
 
 
@@ -207,7 +207,7 @@ class OnlineCounting extends BaseActiveModule
             return $this->bot->core("colors")
                 ->colorize("counting_text", "No " . $prof . " in chat!");
         }
-        $profchars = $this->get_prof($prof);
+        $profchars = $this->getProf($prof);
         $first = 1;
         $retstr = $pcount[0][0] . " " . $prof . "s in chat: ";
         $strings = array();
@@ -225,9 +225,9 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function count_org()
+    function countOrg()
     {
-        $counts = $this->get_orgs();
+        $counts = $this->getOrgs();
         if (empty($counts)) {
             return $this->bot->core("colors")
                 ->colorize("counting_text", "Nobody online!");
@@ -251,7 +251,7 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function count_org_members($orgname)
+    function countOrgMembers($orgname)
     {
         $pcount = $this->bot->db->select(
             "SELECT COUNT(DISTINCT t1.nickname) FROM " . $this->bot
@@ -262,7 +262,7 @@ class OnlineCounting extends BaseActiveModule
             return $this->bot->core("colors")
                 ->colorize("counting_text", "No member of " . $prof . " in chat!");
         }
-        $profchars = $this->get_org_members($orgname);
+        $profchars = $this->getOrgMembers($orgname);
         $first = 1;
         $retstr = $pcount[0][0] . " member of " . $orgname . " in chat: ";
         $strings = array();
@@ -280,9 +280,9 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function check_all()
+    function checkAll()
     {
-        $online = $this->get_prof("");
+        $online = $this->getProf("");
         if (empty($online)) {
             return "Nobody online!";
         }
@@ -291,7 +291,7 @@ class OnlineCounting extends BaseActiveModule
             $assist[] = "/assist " . $mem[0];
         }
         return $this->bot->core("tools")
-            ->make_blob("Check all online", $this->make_assist($assist, "Check all online"));
+            ->make_blob("Check all online", $this->makeAssist($assist, "Check all online"));
     }
 
 
@@ -302,7 +302,7 @@ class OnlineCounting extends BaseActiveModule
         ) {
             return $prof;
         }
-        $profchars = $this->get_prof($prof);
+        $profchars = $this->getProf($prof);
         if (empty($profchars)) {
             return "No " . $prof . " in chat!";
         }
@@ -311,19 +311,19 @@ class OnlineCounting extends BaseActiveModule
             $assist[] = "/assist " . $mem[0];
         }
         return $this->bot->core("tools")
-            ->make_blob("Check " . $prof, $this->make_assist($assist, "Check " . $prof));
+            ->make_blob("Check " . $prof, $this->makeAssist($assist, "Check " . $prof));
     }
 
 
-    function check_org()
+    function checkOrg()
     {
-        $orgs = $this->get_orgs();
+        $orgs = $this->getOrgs();
         if (empty($orgs)) {
             return "Nobody online!";
         }
         $orgassist = array();
         foreach ($orgs as $org) {
-            $orgblob = $this->make_org_assist($org['org']);
+            $orgblob = $this->makeOrgAssist($org['org']);
             if ($orgblob != "") {
                 $orgassist[] = $orgblob;
             }
@@ -333,9 +333,9 @@ class OnlineCounting extends BaseActiveModule
     }
 
 
-    function check_org_members($orgname)
+    function checkOrgMembers($orgname)
     {
-        $blob = $this->make_org_assist($orgname);
+        $blob = $this->makeOrgAssist($orgname);
         if ($blob == "") {
             return "Nobody of " . $orgname . " online!";
         }

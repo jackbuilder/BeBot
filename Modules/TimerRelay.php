@@ -41,18 +41,18 @@ class TimerRelay extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("tell", "relaytimer", "SUPERADMIN");
-        $this->register_command("extpgmsg", "relaytimer", "MEMBER");
+        $this->registerCommand("sendTell", "relaytimer", "SUPERADMIN");
+        $this->registerCommand("externalPrivateGroupMessage", "relaytimer", "MEMBER");
     }
 
 
     function extpgmsg($pgroup, $name, $msg)
     {
-        $this->command_handler($pgroup, $msg, "extpgmsg");
+        $this->commandHandler($pgroup, $msg, "externalPrivateGroupMessage");
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if ($this->bot->core("settings")
             ->get('Relay', 'Status')
@@ -62,14 +62,14 @@ class TimerRelay extends BaseActiveModule
             ) == strtolower($name)
         ) {
             if (preg_match("/^relaytimer class:(.*) endtime:(.*) owner:(.*) repeat:(.*) channel:(.*) name:(.*)/$i", $msg, $info)) {
-                $this->add_timer($info[3], $info[2], $info[6], $info[1], $info[4], $info[5]);
+                $this->addTimer($info[3], $info[2], $info[6], $info[1], $info[4], $info[5]);
             }
         }
         return FALSE;
     }
 
 
-    function add_timer($owner, $endtime, $name, $class, $repeat, $channel)
+    function addTimer($owner, $endtime, $name, $class, $repeat, $channel)
     {
         $this->bot->core("timer")
             ->add_timer(TRUE, $owner, $endtime - time(), $name, $channel, $repeat, $class);

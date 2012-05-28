@@ -1,6 +1,6 @@
 <?php
 /*
-* whois-update.php - A script that updates the whois cache
+* whoIs-update.php - A script that updates the whoIs cache
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -38,7 +38,7 @@
 // Important values:
 $thistime = time(); // the current time, needed to remove old entries and set update time. DO NOT CHANGE THIS!
 $baseurl = "http://people.anarchy-online.com"; // The base URL for all roster queries
-$addons = "whois-update.addons";
+$addons = "whoisUpdate.addons";
 // Default values:
 $hours = 72;
 $delaytime = 10;
@@ -46,7 +46,7 @@ $do_unorged_users = FALSE;
 $delete_not_updated = FALSE;
 $show_org_names = TRUE;
 $show_character_names = FALSE;
-require ('whois-update.conf');
+require ('whoisUpdate.conf');
 // disable execution timeout:
 set_time_limit(0);
 
@@ -92,11 +92,11 @@ if (!extension_loaded("mysql")) {
 echo "Connecting to the database.\n\n";
 $link = mysql_connect($dbserver, $username, $password) or die("Could not connect : " . mysql_error());
 mysql_select_db($dbname) or die("Could not select database");
-// Get all org ids out of the whois table, get the org infos, and add/update all user:
+// Get all org ids out of the whoIs table, get the org infos, and add/update all user:
 $sqlquery = "SELECT org_id, org_name FROM (SELECT org_id, org_name, count(nickname) AS count FROM " . $tablename;
 $sqlquery .= " WHERE org_id != '' GROUP BY org_name) AS temp_whois ORDER BY count DESC;";
 $result = mysql_query($sqlquery) or die("Query failed : " . mysql_error());
-// simple counter, increased by one each time a get_site() call is made:
+// simple counter, increased by one each time a getSite() call is made:
 $httpqueries = 0;
 // same for REPLACE/UPDATE in db:
 $sqlquerycount = 0;
@@ -108,7 +108,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
     if ($show_org_names) {
         echo gmdate("H:i:s") . " - Querying roster for " . $orgid['org_name'] . " (" . $orgid['org_id'] . ")...\n";
     }
-    $org_cont = get_site($baseurl . "/org/stats/d/" . $dimension . "/name/" . $orgid['org_id'] . "/basicstats.xml", 0, 60, 60);
+    $org_cont = getSite($baseurl . "/org/stats/d/" . $dimension . "/name/" . $orgid['org_id'] . "/basicstats.xml", 0, 60, 60);
     $httpqueries++;
     if (!$org_cont) {
         echo "     Could not get roster for " . $orgid['org_name'] . " (" . $orgid['org_id'] . ")!\n";
@@ -116,8 +116,8 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
     }
     else {
         $starttime = time();
-        $orgname = mysql_real_escape_string(xmlparse($org_cont, "name"));
-        $orgfaction = xmlparse($org_cont, "side");
+        $orgname = mysql_real_escape_string(XmlParse($org_cont, "name"));
+        $orgfaction = XmlParse($org_cont, "side");
         $org = explode("<member>", $org_cont);
         if ($show_org_names) {
             echo "     Updating " . $orgname . " (" . $orgid['org_id'] . ")!";
@@ -125,20 +125,20 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
         // Parse members, $org[0] is no org member!
         for ($i = 1; $i < count($org); $i++) {
             $content = $org[$i];
-            $who["nickname"] = xmlparse($content, "nickname");
-            $who["firstname"] = mysql_real_escape_string(xmlparse($content, "firstname"));
-            $who["lastname"] = mysql_real_escape_string(xmlparse($content, "lastname"));
-            $who["level"] = xmlparse($content, "level");
-            $who["gender"] = xmlparse($content, "gender");
-            $who["breed"] = xmlparse($content, "breed");
-            $who["profession"] = xmlparse($content, "profession");
+            $who["nickname"] = XmlParse($content, "nickname");
+            $who["firstname"] = mysql_real_escape_string(XmlParse($content, "firstname"));
+            $who["lastname"] = mysql_real_escape_string(XmlParse($content, "lastname"));
+            $who["level"] = XmlParse($content, "level");
+            $who["gender"] = XmlParse($content, "gender");
+            $who["breed"] = XmlParse($content, "breed");
+            $who["profession"] = XmlParse($content, "profession");
             $who["faction"] = $orgfaction;
-            $who["rank"] = xmlparse($content, "rank_name");
-            $who["rank_id"] = xmlparse($content, "rank");
+            $who["rank"] = XmlParse($content, "rank_name");
+            $who["rank_id"] = XmlParse($content, "rank");
             $who["org"] = $orgname;
             $who["org_id"] = $orgid['org_id'];
-            $who["at_id"] = xmlparse($content, "defender_rank_id");
-            $who["pictureurl"] = xmlparse($content, "photo_url");
+            $who["at_id"] = XmlParse($content, "defender_rank_id");
+            $who["pictureurl"] = XmlParse($content, "photo_url");
             if (empty($who["nickname"])) {
                 echo "     Warning! Missing members nickname!\n";
                 $failedpersonlookup++;
@@ -186,7 +186,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
                                             else {
                                                 // INSERT new entries into DB, UPDATE existing ones:
                                                 $query = "INSERT INTO " . $tablename . " (nickname, firstname, lastname, level, gender, breed, faction,"
-                                                    . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('"
+                                                    . " profession, defender_rank_id, org_id, org_name, orgRank, orgRankId, pictureurl, updated)" . " VALUES ('"
                                                     . $who["nickname"]
                                                     . "', '"
                                                     . $who["firstname"]
@@ -201,7 +201,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
                                                     . "VALUES(lastname), level = VALUES(level), gender = VALUES(gender), breed = VALUES(breed), "
                                                     . "faction = VALUES(faction), profession = VALUES(profession), org_id = VALUES(org_id), "
                                                     . "defender_rank_id = VALUES(defender_rank_id), pictureurl = VALUES(pictureurl), updated = "
-                                                    . "VALUES(updated), org_name = VALUES(org_name), org_rank = VALUES(org_rank), org_rank_id = " . "VALUES(org_rank_id)";
+                                                    . "VALUES(updated), org_name = VALUES(org_name), orgRank = VALUES(orgRank), orgRankId = " . "VALUES(orgRankId)";
                                                 mysql_query($query) or die("Query failed : " . mysql_error());
                                                 $sqlquerycount++;
                                             }
@@ -215,7 +215,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
             }
         }
         // Unset all org entries that are still not updated but pointing to the current org id
-        $query = "UPDATE whois SET org_id = 0, org_name = '', updated = updated - 86400 WHERE org_id = " . $orgid['org_id'] . " AND updated < " . $thistime . " - 10";
+        $query = "UPDATE whoIs SET org_id = 0, org_name = '', updated = updated - 86400 WHERE org_id = " . $orgid['org_id'] . " AND updated < " . $thistime . " - 10";
         mysql_query($query) or die("Query failed : " . mysql_error());
 
         echo "     " . $i . " members completed in " . (time() - $starttime) . " seconds\n";
@@ -242,33 +242,33 @@ if ($do_unorged_users) {
         if ($show_character_names) {
             echo "Reading current stats for character " . $user['nickname'] . "...\n";
         }
-        $content_arr = get_site($baseurl . "/character/bio/d/" . $dimension . "/name/" . strtolower($user['nickname']) . "/bio.xml");
+        $content_arr = getSite($baseurl . "/character/bio/d/" . $dimension . "/name/" . strtolower($user['nickname']) . "/bio.xml");
         $httpqueries++;
         if ($content_arr) {
             $content = $content_arr;
-            $who["nick"] = xmlparse($content, "nick");
-            $who["firstname"] = mysql_real_escape_string(xmlparse($content, "firstname"));
-            $who["lastname"] = mysql_real_escape_string(xmlparse($content, "lastname"));
-            $who["level"] = xmlparse($content, "level");
-            $who["gender"] = xmlparse($content, "gender");
-            $who["breed"] = xmlparse($content, "breed");
-            $who["profession"] = xmlparse($content, "profession");
-            $who["faction"] = xmlparse($content, "faction");
-            $who["rank"] = xmlparse($content, "rank");
-            $who["rank_id"] = xmlparse($content, "rank_id");
+            $who["nick"] = XmlParse($content, "nick");
+            $who["firstname"] = mysql_real_escape_string(XmlParse($content, "firstname"));
+            $who["lastname"] = mysql_real_escape_string(XmlParse($content, "lastname"));
+            $who["level"] = XmlParse($content, "level");
+            $who["gender"] = XmlParse($content, "gender");
+            $who["breed"] = XmlParse($content, "breed");
+            $who["profession"] = XmlParse($content, "profession");
+            $who["faction"] = XmlParse($content, "faction");
+            $who["rank"] = XmlParse($content, "rank");
+            $who["rank_id"] = XmlParse($content, "rank_id");
             if ($who["rank_id"] == '') {
                 $who["rank_id"] = 0;
             }
-            $who["org"] = mysql_real_escape_string(xmlparse($content, "organization_name"));
-            $who["org_id"] = xmlparse($content, "organization_id");
+            $who["org"] = mysql_real_escape_string(XmlParse($content, "organization_name"));
+            $who["org_id"] = XmlParse($content, "organization_id");
             if ($who["org_id"] == '') {
                 $who["org_id"] = 0;
             }
-            $who["at"] = xmlparse($content, "defender_rank_id");
+            $who["at"] = XmlParse($content, "defender_rank_id");
             if ($who["at"] == '') {
                 $who["at"] = 0;
             }
-            $who["pictureurl"] = xmlparse($content, "pictureurl");
+            $who["pictureurl"] = XmlParse($content, "pictureurl");
             // make sure user info does exist, otherwise nick is empty!
             if ($who["nick"] != '') {
                 if ($show_character_names) {
@@ -277,7 +277,7 @@ if ($do_unorged_users) {
                 // add into DB:
                 $query = "UPDATE " . $tablename . " SET " . "firstname='" . $who["firstname"] . "', lastname='" . $who["lastname"] . "', level='" . $who["level"] . "', gender='"
                     . $who["gender"] . "', breed='" . $who["breed"] . "', faction='" . $who["faction"] . "', profession='" . $who["profession"] . "', defender_rank_id='"
-                    . $who["at"] . "', org_id='" . $who["org_id"] . "', org_name='" . $who["org"] . "', org_rank='" . $who["rank"] . "', org_rank_id='" . $who["rank_id"]
+                    . $who["at"] . "', org_id='" . $who["org_id"] . "', org_name='" . $who["org"] . "', orgRank='" . $who["rank"] . "', orgRankId='" . $who["rank_id"]
                     . "', updated='" . $thistime . "', pictureurl = '" . $who["pictureurl"] . "'" . " WHERE nickname='" . $who["nick"] . "';";
                 mysql_query($query) or die("Query failed : " . mysql_error());
                 $sqlquerycount++;
@@ -291,7 +291,7 @@ if ($do_unorged_users) {
 // What's the latest updated stamp for old outdated entries?
 $deletetime = $thistime - $hours * 3600;
 // Clean org infos on seriously outdated entries (using same value as for deleting):
-$query = "UPDATE whois SET org_id = 0, org_name = '' WHERE updated < " . $deletetime;
+$query = "UPDATE whoIs SET org_id = 0, org_name = '' WHERE updated < " . $deletetime;
 mysql_query($query) or die("Query failed : " . mysql_error());
 // Only delete non-updated entries if explicitly wished:
 if ($delete_not_updated) {
@@ -312,7 +312,7 @@ echo $orghttp . " http queries for org information done!\n";
 echo $httpqueries . " total http queries done!\n";
 echo $orgsql . " entries in database associated with an org modified!\n";
 echo $sqlquerycount . " entries in database modified!\n";
-echo $count['count'] . " entries in the whois cache!\n";
+echo $count['count'] . " entries in the whoIs cache!\n";
 echo $failedrosterlookup . " organization rosters could not be found!\n";
 echo $failedpersonlookup . " members had bad data and were not updated!\n";
 echo $orgmins . "min " . $orgsec . "sec runtime for org updates!\n";
@@ -324,16 +324,16 @@ if (file_exists($addons) && is_readable($addons)) {
 mysql_close($link);
 
 
-function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
+function getSite($url, $strip_headers = FALSE, $read_timeout = FALSE)
 {
     echo "     Fetching $url";
     $starttime = time();
 
     if (!function_exists('curl_init')) {
-        $return = get_site_sock($url, $strip_headers, $read_timeout);
+        $return = getSiteSock($url, $strip_headers, $read_timeout);
     }
     else {
-        $return = get_site_curl($url, $strip_headers, $read_timeout);
+        $return = getSiteCurl($url, $strip_headers, $read_timeout);
     }
 
     if ($return) {
@@ -346,9 +346,9 @@ function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
     return $return;
 }
 
-function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
+function getSiteSock($url, $strip_headers = FALSE, $read_timeout = FALSE)
 {
-    $return = get_site_data($url, $strip_headers, $read_timeout);
+    $return = getSiteData($url, $strip_headers, $read_timeout);
 
     if ($return['error']) {
         echo $return['errordesc'] . " Reason (" . $return['content'] . ")";
@@ -360,7 +360,7 @@ function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
 /*
     Gets the data from a URL
     */
-function get_site_data(
+function getSiteData(
     $url, $strip_headers = FALSE, $read_timeout = FALSE,
     $proxy = ''
 )
@@ -445,7 +445,7 @@ function get_site_data(
 }
 
 
-function get_site_curl(
+function getSiteCurl(
     $url, $strip_headers = FALSE, $timeout = FALSE,
     $post = NULL,
     $login = NULL
@@ -498,7 +498,7 @@ function get_site_curl(
 /*
     Parse XML crap
     */
-function xmlparse($xml, $tag)
+function XmlParse($xml, $tag)
 {
     $tmp = explode("<" . $tag . ">", $xml);
     if (!isset($tmp[1])) {

@@ -22,7 +22,7 @@ class base128varint
 
     /**
      * @param $number - number as decimal
-     *                Returns the base128 value of an dec value
+     *                Returns the base128 value of an decrypt value
      */
     public function set_value($number)
     {
@@ -69,7 +69,7 @@ class base128varint
 
 
     /**
-     * Returns the dec value of an base128
+     * Returns the decrypt value of an base128
      *
      * @param string bstring
      */

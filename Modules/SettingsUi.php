@@ -46,36 +46,36 @@ class SetConf extends BaseActiveModule
         $this->help['description'] = "Setting management interface.";
         $this->help['command']['settings'] = "Shows the settings interface";
         $this->help['command']['set <module> <setting> <value>'] = "Sets the setting <setting> for module <module> to <value>.";
-        $this->register_command("all", "settings", "SUPERADMIN");
-        $this->register_alias("settings", "set");
+        $this->registerCommand("all", "settings", "SUPERADMIN");
+        $this->registerAlias("settings", "set");
     }
 
 
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
-    sutible for output via send_tell, send_pmodule, and send_gc.
+    sutible for output via sendTell, send_pmodule, and sendGuildChat.
     */
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     { // Start function process_command()
         $msg = explode(" ", $msg, 4);
         Switch (count($msg)) {
         case 4:
-            return $this->change_setting($name, $msg[1], $msg[2], $msg[3]);
+            return $this->changeSetting($name, $msg[1], $msg[2], $msg[3]);
         case 3:
-            return $this->change_setting($msg[1], $msg[2], "");
+            return $this->changeSetting($msg[1], $msg[2], "");
         case 2:
-            return $this->show_module($msg[1]);
+            return $this->showModule($msg[1]);
         Default:
-            return $this->show_all_modules();
+            return $this->showAllModules();
         }
     } // End function process_command()
 
     /*
     Retruns a click window with the setting modules.
     */
-    function show_all_modules()
-    { // Start function show_all_modules()
+    function showAllModules()
+    { // Start function showAllModules()
         $sql = "SELECT DISTINCT module FROM #___settings WHERE hidden = FALSE ORDER BY module";
         $result = $this->bot->db->select($sql);
         if (empty($result)) {
@@ -90,13 +90,13 @@ class SetConf extends BaseActiveModule
         }
         return $this->bot->core("tools")
             ->make_blob("Settings groups for <botname>", $output);
-    } // End function show_all_modules()
+    } // End function showAllModules()
 
     /*
     Returns a click window with settings for a specific module.
     */
-    function show_module($module)
-    { // Start function show_module()
+    function showModule($module)
+    { // Start function showModule()
         $module = str_replace(" ", "_", $module); // FIXME: Do regexp right and shouldn't need this?
         $sql = "SELECT setting, value, datatype, longdesc, defaultoptions FROM #___settings ";
         $sql .= "WHERE module = '" . $module . "' AND hidden = FALSE ";
@@ -161,15 +161,15 @@ class SetConf extends BaseActiveModule
                 $inside .= $optionlinks . "\n\n";
             }
             else {
-                $inside .= "/tell <botname> <pre>set " . $module . " " . $setting[0] . " &lt;new value&gt;\n\n";
+                $inside .= "/sendTell <botname> <pre>set " . $module . " " . $setting[0] . " &lt;new value&gt;\n\n";
             }
         }
         return $this->bot->core("tools")
             ->make_blob("Settings for " . $module, $inside);
-    } // End fucnction show_module()
+    } // End fucnction showModule()
 
-    function change_setting($user, $module, $setting, $value)
-    { // Start function change_setting()
+    function changeSetting($user, $module, $setting, $value)
+    { // Start function changeSetting()
         $module = $this->bot->core("settings")->remove_space($module);
         $setting = $this->bot->core("settings")->remove_space($setting);
         if (!($this->bot->core("settings")->exists($module, $setting))) {
@@ -223,8 +223,8 @@ class SetConf extends BaseActiveModule
                     $value = "Off";
                 }
             }
-            return "Changed setting " . $setting . " for module " . $module . " to " . strval($value) . " [" . $this->show_module($module) . "]";
+            return "Changed setting " . $setting . " for module " . $module . " to " . strval($value) . " [" . $this->showModule($module) . "]";
         }
-    } // End function change_setting()
+    } // End function changeSetting()
 } // End of Class
 ?>

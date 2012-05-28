@@ -37,7 +37,7 @@
  * There are two kinds of flexible security groups: AND connected and OR connected ones.
  * The kind of group is defined by the field name of 'join', with op '&&' for AND and '||' for OR.
  * There must be exactly one 'join' entry per flexible group! 'join' entries don't need any compareto values.
- * Any other field name is used to compare with the returned values of the whois query on the user.
+ * Any other field name is used to compare with the returned values of the whoIs query on the user.
  *
  * A flexible security group is ALWAYS just an extension of an existing security group defined by the Security module.
  * The access level is linked via the GID entries.
@@ -61,24 +61,24 @@ class FlexibleSecurity_Core extends BasePassiveModule
 					compareto VARCHAR(100) NOT NULL DEFAULT ''
 				)"
         );
-        $this->register_module("flexible_security");
-        $this->register_event("cron", "6hour");
+        $this->registerModule("flexible_security");
+        $this->registerEvent("cron", "6hour");
         $this->cache = array();
         $this->querynames = array(
             'level' => 'level',
             'profession' => 'profession',
             'faction' => 'faction',
-            'rank_id' => 'org_rank_id',
+            'rank_id' => 'orgRankId',
             'org_id' => 'org_id',
             'at_id' => 'defender_rank_id'
         );
-        $this->update_table();
+        $this->updateTable();
         $this->enabled = FALSE;
-        $this->check_enable();
+        $this->checkEnable();
     }
 
 
-    function update_table()
+    function updateTable()
     {
         if ($this->bot->core("settings")
             ->exists("FlexibleSecurity", "SchemaVersion")
@@ -107,25 +107,25 @@ class FlexibleSecurity_Core extends BasePassiveModule
     }
 
 
-    // Clean cache periodically to react to changed in whois cache
+    // Clean cache periodically to react to changed in whoIs cache
     function cron()
     {
-        $this->clear_cache();
+        $this->clearCache();
     }
 
 
     // Clears the cache and checks if we need to enable flexible security, should be called everytime a flexible group gets modified in any way.
     // This means changes in the access levels via security GUI too!
-    function clear_cache()
+    function clearCache()
     {
         $this->cache = array();
-        $this->check_enable();
+        $this->checkEnable();
         // Clear cached security infos for mains in security module:
         $this->bot->core("security")->cache_mgr("del", "maincache", 0);
     }
 
 
-    function check_enable()
+    function checkEnable()
     {
         $result = $this->bot->db->select("SELECT * FROM #___security_flexible WHERE field = 'join'");
         $this->enabled = !empty($result);
@@ -133,7 +133,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
 
 
     // Returns the highest access level $player has due to flexible security groups if higher then $highest. Returns $highest otherwise.
-    function flexible_group_access($player, $highest)
+    function flexibleGroupAccess($player, $highest)
     {
         // If we have no rules active, save time, memory and resources.
         if (!$this->enabled) {
@@ -157,8 +157,8 @@ class FlexibleSecurity_Core extends BasePassiveModule
         if (empty($groups)) {
             return $highest;
         }
-        // Do a whois lookup on the character to be certain he is in the cache
-        $this->bot->core("whois")->lookup($player);
+        // Do a whoIs lookup on the character to be certain he is in the cache
+        $this->bot->core("whoIs")->lookup($player);
         // Go through the groups in descending order of access levels
         foreach ($groups as $group) {
             $gid = $group[0];
@@ -198,7 +198,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
                         $wherestring .= " " . $groupkind;
                     }
                 }
-                // Query the whois cache with the rules:
+                // Query the whoIs cache with the rules:
                 $ret = $this->bot->db->select("SELECT nickname FROM #___whois WHERE nickname = '" . $player . "' AND (" . $wherestring . ")");
                 // If we got a result $player is member of this group, cache result and return it
                 if (!empty($ret)) {

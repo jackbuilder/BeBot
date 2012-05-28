@@ -40,8 +40,8 @@ class MassMsg extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'announce', 'LEADER');
-        $this->register_command('all', 'massinv', 'LEADER');
+        $this->registerCommand('all', 'announce', 'LEADER');
+        $this->registerCommand('all', 'massinv', 'LEADER');
         $this->bot->core("queue")->register($this, "invite", 0.2, 5);
         $this->help['description'] = 'Sends out mass messages and invites.';
         $this->help['command']['announce <message>'] = "Sends out announcement <message> as tells to all online members.";
@@ -68,9 +68,9 @@ class MassMsg extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'args'
@@ -79,11 +79,11 @@ class MassMsg extends BaseActiveModule
         switch ($com['com']) {
         case 'announce':
             $this->bot->send_output($name, "Mass message being sent. Please stand by...", $origin);
-            return ($this->mass_msg($name, $com['args'], 'Message'));
+            return ($this->massMessage($name, $com['args'], 'Message'));
             break;
         case 'massinv':
             $this->bot->send_output($name, "Mass invite being sent. Please stand by...", $origin);
-            return ($this->mass_msg($name, $com['args'], 'Invite'));
+            return ($this->massMessage($name, $com['args'], 'Invite'));
             break;
         default:
             $this->bot->send_help($name);
@@ -91,7 +91,7 @@ class MassMsg extends BaseActiveModule
     }
 
 
-    function mass_msg($sender, $msg, $type)
+    function massMessage($sender, $msg, $type)
     {
         //get a list of online users in the configured channel.
         $users = $this->bot->core('online')->list_users(
@@ -174,7 +174,7 @@ class MassMsg extends BaseActiveModule
                         $status[$recipient]['pg'] = TRUE;
                     }
                     else {
-                        //Check if they've already gotten the tell so we don't spam unneccessarily.
+                        //Check if they've already gotten the sendTell so we don't spam unneccessarily.
                         if (!$status[$recipient]['sent']) {
                             $this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
                             $status[$recipient]['sent'] = TRUE;
@@ -194,11 +194,11 @@ class MassMsg extends BaseActiveModule
                 }
             }
         }
-        return ("Mass messages complete. " . $this->make_status_blob($status));
+        return ("Mass messages complete. " . $this->makeStatusBlob($status));
     }
 
 
-    function make_status_blob($status_array)
+    function makeStatusBlob($status_array)
     {
         $window = "<center>##blob_title##::: Status report for mass message :::##end##</center>\n";
         foreach ($status_array as $recipient => $status) {

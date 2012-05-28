@@ -54,9 +54,9 @@ class Roll extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'roll', 'GUEST');
-        $this->register_command('all', 'flip', 'GUEST');
-        $this->register_command('tell', 'verify', 'ANONYMOUS');
+        $this->registerCommand('all', 'roll', 'GUEST');
+        $this->registerCommand('all', 'flip', 'GUEST');
+        $this->registerCommand('sendTell', 'verify', 'ANONYMOUS');
         $this->help['description'] = 'Throws a dice and shows the result.';
         $this->help['command']['roll <min> <max> [item]']
             = "Rolls a number between <min> and <max> and shows the result. You can provide an optional [item] to record what the dice is being rolled for.";
@@ -68,11 +68,11 @@ class Roll extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 "com",
                 "args"
@@ -80,7 +80,7 @@ class Roll extends BaseActiveModule
         );
         switch ($com['com']) {
         case 'roll':
-            $args = $this->parse_com(
+            $args = $this->parseCommand(
                 $com['args'], array(
                     'min',
                     'max',
@@ -94,10 +94,10 @@ class Roll extends BaseActiveModule
             if (!isset($args['item'])) {
                 $args['item'] = "";
             }
-            return ($this->do_roll($name, $args['min'], $args['max'], $args['item']));
+            return ($this->doRoll($name, $args['min'], $args['max'], $args['item']));
             break;
         case 'flip':
-            return ($this->do_flip($name, $com['args']));
+            return ($this->doFlip($name, $com['args']));
             break;
         case 'verify':
             return ($this->verify($com['args']));
@@ -145,7 +145,7 @@ class Roll extends BaseActiveModule
     /*
     Starts the roll
     */
-    function do_roll($name, $min, $max, $item)
+    function doRoll($name, $min, $max, $item)
     {
         if (!isset($this->lastroll[$name])
             || ($this->lastroll[$name] < time() - $this->bot
@@ -186,7 +186,7 @@ class Roll extends BaseActiveModule
     /*
     Starts the flip
     */
-    function do_flip($name, $item)
+    function doFlip($name, $item)
     {
         if (!isset($this->lastroll[$name])
             || ($this->lastroll[$name] < time() - $this->bot

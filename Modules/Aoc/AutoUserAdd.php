@@ -45,15 +45,15 @@ class AutoUserAdd extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_event("gmsg", "org");
-        $this->register_module("autouseradd");
+        $this->registerEvent("groupMessage", "org");
+        $this->registerModule("autouseradd");
         $this->bot->core("settings")
             ->create("Autouseradd", "Enabled", TRUE, "Should users be added to the Bot?");
         $this->bot->core("settings")
             ->create("Autouseradd", "Notify", TRUE, "Should the User be Notified that he was added to the Bot?");
         // Fill checked array with current members, we won't need to readd them:
         $this->checked = array();
-        $mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = 2", MYSQL_ASSOC);
+        $mems = $this->bot->db->select("SELECT nickname FROM #___users WHERE userLevel = 2", MYSQL_ASSOC);
         if (!empty($mems)) {
             foreach ($mems as $mem) {
                 $this->checked[$mem['nickname']] = TRUE;
@@ -68,7 +68,7 @@ class AutoUserAdd extends BasePassiveModule
     }
 
 
-    function gmsg($name, $group, $msg)
+    function groupMessage($name, $group, $msg)
     {
         if (!$this->bot->core("settings")->get("Autouseradd", "Enabled")) {
             Return;
@@ -76,20 +76,20 @@ class AutoUserAdd extends BasePassiveModule
         // Add all characters when they are noticed in chat the first time:
         if (!isset($this->checked[$name])) {
             $this->checked[$name] = TRUE;
-            $result = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $name . "'");
+            $result = $this->bot->db->select("SELECT userLevel FROM #___users WHERE nickname = '" . $name . "'");
             if (!empty($result)) {
                 if ($result[0][0] != 2) {
-                    $this->add_user($name);
+                    $this->addUser($name);
                 }
             }
             else {
-                $this->add_user($name);
+                $this->addUser($name);
             }
         }
     }
 
 
-    function add_user($name)
+    function addUser($name)
     {
         if ($this->bot->core("settings")->get("Autouseradd", "Notify")) {
             $silent = 0;

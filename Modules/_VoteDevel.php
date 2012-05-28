@@ -70,11 +70,11 @@ class Vote extends BaseActiveModule
 							player VARCHAR(14),
 							option_id INT)"
         );
-        $this->register_command('all', 'vote', 'MEMBER');
-        $this->register_event("buddy");
-        $this->register_event('connect');
-        $this->register_event('disconnect');
-        $this->register_event('cron', '1hour');
+        $this->registerCommand('all', 'vote', 'MEMBER');
+        $this->registerEvent("buddy");
+        $this->registerEvent('connect');
+        $this->registerEvent('disconnect');
+        $this->registerEvent('cron', '1hour');
         $this->bot->core("settings")
             ->create('Vote', 'New', 'ADMIN', 'Who should be able to start new votes', 'GUEST;MEMBER;LEADER;ADMIN;SUPERADMIN;OWNER');
         $this->bot->core("settings")
@@ -106,7 +106,7 @@ class Vote extends BaseActiveModule
     $msg: The actual message, including command prefix and all
     $type: The channel the message arrived from. 1 Being tells, 2 being private groupm 3 being guildchat
     */
-    function command_handler($source, $msg, $type)
+    function commandHandler($source, $msg, $type)
     {
         $vars = explode(' ', strtolower($msg));
         //Source should always be the main of the character executing the command.
@@ -118,54 +118,54 @@ class Vote extends BaseActiveModule
         case 'vote':
             switch ($subcom) {
             case '':
-                return $this->vote_interface($source);
+                return $this->voteInterface($source);
                 break;
             case 'show':
-                return $this->vote_interface($source, $vars[2]);
+                return $this->voteInterface($source, $vars[2]);
                 break;
             case 'all':
-                return $this->vote_interface($source, 'all');
+                return $this->voteInterface($source, 'all');
                 break;
             case 'cast':
                 $vote_no = $vars[2];
                 $option_no = $vars[3];
-                return $this->cast_vote($source, $vote_no, $option_no);
+                return $this->castVote($source, $vote_no, $option_no);
                 break;
             case 'new':
-                return $this->new_vote($source, implode(' ', $vars));
+                return $this->newVote($source, implode(' ', $vars));
                 break;
             case 'restrict':
                 $vote_no = $vars[2];
                 unset($vars[2]);
-                return $this->restrict_vote($source, $vote_no, implode(' ', $vars));
+                return $this->restrictVote($source, $vote_no, implode(' ', $vars));
                 break;
             case 'addopt':
                 $vote_no = $vars[2];
                 unset($vars[2]);
-                return $this->add_option($source, $vote_no, implode(' ', $vars));
+                return $this->addOption($source, $vote_no, implode(' ', $vars));
                 break;
             case 'delopt':
                 $option_id = $vars[2];
                 unset($vars[2]);
-                return $this->del_option($source, implode(' ', $vars));
+                return $this->delOption($source, implode(' ', $vars));
                 break;
             case 'edit':
                 $option_no = $vars[2];
                 unset($vars[2]);
-                return $this->edit_option($source, $option_no, implode(' ', $vars));
+                return $this->editOption($source, $option_no, implode(' ', $vars));
                 break;
             case 'time':
                 $vote_no = $vars[2];
                 unset($vars[2]);
-                return $this->set_time($source, $vote_no, implode(' ', $vars));
+                return $this->setTime($source, $vote_no, implode(' ', $vars));
                 break;
             case 'start':
                 $vote_no = $vars[2];
-                return $this->start_vote($source, $vote_no);
+                return $this->startVote($source, $vote_no);
                 break;
             case 'end':
                 $vote_no = $vars[2];
-                return $this->end_vote($source, $vote_no);
+                return $this->endVote($source, $vote_no);
                 break;
             default:
                 return $this->bot->send_help($source, 'vote');
@@ -173,7 +173,7 @@ class Vote extends BaseActiveModule
             break;
         default:
             // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
-            // $this -> bot -> send_output($source, $text, $type) will send $text to $source by tell if $type is 1 (tell) or to the apropriate channel if $type is 2 or 3.
+            // $this -> bot -> sendOutput($source, $text, $type) will send $text to $source by sendTell if $type is 1 (sendTell) or to the apropriate channel if $type is 2 or 3.
             $this->bot->send_output($source, "Broken plugin, received unhandled command: $command", $type);
         }
     }
@@ -198,7 +198,7 @@ class Vote extends BaseActiveModule
         $query = "SELECT id FROM #___votes WHERE endtime > $now AND endtime <> 0";
         if ($votes = $this->bot->db->select($query, MYSQL_ASSOC)) {
             foreach ($votes as $vote) {
-                $this->end_vote($this->bot->name, $vote['id']);
+                $this->endVote($this->bot->name, $vote['id']);
             }
         }
     }
@@ -225,7 +225,7 @@ class Vote extends BaseActiveModule
     /*
     Custom functions go below here
     */
-    function new_vote($name, $description)
+    function newVote($name, $description)
     {
         //Check that we haven't got an empty description
         if (!empty($description)) {
@@ -258,7 +258,7 @@ class Vote extends BaseActiveModule
                 }
             }
             //Show vote interface for the new vote.
-            return $this->vote_interface($name, $vote_id);
+            return $this->voteInterface($name, $vote_id);
         }
         else {
             return ("##error##You need to specify a description for your vote.##end##");
@@ -266,27 +266,27 @@ class Vote extends BaseActiveModule
     }
 
 
-    function add_option($name, $vote_no, $description)
+    function addOption($name, $vote_no, $description)
     {
         //Check if this person is allowed to add options to this vote
         $query = "INSERT vote_id,description INTO #___vote_options VALUES($vote_no, '$description')";
     }
 
 
-    function del_option($name, $option_id)
+    function delOption($name, $option_id)
     {
         //Check if this person is allowed to add options to this vote
         $query = "DELETE FROM #___vote_options WHERE id=$option_id";
     }
 
 
-    function edit_option($name, $option_no, $newdescription)
+    function editOption($name, $option_no, $newdescription)
     {
         $query = "UPDATE #___vote_options SET description='$newdescription' WHERE id=$option_id";
     }
 
 
-    function set_time($name, $vote_no, $time)
+    function setTime($name, $vote_no, $time)
     {
         $timestamp = strtotime($time);
         if (($timestamp === FALSE) or ($timestamp === -1)) {
@@ -298,7 +298,7 @@ class Vote extends BaseActiveModule
     }
 
 
-    function restrict_vote($name, $vote_no, $level = FALSE)
+    function restrictVote($name, $vote_no, $level = FALSE)
     {
         if ($level === FALSE) {
             //Show a list of ranks as listed in $this -> bot -> core("security") -> cache[orgranks] and guest, member, leader. admin.
@@ -309,7 +309,7 @@ class Vote extends BaseActiveModule
     }
 
 
-    function start_vote($name, $vote_no)
+    function startVote($name, $vote_no)
     {
         //Check that the person attempting to start the vote is the person that created it.
         $query = "SELECT * FROM #___votes WHERE id = $voteno and votestarter = '$name'";
@@ -318,11 +318,11 @@ class Vote extends BaseActiveModule
         //Set started to true (1)
         $query = "UPDATE #___votes SET started = true WHERE id = $voteno";
         //Return the vote interface
-        return $this->vote_interface($name, $vote_no);
+        return $this->voteInterface($name, $vote_no);
     }
 
 
-    function end_vote($name, $vote_id)
+    function endVote($name, $vote_id)
     {
         $query = "SELECT vote_starter, started from #___votes WHERE id = $vote_id";
         if ($vote = $this->bot->db->select($query)) {
@@ -367,7 +367,7 @@ class Vote extends BaseActiveModule
     }
 
 
-    function cast_vote($name, $vote_no, $option_no)
+    function castVote($name, $vote_no, $option_no)
     {
         //Check that this vote has not ended
         $query = $this->bot->db->select("SELECT * FROM #___votes WHERE id = $vote_no AND endtime > -1");
@@ -391,7 +391,7 @@ class Vote extends BaseActiveModule
     }
 
 
-    function vote_interface($name, $vote = FALSE)
+    function voteInterface($name, $vote = FALSE)
     {
         if ($vote === FALSE) {
             //Get the highest rank of this players toons
@@ -407,7 +407,7 @@ class Vote extends BaseActiveModule
                     $ballots = $this->bot->db->select($query, MYSQL_ASSOC);
                     if (empty($ballots)) {
                         //Add the vote to the list of votes to show.
-                        $window .= "{$vote['id']}: <a href='chat:///tell <botname> <pre>vote show {$vote['id']}'>{$vote['description']}</a><br>";
+                        $window .= "{$vote['id']}: <a href='chat:///sendTell <botname> <pre>vote show {$vote['id']}'>{$vote['description']}</a><br>";
                     }
                 }
                 return $this->bot->core("tools")

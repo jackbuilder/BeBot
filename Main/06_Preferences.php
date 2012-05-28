@@ -55,14 +55,14 @@ class Preferences_core extends BasePassiveModule
         $query .= 'owner BIGINT, ';
         $query .= 'value VARCHAR(25))';
         $this->bot->db->query($query);
-        $this->register_event('connect'); //Cache all defaults on connect.
-        $this->register_event("buddy"); //Cache Throw out cache on logout
-        $this->register_module('prefs');
-        $this->update_table();
+        $this->registerEvent('connect'); //Cache all defaults on connect.
+        $this->registerEvent("buddy"); //Cache Throw out cache on logout
+        $this->registerModule('prefs');
+        $this->updateTable();
     }
 
 
-    function update_table()
+    function updateTable()
     {
         if ($this->bot->db->get_version("preferences_def") == 2 and $this->bot->db->get_version("preferences") == 2) {
             return;
@@ -72,7 +72,7 @@ class Preferences_core extends BasePassiveModule
         case 1:
             $this->bot->db->update_table("preferences_def", "access", "drop", "ALTER TABLE #___preferences_def DROP access");
             $this->bot->db->set_version("preferences_def", 2);
-            $this->update_table();
+            $this->updateTable();
             return;
         default:
             break;
@@ -82,7 +82,7 @@ class Preferences_core extends BasePassiveModule
         case 1:
             $this->bot->db->update_table("preferences", "owner", "alter", "ALTER TABLE #___preferences MODIFY owner BIGINT NOT NULL");
             $this->bot->db->set_version("preferences", 2);
-            $this->update_table();
+            $this->updateTable();
             return;
         default:
             break;
@@ -186,7 +186,7 @@ class Preferences_core extends BasePassiveModule
 
     function get($name, $module = FALSE, $setting = FALSE)
     {
-        //Check if $name is already a uid.
+        //Check if $name is already a userId.
         if (is_numeric($name)) {
             $uid = $name;
         }
@@ -268,7 +268,7 @@ class Preferences_core extends BasePassiveModule
     /*
     Changes the default value of a preference
     */
-    function change_default($name, $module, $setting, $value)
+    function changeDefault($name, $module, $setting, $value)
     {
         $module = strtolower($module);
         $setting = strtolower($setting);
@@ -299,7 +299,7 @@ class Preferences_core extends BasePassiveModule
     }
 
 
-    function show_modules($name)
+    function showModules($name)
     {
         $list = $this->bot->core("prefs")->get($name);
         $list = array_keys($list);
@@ -311,7 +311,7 @@ class Preferences_core extends BasePassiveModule
     }
 
 
-    function show_prefs($name, $module, $defaults = TRUE)
+    function showPrefs($name, $module, $defaults = TRUE)
     {
         //Show preferences for the given module
         //Grab some values from the definitions
@@ -341,7 +341,7 @@ class Preferences_core extends BasePassiveModule
                 //Check if user is able to set this value as default
                 if ($defaults
                     && $this->bot->core('access_control')
-                        ->check_rights($name, 'preferences', 'preferences default', 'tell')
+                        ->check_rights($name, 'preferences', 'preferences default', 'sendTell')
                 ) {
                     //Check if this is the current default
                     if ($option == $preference['default_value']) {

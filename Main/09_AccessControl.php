@@ -72,8 +72,8 @@ class AccessControl_Core extends BasePassiveModule
 				)"
         );
         $this->startup = TRUE;
-        $this->register_module("access_control");
-        $this->register_event("cron", "1hour");
+        $this->registerModule("access_control");
+        $this->registerEvent("cron", "1hour");
         $this->bot->core("settings")
             ->create(
             "AccessControl", "DefaultLevel", "SUPERADMIN",
@@ -84,7 +84,7 @@ class AccessControl_Core extends BasePassiveModule
             ->create("AccessControl", "LockGc", FALSE, "Are all commands in the guild chat locked from use?", "On;Off", TRUE);
         $this->bot->core("settings")
             ->create("AccessControl", "LockPgroup", FALSE, "Are all commands in the private chatgroup locked from use?", "On;Off", TRUE);
-        $this->update_table();
+        $this->updateTable();
         $this->access_levels = array(
             'ANONYMOUS',
             'GUEST',
@@ -107,17 +107,17 @@ class AccessControl_Core extends BasePassiveModule
         );
         $this->deny_levels = array('DISABLED');
         $this->channels = array(
-            "tell",
-            "pgmsg",
-            "gc",
-            "extpgmsg",
+            "sendTell",
+            "sendToGroup",
+            "sendToGuildChat",
+            "externalPrivateGroupMessage",
             "all"
         );
-        $this->create_access_cache();
+        $this->createAccessCache();
     }
 
 
-    function update_table()
+    function updateTable()
     {
         if ($this->bot->core("settings")
             ->exists("accesscontrol", "schemaversion")
@@ -159,13 +159,13 @@ class AccessControl_Core extends BasePassiveModule
         if ($this->startup) {
             $this->startup = FALSE;
             // The 2/3 channels:
-            $channel[0] = "tell";
-            $channel[1] = "pgmsg";
-            $channel[2] = "extpgmsg";
+            $channel[0] = "sendTell";
+            $channel[1] = "sendToGroup";
+            $channel[2] = "externalPrivateGroupMessage";
             $channelcount = 3;
             if ($this->bot->guildbot) {
                 $channelcount++;
-                $channel[3] = "gc";
+                $channel[3] = "sendToGuildChat";
             }
             // Set default access where needed:
             for ($i = 0; $i < $channelcount; $i++) {
@@ -185,13 +185,13 @@ class AccessControl_Core extends BasePassiveModule
             }
         }
         // Re-Create the access_cache:
-        $this->create_access_cache();
+        $this->createAccessCache();
         $this->bot->core("help")->update_cache();
     }
 
 
     // Creates the cache for all access rights to commands:
-    function create_access_cache()
+    function createAccessCache()
     {
         $this->access_cache = array();
         $access_rights = $this->bot->db->select("SELECT * FROM #___access_control");
@@ -206,7 +206,7 @@ class AccessControl_Core extends BasePassiveModule
 
 
     // Does the innermost check for access rights
-    function do_check($user, $command, $subcommand, $channel)
+    function doCheck($user, $command, $subcommand, $channel)
     {
         // If disabled or delted, return false, as no access is allowed
         if (in_array($this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)], $this->deny_levels)) {
@@ -221,13 +221,13 @@ class AccessControl_Core extends BasePassiveModule
 
 
     // Checks if $user is allowed to use $command in the $channel, true if yes, false if no.
-    function check_rights($user, $command, $msg, $channel)
+    function checkRights($user, $command, $msg, $channel)
     {
-        // Check for locks in gc or pgmsg first:
-        if (($channel == "gc"
+        // Check for locks in sendToGuildChat or sendToGroup first:
+        if (($channel == "sendToGuildChat"
             && $this->bot->core("settings")
                 ->get("AccessControl", "LockGc"))
-            || ($channel == "pgmsg"
+            || ($channel == "sendToGroup"
                 && $this->bot
                     ->core("settings")->get("AccessControl", "LockPgroup"))
         ) {
@@ -238,11 +238,11 @@ class AccessControl_Core extends BasePassiveModule
             // No subcommand, check if special "only command" entry exists, otherwise fall back on
             // general entry for command if that exists.
             if (isset($this->access_cache[strtolower($command)]['$'][strtolower($channel)])) {
-                return $this->do_check($user, $command, '$', $channel);
+                return $this->doCheck($user, $command, '$', $channel);
             }
             // Check general entry:
             if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
-                return $this->do_check($user, $command, '*', $channel);
+                return $this->doCheck($user, $command, '*', $channel);
             }
             // No entry for command at all, deny access:
             return FALSE;
@@ -254,7 +254,7 @@ class AccessControl_Core extends BasePassiveModule
             // Check only general entry then:
             if (strcmp($parts[1], "*") == 0 || strcmp($parts[1], "$") == 0) {
                 if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
-                    return $this->do_check($user, $command, '*', $channel);
+                    return $this->doCheck($user, $command, '*', $channel);
                 }
                 else {
                     // No access level defined, deny access on default:
@@ -265,12 +265,12 @@ class AccessControl_Core extends BasePassiveModule
             if (isset($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)])) {
                 // Make sure the access control entry for this subcommand is not deleted
                 if ($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)] != 'DELETED') {
-                    return $this->do_check($user, $command, $parts[1], $channel);
+                    return $this->doCheck($user, $command, $parts[1], $channel);
                 }
             }
             // Otherwise check if general entry for $command exists, then use that:
             if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
-                return $this->do_check($user, $command, '*', $channel);
+                return $this->doCheck($user, $command, '*', $channel);
             }
             // No fitting entry exists, deny access:
             return FALSE;
@@ -280,7 +280,7 @@ class AccessControl_Core extends BasePassiveModule
 
     // Updates the access level for a command or sets it the first time if not yet existing.
     // If the setting exists it will ALWAYS be overwriten. To add default rights use the create() function below.
-    function update_access($command, $channel, $newlevel)
+    function updateAccess($command, $channel, $newlevel)
     {
         $command = strtolower($command);
         $channel = strtolower($channel);
@@ -302,8 +302,8 @@ class AccessControl_Core extends BasePassiveModule
 
 
     // Creates default rights for a command. This function never changes any existing access levels.
-    // Warning: different order of variables from update_access(), but more in line with a command definition.
-    // $channel = "all" means set default rights for all channels (gc, pgmsg, tell). You always have to set explicit rights for extpgmsg
+    // Warning: different order of variables from updateAccess(), but more in line with a command definition.
+    // $channel = "all" means set default rights for all channels (sendToGuildChat, sendToGroup, sendTell). You always have to set explicit rights for externalPrivateGroupMessage
     function create($channel, $command, $defaultlevel)
     {
         $command = strtolower($command);
@@ -321,9 +321,9 @@ class AccessControl_Core extends BasePassiveModule
         }
         if ($channel == "all") {
             $chans = array(
-                "tell",
-                "pgmsg",
-                "gc"
+                "sendTell",
+                "sendToGroup",
+                "sendToGuildChat"
             );
             foreach ($chans as $chan) {
                 // Add the default level if no entry for the channel/command combination exists yet:
@@ -388,8 +388,8 @@ class AccessControl_Core extends BasePassiveModule
 
     // Creates default rights for a command $command with subcommand $sub in channel $channel.
     // This function never changes any existing access levels. It never accepts the general subcommand *.
-    // $channel = "all" means set default rights for all channels (gc, pgmsg, tell). You always have to set explicit rights for extpgmsg
-    function create_subcommand($channel, $command, $sub, $defaultlevel)
+    // $channel = "all" means set default rights for all channels (sendToGuildChat, sendToGroup, sendTell). You always have to set explicit rights for externalPrivateGroupMessage
+    function createSubcommand($channel, $command, $sub, $defaultlevel)
     {
         $command = strtolower($command);
         $sub = strtolower($sub);
@@ -410,15 +410,15 @@ class AccessControl_Core extends BasePassiveModule
         if ($sub == "*") {
             $this->bot->log(
                 "ACCESS", "ERROR",
-                "You cannot set access levels for the general subcommand * " . "using the create_subcommand() function! Use create() for that! Command " . $command . "!"
+                "You cannot set access levels for the general subcommand * " . "using the createSubcommand() function! Use create() for that! Command " . $command . "!"
             );
             return;
         }
         if ($channel == "all") {
             $chans = array(
-                "tell",
-                "pgmsg",
-                "gc"
+                "sendTell",
+                "sendToGroup",
+                "sendToGuildChat"
             );
             foreach ($chans as $chan) {
                 // Add the default level if no entry for the channel/command combination exists yet:
@@ -452,10 +452,10 @@ class AccessControl_Core extends BasePassiveModule
         $count = 0;
         $countsub = 0;
         $cshort = array(
-            "tell" => "t",
-            "gc" => "g",
-            "pgmsg" => "p",
-            "extpgmsg" => "e"
+            "sendTell" => "t",
+            "sendToGuildChat" => "g",
+            "sendToGroup" => "p",
+            "externalPrivateGroupMessage" => "e"
         );
         $lshort = array(
             "ANONYMOUS" => "AN",
@@ -483,11 +483,11 @@ class AccessControl_Core extends BasePassiveModule
                     }
                 }
                 if (!empty($chans)) {
-                    if ($chans["tell"] && $chans["tell"] == $chans["gc"] && $chans["tell"] == $chans["pgmsg"] && !$chans["extpgmsg"]) {
-                        $chan[] = "a," . $lshort[$chans["tell"]];
+                    if ($chans["sendTell"] && $chans["sendTell"] == $chans["sendToGuildChat"] && $chans["sendTell"] == $chans["sendToGroup"] && !$chans["externalPrivateGroupMessage"]) {
+                        $chan[] = "a," . $lshort[$chans["sendTell"]];
                     }
-                    elseif ($chans["tell"] && !$chans["gc"] && $chans["tell"] == $chans["pgmsg"] && !$chans["extpgmsg"]) {
-                        $chan[] = "r," . $lshort[$chans["tell"]];
+                    elseif ($chans["sendTell"] && !$chans["sendToGuildChat"] && $chans["sendTell"] == $chans["sendToGroup"] && !$chans["externalPrivateGroupMessage"]) {
+                        $chan[] = "r," . $lshort[$chans["sendTell"]];
                     }
                     else {
                         foreach ($chans as $channel => $level) {
@@ -523,10 +523,10 @@ class AccessControl_Core extends BasePassiveModule
         $count = 0;
         $countsub = 0;
         $clong = array(
-            "t" => "tell",
-            "g" => "gc",
-            "p" => "pgmsg",
-            "e" => "extpgmsg"
+            "t" => "sendTell",
+            "g" => "sendToGuildChat",
+            "p" => "sendToGroup",
+            "e" => "externalPrivateGroupMessage"
         );
         $llong = array(
             'AN' => 'ANONYMOUS',
@@ -557,19 +557,19 @@ class AccessControl_Core extends BasePassiveModule
                             $load[] = array(
                                 $com,
                                 $subcom,
-                                "tell",
+                                "sendTell",
                                 $llong[$lvl]
                             );
                             $load[] = array(
                                 $com,
                                 $subcom,
-                                "gc",
+                                "sendToGuildChat",
                                 $llong[$lvl]
                             );
                             $load[] = array(
                                 $com,
                                 $subcom,
-                                "pgmsg",
+                                "sendToGroup",
                                 $llong[$lvl]
                             );
                         }
@@ -577,13 +577,13 @@ class AccessControl_Core extends BasePassiveModule
                             $load[] = array(
                                 $com,
                                 $subcom,
-                                "tell",
+                                "sendTell",
                                 $llong[$lvl]
                             );
                             $load[] = array(
                                 $com,
                                 $subcom,
-                                "pgmsg",
+                                "sendToGroup",
                                 $llong[$lvl]
                             );
                         }
@@ -626,10 +626,10 @@ class AccessControl_Core extends BasePassiveModule
 
 
     // Checks if $name can access $command, including all subcommands. If $name can access one of the options it returns true, otherwise false
-    function check_for_access($name, $command)
+    function checkForAccess($name, $command)
     {
         $command = strtolower($command);
-        $minlevel = $this->get_min_access_level($command);
+        $minlevel = $this->getMinAccessLevel($command);
         if ($minlevel == OWNER + 1) {
             return FALSE;
         }
@@ -638,14 +638,14 @@ class AccessControl_Core extends BasePassiveModule
 
 
     // Returns the array of all access levels
-    function get_access_levels()
+    function getAccessLevels()
     {
         return $this->access_levels;
     }
 
 
     // Does the innermost check to get the minimum access level for $command $subcommand in $channel:
-    function do_min_check($command, $subcommand, $channel)
+    function doMinCheck($command, $subcommand, $channel)
     {
         // If disabled or delted, return false, as no access is allowed
         if (in_array($this->access_cache[strtolower($command)][strtolower($subcommand)][strtolower($channel)], $this->deny_levels)) {
@@ -660,13 +660,13 @@ class AccessControl_Core extends BasePassiveModule
 
     // Returns the minimum access level needed to access $command in $channel, with full input $msg.
     // Returns OWNER + 1 if the command isn't enabled
-    function get_min_rights($command, $msg, $channel)
+    function getMinRights($command, $msg, $channel)
     {
-        // Check for locks in gc or pgmsg first:
-        if (($channel == "gc"
+        // Check for locks in sendToGuildChat or sendToGroup first:
+        if (($channel == "sendToGuildChat"
             && $this->bot->core("settings")
                 ->get("AccessControl", "LockGc"))
-            || ($channel == "pgmsg"
+            || ($channel == "sendToGroup"
                 && $this->bot
                     ->core("settings")->get("AccessControl", "LockPgroup"))
         ) {
@@ -677,11 +677,11 @@ class AccessControl_Core extends BasePassiveModule
             // No subcommand, check if special "only command" entry exists, otherwise fall back on
             // general entry for command if that exists.
             if (isset($this->access_cache[strtolower($command)]['$'][strtolower($channel)])) {
-                return $this->do_min_check($command, '$', $channel);
+                return $this->doMinCheck($command, '$', $channel);
             }
             // Check general entry:
             if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
-                return $this->do_min_check($command, '*', $channel);
+                return $this->doMinCheck($command, '*', $channel);
             }
             // No entry for command at all, access denied on default:
             return OWNER + 1;
@@ -693,7 +693,7 @@ class AccessControl_Core extends BasePassiveModule
             // Check only general entry then:
             if (strcmp($parts[1], "*") == 0 || strcmp($parts[1], "$") == 0) {
                 if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
-                    return $this->do_min_check($command, '*', $channel);
+                    return $this->doMinCheck($command, '*', $channel);
                 }
                 else {
                     // No access level defined, access denied on default:
@@ -704,12 +704,12 @@ class AccessControl_Core extends BasePassiveModule
             if (isset($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)])) {
                 // Make sure the access control entry for this subcommand is not deleted
                 if ($this->access_cache[strtolower($command)][strtolower($parts[1])][strtolower($channel)] != 'DELETED') {
-                    return $this->do_min_check($command, $parts[1], $channel);
+                    return $this->doMinCheck($command, $parts[1], $channel);
                 }
             }
             // Otherwise check if general entry for $command exists, then use that:
             if (isset($this->access_cache[strtolower($command)]['*'][strtolower($channel)])) {
-                return $this->do_min_check($command, '*', $channel);
+                return $this->doMinCheck($command, '*', $channel);
             }
             // No fitting entry exists, access denied on default:
             return OWNER + 1;
@@ -718,8 +718,8 @@ class AccessControl_Core extends BasePassiveModule
 
 
     // Returns the minimum access level to access $command in $channel
-    // or any channel (tell, gc, pgmsg) if $channel is set to FALSE.
-    function get_min_access_level($command, $channel = FALSE)
+    // or any channel (sendTell, sendToGuildChat, sendToGroup) if $channel is set to FALSE.
+    function getMinAccessLevel($command, $channel = FALSE)
     {
         $command = strtolower($command);
         if ($channel) {

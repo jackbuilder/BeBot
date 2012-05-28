@@ -107,8 +107,8 @@ class PB extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "pb", "GUEST");
-        //$this -> register_command("all", "symb", "GUEST");
+        $this->registerCommand("all", "pb", "GUEST");
+        //$this -> registerCommand("all", "symb", "GUEST");
         $this->help['description'] = "Shows know pocket bosses and their loot.";
         $this->help['command']['pb <name>'] = "Shows the known loot of the pocket boss <name>.";
         $this->help['command']['symb <type> <slot>'] = "Shows all known drops of symbs of <type> in <slot>.";
@@ -125,8 +125,8 @@ class PB extends BaseActiveModule
 
     function tables()
     {
-        /*$this -> bot -> db -> define_tablename("symbiants", "false");
-Switch($this -> bot -> db -> get_version("symbiants"))
+        /*$this -> bot -> db -> defineTableName("symbiants", "false");
+Switch($this -> bot -> db -> getVersion("symbiants"))
 {
 case 1:
 $filename = "./extra/symbiants/symbiants.sql";
@@ -140,7 +140,7 @@ foreach($query as $q)
     $this -> bot -> db -> query($q);
 }
 }
-$this -> bot -> db -> set_version("symbiants", 2); */
+$this -> bot -> db -> setVersion("symbiants", 2); */
         $this->bot->db->define_tablename("pocketbosses", "false");
         Switch ($this->bot->db->get_version("pocketbosses")) {
         case 1:
@@ -160,9 +160,9 @@ $this -> bot -> db -> set_version("symbiants", 2); */
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'args'
@@ -172,10 +172,10 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         case 'pb':
             switch ($com['args']) {
             case '':
-                return $this->list_all($name);
+                return $this->listAll($name);
                 break;
             default:
-                return $this->SearchPB($com['args']);
+                return $this->SearchPb($com['args']);
                 break;
             }
             break;
@@ -190,7 +190,7 @@ $this -> bot -> db -> set_version("symbiants", 2); */
            {
                $com['args']=str_replace($slot, $name, $com['args']);
            }
-           $args = $this -> parse_com($com['args'], array('unit', 'slot'));
+           $args = $this -> parseCommand($com['args'], array('unit', 'slot'));
            return $this -> SearchSymb($args['unit'], $args['slot']);
            break; */
         Default:
@@ -224,14 +224,14 @@ $this -> bot -> db -> set_version("symbiants", 2); */
            ksort($data);
            foreach($data as $symb) {
                $msg .= "<a href='itemref://".$symb[8]."/".$symb[8]."/".$symb[0]."'>".$symb[9]."</a>\n";
-               $msg .= "##normal##   Found on ##end##".$this -> bot -> core("tools") -> chatcmd("pb ".$symb[3], $symb[3])."\n\n";
+               $msg .= "##normal##   Found on ##end##".$this -> bot -> core("tools") -> chatCommand("pb ".$symb[3], $symb[3])."\n\n";
            }
-           return $this -> bot -> core("tools") -> make_blob("Found ".count($data)." matches", $msg);
+           return $this -> bot -> core("tools") -> makeBlob("Found ".count($data)." matches", $msg);
        } */
     }
 
 
-    function best_match($search)
+    function bestMatch($search)
     {
         $haystack = $this->bot->db->select("SELECT name FROM #___pocketbosses");
         // 1st lets check for pocketbosses that contain the string
@@ -273,9 +273,9 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         }
         return $this -> CreateBlob($symbdata, "symb");
     }*/
-    function SearchPB($search)
+    function SearchPb($search)
     {
-        $boss = $this->best_match($search);
+        $boss = $this->bestMatch($search);
         if ($boss === FALSE) {
             return ("I found no pocket boss like '$search'");
         }
@@ -288,18 +288,18 @@ $this -> bot -> db -> set_version("symbiants", 2); */
         //{
         //	$return[] = $pb;
         //}
-        return $this->CreateBlob($boss[0], $this->get_symbs($boss[0][0]));
+        return $this->CreateBlob($boss[0], $this->getSymbs($boss[0][0]));
     }
 
 
-    function get_symbs($id)
+    function getSymbs($id)
     {
         $symbs = $this->bot->db->select("SELECT QL, slot, unit, Name, itemref FROM #___symbiants WHERE boss_id = $id");
         Return $symbs;
     }
 
 
-    function list_all($name)
+    function listAll($name)
     {
         $query = "SELECT Playfield, name FROM #___pocketbosses ORDER BY Playfield, level, name";
         $bosslist = $this->bot->db->select($query);

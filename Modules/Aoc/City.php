@@ -1557,8 +1557,8 @@ class City extends BaseActiveModule
         $this->help['command']['build confirm'] = "Extras step to complete building part of the city.";
         $this->help['command']['build wall <wall name>'] = "Examples: Tower I, Tower III, Gate II";
         $this->help['command']['build bank <material> <amount>'] = "Use name of crafted blocks or gathered resources, ex: Brace, Brick, Sandstone, etc.";
-        $this->register_command("all", "city", "MEMBER");
-        $this->register_command("all", "build", "ADMIN");
+        $this->registerCommand("all", "city", "MEMBER");
+        $this->registerCommand("all", "build", "ADMIN");
         $this->bot->core("colors")->define_scheme("city", "titles", "gold");
         $this->bot->core("colors")->define_scheme("city", "buildings", "gold");
         $this->bot->core("colors")->define_scheme("city", "resources", "gold");
@@ -1582,7 +1582,7 @@ class City extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $vars = explode(' ', strtolower($msg));
         switch ($vars[0]) {
@@ -1599,13 +1599,13 @@ class City extends BaseActiveModule
         case 'build':
             switch ($vars[1]) {
             case 'next':
-                return $this->buildnext();
+                return $this->buildNext();
                 break;
             case 'wall':
-                return $this->buildwall(substr($msg, 11));
+                return $this->buildWall(substr($msg, 11));
                 break;
             case 'confirm':
-                return $this->dobuild();
+                return $this->doBuild();
                 break;
             case 'bank':
                 // !build bank grand facade 10, mat name = 2-3 (2 , quantity = 4 (c-1)
@@ -1616,7 +1616,7 @@ class City extends BaseActiveModule
                     }
                     $m .= $vars[$i];
                 }
-                return $this->setmaterial($m, $vars[$c - 1]);
+                return $this->setMaterial($m, $vars[$c - 1]);
                 break;
             default:
                 return $this->status(true);
@@ -2206,7 +2206,7 @@ class City extends BaseActiveModule
             $det = $this->bot->core("colors")
                 ->colorize("city_buildings", $this->names[$id]) . "\n";
             $det .= " Requires: " . $this->bot->core("colors")
-                ->colorize("city_resources", $this->calcreqs($id)) . "\n";
+                ->colorize("city_resources", $this->calcReqs($id)) . "\n";
             if ($this->sequence[$id] > -1) {
                 $det .= " Predecessor: " . $this->bot->core("colors")
                     ->colorize("city_buildings", $this->names[$this->sequence[$id]]) . "\n";
@@ -2220,7 +2220,7 @@ class City extends BaseActiveModule
     }
 
 
-    function buildnext()
+    function buildNext()
     {
         //check progression and set next and timer, no reason to check prereqs as there is only one build order
         for ($i = 0; $i <= 29; $i++) {
@@ -2230,14 +2230,14 @@ class City extends BaseActiveModule
                 return "Preparing to build " . $this->bot->core("colors")
                     ->colorize("city_buildings", $this->names[$i]) . " using " . $this->bot
                     ->core("colors")
-                    ->colorize("city_resources", $this->calcreqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
+                    ->colorize("city_resources", $this->calcReqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
             }
         }
         return "City buildings are already complete!";
     }
 
 
-    function buildwall($name)
+    function buildWall($name)
     {
         foreach ($this->names as $i => $n) {
             //check through name list to get id of wall
@@ -2258,7 +2258,7 @@ class City extends BaseActiveModule
                     return "Preparing to build " . $this->bot->core("colors")
                         ->colorize("city_buildings", $this->names[$i]) . " using " . $this->bot
                         ->core("colors")
-                        ->colorize("city_resources", $this->calcreqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
+                        ->colorize("city_resources", $this->calcReqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
                 }
                 else {
                     if ($this->progress[$i] == $this->max[$this->bot
@@ -2288,7 +2288,7 @@ class City extends BaseActiveModule
     }
 
 
-    function dobuild()
+    function doBuild()
     {
         //check timer to see if a build request was set recently, if so remove resources of building, raise progression and save to database
         if (($this->buildtimer < time()) && (($this->buildtimer + 30) > time())) {
@@ -2307,13 +2307,13 @@ class City extends BaseActiveModule
             return $this->bot->core("colors")
                 ->colorize("city_buildings", $this->names[$this->buildid]) . " has been built. Removed " . $this->bot
                 ->core("colors")
-                ->colorize("city_resources", $this->calcreqs($this->buildid)) . " from guild bank.";
+                ->colorize("city_resources", $this->calcReqs($this->buildid)) . " from guild bank.";
         }
         return "No structure selected. Use '!build next' or '!build wall <name>' to start building.";
     }
 
 
-    function setmaterial($name, $qty)
+    function setMaterial($name, $qty)
     {
         //update arrays and database with new quantiy
         $mat = ucwords(strtolower($name));
@@ -2338,7 +2338,7 @@ class City extends BaseActiveModule
                     return "Stock for " . $this->bot->core("colors")
                         ->colorize("city_resources", $this->refinednames[$i]) . " has been set to " . $this->bot
                         ->core("colors")
-                        ->colorize("city_resources", $this->moneyformat($qty)) . ".";
+                        ->colorize("city_resources", $this->moneyFormat($qty)) . ".";
                 }
                 elseif ($this->bot->core("settings")
                     ->get("City", "UseRefinedNames")
@@ -2361,7 +2361,7 @@ class City extends BaseActiveModule
     }
 
 
-    function calcreqs($id)
+    function calcReqs($id)
     {
         if (is_array($this->resources[$id])) {
             return $this->reqs($this->resources[$id]);
@@ -2379,7 +2379,7 @@ class City extends BaseActiveModule
             foreach ($array as $i => $q) {
                 if ($q > 0 || $showzeros) {
                     if ($i == 12) {
-                        $q = $this->moneyformat($q);
+                        $q = $this->moneyFormat($q);
                     }
                     if (!is_bool($userefinednames)) {
                         $refnames = $this->bot->core("settings")
@@ -2404,7 +2404,7 @@ class City extends BaseActiveModule
     }
 
 
-    function moneyformat($c)
+    function moneyFormat($c)
     {
         if ($c >= 100) {
             $m .= floor($c / 100) . "G ";

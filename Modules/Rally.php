@@ -46,7 +46,7 @@ class Rally extends BaseActiveModule
 
         $this->rallyinfo = FALSE;
 
-        $this->register_command('all', 'rally', 'MEMBER');
+        $this->registerCommand('all', 'rally', 'MEMBER');
 
         $this->help['description'] = 'Sets a rallying point for the raid.';
         $this->help['command']['rally'] = "Shows the current rally point.";
@@ -68,7 +68,7 @@ class Rally extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $msg = explode(" ", $msg, 2);
         if (strtolower($msg[0]) != "rally") {
@@ -79,17 +79,17 @@ class Rally extends BaseActiveModule
         Switch (strtolower($msg[0])) {
         case 'rem':
         case 'del':
-            return $this->del_rally($name, $msg[1]);
+            return $this->delRally($name, $msg[1]);
         case 'clear':
-            return $this->clear_rally($name);
+            return $this->clearRally($name);
         case 'list':
-            return $this->list_rally($name);
+            return $this->listRally($name);
         case 'load':
-            return $this->load_rally($name, $msg[1]);
+            return $this->loadRally($name, $msg[1]);
         case 'save':
-            return $this->save_rally($name, $msg[1]);
+            return $this->saveRally($name, $msg[1]);
         case '':
-            return $this->get_rally();
+            return $this->getRally();
         case 'set':
             $noadd = TRUE;
         Default:
@@ -100,19 +100,19 @@ class Rally extends BaseActiveModule
                 $msg = $msg[1];
             }
             if (preg_match("/^([ a-zA-Z0-9]+) ([0-9]+) ([0-9]+)$/i", $msg, $info)) {
-                return $this->set_rally($info[1], $info[2], $info[3], "");
+                return $this->setRally($info[1], $info[2], $info[3], "");
             }
             else {
                 if (preg_match("/^([ a-zA-Z0-9]+) ([0-9]+) ([0-9]+) (.*)$/i", $msg, $info)) {
-                    return $this->set_rally($info[1], $info[2], $info[3], $info[4]);
+                    return $this->setRally($info[1], $info[2], $info[3], $info[4]);
                 }
                 else {
                     if (preg_match("/^- ([0-9].+), ([0-9].+), ([0-9].+) \(([0-9].+) ([0-9].+) y ([0-9].+) ([0-9]+)\)$/i", $msg, $info)) {
-                        return $this->set_rally($info[7], $info[1], $info[2], "");
+                        return $this->setRally($info[7], $info[1], $info[2], "");
                     }
                     else {
                         if (preg_match("/^- ([0-9].+), ([0-9].+), ([0-9].+) \(([0-9].+) ([0-9].+) y ([0-9].+) ([0-9]+)\) (.*)$/i", $msg, $info)) {
-                            return $this->set_rally($info[7], $info[1], $info[2], $info[8]);
+                            return $this->setRally($info[7], $info[1], $info[2], $info[8]);
                         }
                         else {
                             return ("To set Rally: <pre>rally &lt;playfield&gt; &lt;x-coord&gt; &lt;y-coord&gt; &lt;notes&gt;");
@@ -127,7 +127,7 @@ class Rally extends BaseActiveModule
     /*
     Make the rally info
     */
-    function set_rally($zone, $x, $y, $note)
+    function setRally($zone, $x, $y, $note)
     {
         if (is_numeric($zone)) {
             $zonenumc = $this->bot->db->select("SELECT area FROM #___land_control_zones WHERE zoneid = $zone");
@@ -163,7 +163,7 @@ class Rally extends BaseActiveModule
     }
 
 
-    function get_rally()
+    function getRally()
     {
         $rally = $this->rallyinfo;
         if ($rally) {
@@ -190,7 +190,7 @@ class Rally extends BaseActiveModule
     /*
     Remove the rally info
     */
-    function clear_rally($name)
+    function clearRally($name)
     {
         if ($this->bot->core("security")->check_access($name, "LEADER")) {
             $this->rallyinfo = FALSE;
@@ -202,7 +202,7 @@ class Rally extends BaseActiveModule
     }
 
 
-    function list_rally($name)
+    function listRally($name)
     {
         if ($this->bot->core("security")->check_access($name, "LEADER")) {
             $list = $this->bot->db->select("SELECT name, rally FROM #___rally ORDER BY name");
@@ -227,7 +227,7 @@ class Rally extends BaseActiveModule
     }
 
 
-    function save_rally($name, $msg)
+    function saveRally($name, $msg)
     {
         if ($this->bot->core("security")->check_access($name, "LEADER")) {
             if ($this->rallyinfo) {
@@ -252,7 +252,7 @@ class Rally extends BaseActiveModule
     }
 
 
-    function load_rally($name, $msg)
+    function loadRally($name, $msg)
     {
         if ($this->bot->core("security")->check_access($name, "LEADER")) {
             if (empty($msg)) {
@@ -271,7 +271,7 @@ class Rally extends BaseActiveModule
     }
 
 
-    function del_rally($name, $msg)
+    function delRally($name, $msg)
     {
         if ($this->bot->core("security")->check_access($name, "LEADER")) {
             if (empty($msg)) {

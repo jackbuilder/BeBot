@@ -45,14 +45,14 @@ class Maintenance extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_event("cron", "5sec");
-        $this->register_event("connect");
-        $this->register_module("maintenance");
+        $this->registerEvent("cron", "5sec");
+        $this->registerEvent("connect");
+        $this->registerModule("maintenance");
         // TODO: help
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $msg = strtolower($msg);
         $vars = explode(" ", $msg, 4);
@@ -95,7 +95,7 @@ class Maintenance extends BaseActiveModule
 
     function connect()
     {
-        $this->register_command("all", "maintenance", "SUPERADMIN");
+        $this->registerCommand("all", "maintenance", "SUPERADMIN");
         $this->bot->core("settings")
             ->create("Maintenance", "info", "", "Info saved while restarting, blank when not doing maintenance.", NULL, TRUE, 2);
         /*	$info = $this -> bot -> core("settings") -> get("Maintenance", "info");
@@ -103,7 +103,7 @@ class Maintenance extends BaseActiveModule
        if($info != "")
        {
            $rostermod = $this -> bot -> core("roster_core");
-           $this -> bot -> unregister_event("cron", "24hour", $rostermod);
+           $this -> bot -> unRegisterEvent("cron", "24hour", $rostermod);
        } */
     }
 
@@ -139,7 +139,7 @@ class Maintenance extends BaseActiveModule
                 }
             }
         Default:
-            $this->unregister_event("cron", "5sec");
+            $this->unregisterEvent("cron", "5sec");
             break;
         }
     }

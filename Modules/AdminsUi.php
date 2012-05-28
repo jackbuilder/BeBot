@@ -40,7 +40,7 @@ class admins extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
 
-        $this->register_command('all', 'admins', 'GUEST');
+        $this->registerCommand('all', 'admins', 'GUEST');
 
         $this->help['description'] = 'Shows bots Admin list.';
         $this->help['command']['admins'] = "Shows the list of admins.";
@@ -48,13 +48,13 @@ class admins extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $channel)
+    function commandHandler($name, $msg, $channel)
     {
-        Return ($this->admins_blob($msg));
+        Return ($this->adminsBlob($msg));
     }
 
 
-    function admins_blob($msg)
+    function adminsBlob($msg)
     {
         if (preg_match("/^admins all$/i", $msg, $info)) {
             $all = TRUE;
@@ -214,21 +214,21 @@ class admins extends BaseActiveModule
             {
                 $members .= " + ".$group['name']." (".stripslashes($group['description']).") ";
                 $members .= "\n";
-                $members .= "        ".$this -> make_group_member_list($group['gid']);
+                $members .= "        ".$this -> makeGroupMemberList($group['gid']);
                 $members .= "\n";
             }
             elseif ($group['access_level'] == GUEST)
             {
                 $guests .= " + ".$group['name']." (".stripslashes($group['description']).") ";
                 $guests .= "\n";
-                $guests .= "        ".$this -> make_group_member_list($group['gid']);
+                $guests .= "        ".$this -> makeGroupMemberList($group['gid']);
                 $guests .= "\n";
             }
             elseif ($group['access_level'] == ANONYMOUS)
             {
                 $anon .= " + ".$group['name']." (".stripslashes($group['description']).") ";
                 $anon .= "\n";
-                $anon .= "        ".$this -> make_group_member_list($group['gid']);
+                $anon .= "        ".$this -> makeGroupMemberList($group['gid']);
                 $anon .= "\n";
             }*/
         }
@@ -250,7 +250,7 @@ class admins extends BaseActiveModule
         //else
         //{
         //	$blob .= "<font color=CCWhite>Online Admins:##end##\n\n";
-        //	$end = "\n" . $this -> bot -> core("tools") -> chatcmd("admins all", "View all bot admins");
+        //	$end = "\n" . $this -> bot -> core("tools") -> chatCommand("admins all", "View all bot admins");
         //	$result = $this -> bot -> db -> select("SELECT * FROM admins_list where status_gc=1");
         //}
         /*foreach ($result as $row)
@@ -270,7 +270,7 @@ $blob .= "##lightyellow## is ##end##<font color=#ff0000>offline.##end##";
 $blob .= "\n";
 }
 $blob .= $end . "\n";
-return "Admins list " . $this -> bot -> core("tools") -> make_blob("click to view", $blob);*/
+return "Admins list " . $this -> bot -> core("tools") -> makeBlob("click to view", $blob);*/
     }
 }
 

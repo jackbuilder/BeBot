@@ -62,7 +62,7 @@ class Points extends BaseActiveModule
 				time INT,
 				why VARCHAR(500))"
         );
-        $this->update_table();
+        $this->updateTable();
         $this->bot->core("settings")
             ->create("Points", "Transfer", FALSE, "Can points be transfered?");
         $this->bot->core("settings")
@@ -76,7 +76,7 @@ class Points extends BaseActiveModule
         $this->help['command']['points tomain <(on|off)>'] = "Turns ability to give points from alts to main on or off.";
         $this->help['command']['points all'] = "Shows the combined number of points on your main and alts.";
         $this->help['command']['points top'] = "Shows the 25 biggest point accounts.";
-        $this->register_command(
+        $this->registerCommand(
             "all", "points", "GUEST", array(
                 "add" => "SUPERADMIN",
                 "del" => "SUPERADMIN",
@@ -86,11 +86,11 @@ class Points extends BaseActiveModule
                 "all" => "SUPERADMIN"
             )
         );
-        $this->register_module("points");
+        $this->registerModule("points");
     }
 
 
-    function update_table()
+    function updateTable()
     {
         if ($this->bot->db->get_version("raid_points") == 4) {
             return;
@@ -141,48 +141,48 @@ class Points extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $msg = explode(" ", $msg, 5);
         Switch (strtolower($msg[1])) {
         case 'give':
-            $this->give_points($name, $msg[2], $info[3]);
+            $this->givePoints($name, $msg[2], $info[3]);
             Break;
         case 'add':
             if (strlen($msg[4]) < 5) {
                 Return ("Error: Reason required, min ##highlight##5##end## letters");
             }
-            $this->add_points($name, $msg[2], $msg[3], $msg[4]);
+            $this->addPoints($name, $msg[2], $msg[3], $msg[4]);
             Break;
         case 'del':
         case 'rem':
             if (strlen($msg[4]) < 5) {
                 Return ("Error: Reason required, min ##highlight##5##end## letters");
             }
-            $this->rem_points($name, $msg[2], $msg[3], $msg[4]);
+            $this->remPoints($name, $msg[2], $msg[3], $msg[4]);
             Break;
         case 'transfer':
-            $this->transfer_points($name, $msg[2]);
+            $this->transferPoints($name, $msg[2]);
             Break;
         case 'tomain':
-            $this->tomain_points($name, $msg[2]);
+            $this->pointsToMain($name, $msg[2]);
             Break;
         case 'all':
-            $this->all_points($name);
+            $this->allPoints($name);
             Break;
         case 'top':
-            $this->top_points($name);
+            $this->topPoints($name);
             Break;
         case 'log':
         case 'logs':
-            Return $this->view_log($name, $msg[2], $msg[3]);
+            Return $this->viewLog($name, $msg[2], $msg[3]);
         case '':
-            $this->show_points($name, FALSE);
+            $this->showPoints($name, FALSE);
             Break;
         Default:
-            $this->show_points($name, $msg[1]);
+            $this->showPoints($name, $msg[1]);
         }
         Return FALSE;
     }
@@ -191,13 +191,13 @@ class Points extends BaseActiveModule
     /*
     Shows your points
     */
-    function show_points($name, $target)
+    function showPoints($name, $target)
     {
         if (!$target || strtolower($target) == strtolower($name)) {
-            $result = $this->bot->db->select("SELECT points, nickname FROM #___raid_points WHERE id = " . $this->points_to($name));
+            $result = $this->bot->db->select("SELECT points, nickname FROM #___raid_points WHERE id = " . $this->pointsTo($name));
             if ($result) {
                 if ($result[0][1] == "") {
-                    $this->bot->db->query("UPDATE #___raid_points SET nickname = '" . $this->points_to_name($name) . "' WHERE id = " . $this->points_to($name));
+                    $this->bot->db->query("UPDATE #___raid_points SET nickname = '" . $this->pointsToName($name) . "' WHERE id = " . $this->pointsTo($name));
                 }
                 $points = $this->round($result[0][0]);
             }
@@ -212,10 +212,10 @@ class Points extends BaseActiveModule
                     $this->bot->send_tell($name, "Player ##highlight##$target##end## does not exist.");
                 }
                 else {
-                    $result = $this->bot->db->select("SELECT points, nickname FROM #___raid_points WHERE id = " . $this->points_to($target));
+                    $result = $this->bot->db->select("SELECT points, nickname FROM #___raid_points WHERE id = " . $this->pointsTo($target));
                     if ($result) {
                         if ($result[0][1] == "") {
-                            $this->bot->db->query("UPDATE #___raid_points SET nickname = '" . $this->points_to_name($target) . "' WHERE id = " . $this->points_to($target));
+                            $this->bot->db->query("UPDATE #___raid_points SET nickname = '" . $this->pointsToName($target) . "' WHERE id = " . $this->pointsTo($target));
                         }
                         $points = $this->round($result[0][0]);
                     }
@@ -235,9 +235,9 @@ class Points extends BaseActiveModule
     /*
     Shows your points
     */
-    function all_points($name)
+    function allPoints($name)
     {
-        //	if ($this -> bot -> core("security") -> check_access($name, "superadmin"))
+        //	if ($this -> bot -> core("security") -> checkAccess($name, "superadmin"))
         //	{
         $this->bot->send_tell($name, "Fetching full list of points, this might take a while.");
         $result = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE points > 0 ORDER BY points DESC");
@@ -258,14 +258,14 @@ class Points extends BaseActiveModule
         );
         //	}
         //	else
-        //	$this -> bot -> send_tell($name, "You must be a superadmin to do this");
+        //	$this -> bot -> sendTell($name, "You must be a superadmin to do this");
     }
 
 
     /*
     Shows top25 points
     */
-    function top_points($name)
+    function topPoints($name)
     {
         $result = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE points > 0 ORDER BY points DESC LIMIT 25");
         if (!empty($result)) {
@@ -294,9 +294,9 @@ class Points extends BaseActiveModule
     /*
     Use main char's account for points...
     */
-    function tomain_points($name, $toggle)
+    function pointsToMain($name, $toggle)
     {
-        //if ($this -> bot -> core("security") -> check_access($name, "superadmin"))
+        //if ($this -> bot -> core("security") -> checkAccess($name, "superadmin"))
         //{
         $toggle == strtolower($toggle);
         if ($toggle == "on") {
@@ -323,17 +323,17 @@ class Points extends BaseActiveModule
         {
             $result = $this->bot->db->select("SELECT id, nickname, points FROM #___raid_points WHERE points > 0");
             foreach ($result as $res) {
-                if ($res[0] != $this->points_to($res[1])) {
+                if ($res[0] != $this->pointsTo($res[1])) {
                     $this->bot->db->query("UPDATE #___raid_points SET points = 0 WHERE id = " . $res[0]);
-                    $resu = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this->points_to($res[1]));
+                    $resu = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this->pointsTo($res[1]));
                     if (empty($resu)) {
                         $this->bot->db->query(
-                            "INSERT INTO #___raid_points (id, nickname, points, raiding) VALUES (" . $this->points_to($res[1]) . ", '" . $this->points_to_name($res[1]) . "', "
+                            "INSERT INTO #___raid_points (id, nickname, points, raiding) VALUES (" . $this->pointsTo($res[1]) . ", '" . $this->pointsToName($res[1]) . "', "
                                 . $res[2] . ", 0)"
                         );
                     }
                     else {
-                        $this->bot->db->query("UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this->points_to($res[0]));
+                        $this->bot->db->query("UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this->pointsTo($res[0]));
                     }
                 }
             }
@@ -347,30 +347,30 @@ class Points extends BaseActiveModule
         }
         //}
         //else
-        //$this -> bot -> send_tell($name, "You must be a superadmin to do this");
+        //$this -> bot -> sendTell($name, "You must be a superadmin to do this");
     }
 
 
-    function check_alts($main)
+    function checkAlts($main)
     {
         $alts = $this->bot->core("alts")->get_alts($main);
         if (!empty($alts)) {
             foreach ($alts as $alt) {
-                $result = $this->bot->db->select("SELECT id, nickname, points FROM #___raid_points WHERE points != 0 AND id = " . $this->points_to($alt, FALSE));
+                $result = $this->bot->db->select("SELECT id, nickname, points FROM #___raid_points WHERE points != 0 AND id = " . $this->pointsTo($alt, FALSE));
                 if (!empty($result)) {
                     $res = $result[0];
-                    if ($res[0] != $this->points_to($res[1])) {
-                        $resu = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this->points_to($res[1]));
+                    if ($res[0] != $this->pointsTo($res[1])) {
+                        $resu = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this->pointsTo($res[1]));
                         if (empty($resu)) {
                             $this->bot->db->query(
-                                "INSERT INTO #___raid_points (id, nickname, points, raiding) VALUES (" . $this->points_to($res[1]) . ", '" . $this->points_to_name($res[1]) . "', "
+                                "INSERT INTO #___raid_points (id, nickname, points, raiding) VALUES (" . $this->pointsTo($res[1]) . ", '" . $this->pointsToName($res[1]) . "', "
                                     . $res[2] . ", 0)"
                             );
                         }
                         else {
-                            $this->bot->db->query("UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this->points_to($res[0]));
+                            $this->bot->db->query("UPDATE #___raid_points SET points = " . ($res[2] + $resu[0][1]) . " WHERE id = " . $this->pointsTo($res[0]));
                         }
-                        $check = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this->points_to($res[1]));
+                        $check = $this->bot->db->select("SELECT nickname, points FROM #___raid_points WHERE id = " . $this->pointsTo($res[1]));
                         if (!empty($check) && ($check[0][1] != ($res[2] + $resu[0][1]))) {
                             echo "Error With Transfering Points from Alt $alt to $main";
                         }
@@ -379,11 +379,11 @@ class Points extends BaseActiveModule
                         }
                     }
                 }
-                $result = $this->bot->db->select("SELECT id FROM #___raid_points WHERE raiding = 1 and id = " . $this->points_to($alt, FALSE));
+                $result = $this->bot->db->select("SELECT id FROM #___raid_points WHERE raiding = 1 and id = " . $this->pointsTo($alt, FALSE));
                 if (!empty($result)) {
                     $res = $result[0];
                     $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $res[0]);
-                    $this->bot->db->query("UPDATE #___raid_points SET raiding = 1 WHERE id = " . $this->points_to($alt));
+                    $this->bot->db->query("UPDATE #___raid_points SET raiding = 1 WHERE id = " . $this->pointsTo($alt));
                 }
             }
         }
@@ -393,7 +393,7 @@ class Points extends BaseActiveModule
     /*
     Enable/Disable !points give
     */
-    function transfer_points($name, $toggle)
+    function transferPoints($name, $toggle)
     {
         if ($this->bot->core("security")->check_access($name, "superadmin")) {
             $toggle == strtolower($toggle);
@@ -417,14 +417,14 @@ class Points extends BaseActiveModule
     /*
     Transfers points
     */
-    function give_points($name, $who, $num)
+    function givePoints($name, $who, $num)
     {
         if ($this->bot->core("settings")->get("Points", "Transfer")) {
             if (!is_numeric($num)) {
                 $this->bot->send_tell($name, "$num is not a valid points value.");
                 return;
             }
-            $result = $this->bot->db->select("SELECT points FROM #___raid_points WHERE id = " . $this->points_to($name));
+            $result = $this->bot->db->select("SELECT points FROM #___raid_points WHERE id = " . $this->pointsTo($name));
             if (!$result) {
                 $this->bot->send_tell($name, "You have no points.");
                 return;
@@ -439,9 +439,9 @@ class Points extends BaseActiveModule
                     return;
                 }
                 else {
-                    $this->bot->db->query("UPDATE #___raid_points SET points = points - " . ($num) . " WHERE id = " . $this->points_to($name));
+                    $this->bot->db->query("UPDATE #___raid_points SET points = points - " . ($num) . " WHERE id = " . $this->pointsTo($name));
                     $this->bot->db->query(
-                        "INSERT INTO #___raid_points (id, nickname, points) VALUES (" . $this->points_to($who) . ", '" . $this->points_to_name($who)
+                        "INSERT INTO #___raid_points (id, nickname, points) VALUES (" . $this->pointsTo($who) . ", '" . $this->pointsToName($who)
                             . "', $num) ON DUPLICATE KEY UPDATE points = points + VALUES(points)"
                     );
                     $this->bot->send_tell($name, "You gave ##highlight##$num##end## raidpoints to ##highlight##$who##end##.");
@@ -459,7 +459,7 @@ class Points extends BaseActiveModule
     /*
     Adds points
     */
-    function add_points($name, $who, $num, $why, $silent = FALSE)
+    function addPoints($name, $who, $num, $why, $silent = FALSE)
     {
         if (!is_numeric($num)) {
             $this->bot->send_tell($name, "$num is not a valid points value.");
@@ -471,7 +471,7 @@ class Points extends BaseActiveModule
         }
         else {
             $this->bot->db->query(
-                "INSERT INTO #___raid_points (id, nickname, points) VALUES (" . $this->points_to($who) . ", '" . $this->points_to_name($who)
+                "INSERT INTO #___raid_points (id, nickname, points) VALUES (" . $this->pointsTo($who) . ", '" . $this->pointsToName($who)
                     . "', $num) ON DUPLICATE KEY UPDATE points = points + VALUES(points)"
             );
             if (!$silent) {
@@ -488,7 +488,7 @@ class Points extends BaseActiveModule
     /*
     Remove points
     */
-    function rem_points($name, $who, $num, $why, $silent = FALSE)
+    function remPoints($name, $who, $num, $why, $silent = FALSE)
     {
         if (!is_numeric($num)) {
             $this->bot->send_tell($name, "$num is not a valid points value.");
@@ -499,7 +499,7 @@ class Points extends BaseActiveModule
             return FALSE;
         }
         else {
-            $this->bot->db->query("UPDATE #___raid_points SET points = points - " . ($num) . " WHERE id = " . $this->points_to($who));
+            $this->bot->db->query("UPDATE #___raid_points SET points = points - " . ($num) . " WHERE id = " . $this->pointsTo($who));
             if (!$silent) {
                 $this->bot->send_output("", "##highlight##$name##end## removed ##highlight##$num##end## raidpoints from ##highlight##$who##end##'s account.", "both");
                 $this->bot->send_tell($name, "You removed ##highlight##$num##end## raidpoints from ##highlight##$who##end##'s account.");
@@ -514,7 +514,7 @@ class Points extends BaseActiveModule
     /*
     Get correct char for points
     */
-    function points_to($name, $tomain = TRUE)
+    function pointsTo($name, $tomain = TRUE)
     {
         if (!$tomain || !$this->bot->core("settings")->get("Points", "To_main")
         ) {
@@ -525,7 +525,7 @@ class Points extends BaseActiveModule
     }
 
 
-    function points_to_name($name, $tomain = TRUE)
+    function pointsToName($name, $tomain = TRUE)
     {
         if (!$tomain || !$this->bot->core("settings")->get("Points", "To_main")
         ) {
@@ -545,7 +545,7 @@ class Points extends BaseActiveModule
     }
 
 
-    function view_log($name, $timeorname, $time2)
+    function viewLog($name, $timeorname, $time2)
     {
         if (!$timeorname) {
             $timeorname = $name;

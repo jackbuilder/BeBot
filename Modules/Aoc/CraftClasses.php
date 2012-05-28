@@ -68,9 +68,9 @@ class craftclasses extends BaseActiveModule
         $this->last_log = array();
         $this->output = "group";
         $this->result = "";
-        $this->register_event("logon_notify");
-        $this->register_command("all", "setcraft", "MEMBER");
-        $this->register_command("all", "craft", "MEMBER");
+        $this->registerEvent("logon_notify");
+        $this->registerCommand("all", "setcraft", "MEMBER");
+        $this->registerCommand("all", "craft", "MEMBER");
         $this->help['description'] = 'Used to set the crafting classes on a user.';
         $this->help['command']['setcraft <class1> <class2>']
             = "Sets the two crafting classes for you. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None";
@@ -99,7 +99,7 @@ class craftclasses extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $output = "";
         if (preg_match("/^setcraft (.+)$/i", $msg, $info)) {
@@ -125,7 +125,7 @@ class craftclasses extends BaseActiveModule
                         . '") ON DUPLICATE KEY UPDATE class1=values(class1), class2=values(class2)'
                 );
                 $this->bot->db->query("UPDATE #___whois set craft1 = '" . $options[0] . "', craft2 = '" . $options[1] . "' WHERE nickname = '" . $name . "'");
-                $this->bot->core("whois")->remove_from_cache($name);
+                $this->bot->core("whoIs")->remove_from_cache($name);
                 $output = "Thank you for updating your crafting information.";
             }
             else {
@@ -139,7 +139,7 @@ class craftclasses extends BaseActiveModule
             }
             else {
                 $output
-                    = "You have no crafting information set. Please use '/tell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None.";
+                    = "You have no crafting information set. Please use '/sendTell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None.";
             }
         }
         return $output;
@@ -153,11 +153,11 @@ class craftclasses extends BaseActiveModule
             && !$startup
         ) {
             $id = $this->bot->core("player")->id($name);
-            $result = $this->bot->core("whois")->lookup($name);
+            $result = $this->bot->core("whoIs")->lookup($name);
             if (!($result instanceof BotError)) {
                 if (empty($result["craft1"]) & $result["level"] > 40) {
                     $msg
-                        = "You have no crafting information set and you are above level 40. Please use '/tell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None. If you haven't picked crafting classes yet this may be the time to do it.";
+                        = "You have no crafting information set and you are above level 40. Please use '/sendTell <botname> <pre>setcraft [class1] [class2]'. Classes can be Alchemist, Architect, Armorsmith, Gemcutter, Weaponsmith and None. If you haven't picked crafting classes yet this may be the time to do it.";
                     $this->bot->send_tell($name, $msg);
                 }
             }

@@ -62,17 +62,17 @@ class News extends BaseActiveModule
 		           )"
         );
         //Regiser commands
-        $this->register_command('all', 'news', 'GUEST', array('add' => 'MEMBER'));
-        $this->register_command('all', 'headline', 'GUEST', array('add' => 'ADMIN'));
-        $this->register_command(
+        $this->registerCommand('all', 'news', 'GUEST', array('add' => 'MEMBER'));
+        $this->registerCommand('all', 'headline', 'GUEST', array('add' => 'ADMIN'));
+        $this->registerCommand(
             'all', 'raids', 'MEMBER', array(
                 'add' => 'LEADER',
                 'del' => 'LEADER'
             )
         );
-        // Register for logon notifies and pgjoin
-        $this->register_event("logon_notify");
-        $this->register_event("pgjoin");
+        // Register for logon notifies and privateGroupJoin
+        $this->registerEvent("logon_notify");
+        $this->registerEvent("privateGroupJoin");
         //These are required in order to let authors delete their own messages but not everyones.
         $this->bot->core("settings")
             ->create("News", "Headline_Del", "ADMIN", "Who should be able to delete headlines", "ADMIN;LEADER;MEMBER;GUEST;ANONYMOUS");
@@ -97,53 +97,53 @@ class News extends BaseActiveModule
         if (!$startup) {
             switch ($this->bot->core("prefs")->get($name, "News", "Logonspam")) {
             case 'Last_headline':
-                $spam .= $this->get_last_headline();
-                $spam .= $this->get_news($name);
+                $spam .= $this->getLatestHeadline();
+                $spam .= $this->getNews($name);
                 if ($spam != "No news.") {
-                    $this->bot->send_output($name, $spam, 'tell');
+                    $this->bot->send_output($name, $spam, 'sendTell');
                 }
                 break;
             case 'Link':
-                $spam .= $this->get_news($name);
+                $spam .= $this->getNews($name);
                 if ($spam != "No news.") {
-                    $this->bot->send_output($name, $spam, 'tell');
+                    $this->bot->send_output($name, $spam, 'sendTell');
                 }
             }
         }
     }
 
 
-    function pgjoin($name)
+    function privateGroupJoin($name)
     {
         switch ($this->bot->core("prefs")->get($name, "News", "PGjoinspam")) {
         case 'Last_headline':
-            $spam .= $this->get_last_headline();
-            $spam .= $this->get_news($name);
+            $spam .= $this->getLatestHeadline();
+            $spam .= $this->getNews($name);
             if ($spam != "No news.") {
-                $this->bot->send_output($name, $spam, 'tell');
+                $this->bot->send_output($name, $spam, 'sendTell');
             }
             break;
         case 'Link':
-            $spam .= $this->get_news($name);
+            $spam .= $this->getNews($name);
             if ($spam != "No news.") {
-                $this->bot->send_output($name, $spam, 'tell');
+                $this->bot->send_output($name, $spam, 'sendTell');
             }
         }
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        $com = $this->parse_com($msg);
+        $com = $this->parseCommand($msg);
         switch ($com['com']) {
         case 'news':
-            return $this->sub_handler($name, $com, 1);
+            return $this->subHandler($name, $com, 1);
             break;
         case 'headline':
-            return $this->sub_handler($name, $com, 2);
+            return $this->subHandler($name, $com, 2);
             break;
         case 'raids':
-            return $this->sub_handler($name, $com, 3);
+            return $this->subHandler($name, $com, 3);
             break;
         default:
             $this->error->set("News received unknown command '{$com['com']}'.");
@@ -153,29 +153,29 @@ class News extends BaseActiveModule
     }
 
 
-    function sub_handler($name, $com, $type)
+    function subHandler($name, $com, $type)
     {
         switch ($com['sub']) {
         case '':
         case 'read':
             if (($type == 1) || ($type == 2)) {
-                return $this->get_news($name);
+                return $this->getNews($name);
             }
             else {
-                return $this->get_raids($name);
+                return $this->getRaids($name);
             }
             break;
         case 'add':
-            return $this->set_news($name, $com['args'], $type);
+            return $this->setNews($name, $com['args'], $type);
             break;
         case 'del':
         case 'rem':
-            return $this->del_news($name, $com['args']);
+            return $this->delNews($name, $com['args']);
             break;
         default:
             //No keywords recognized. Assume that person in attempting to add news and forgot the "add" keyword
             $news = "{$com['sub']} {$com['args']}";
-            return $this->set_news($name, $news, $type);
+            return $this->setNews($name, $news, $type);
             break;
         }
     }
@@ -184,7 +184,7 @@ class News extends BaseActiveModule
     /*
     Get news
     */
-    function get_news($name)
+    function getNews($name)
     {
         // Create Headline
         $result_headline = $this->bot->db->select("SELECT id, time, name, news FROM #___news WHERE type = '2' ORDER BY time DESC LIMIT 0, 3");
@@ -251,7 +251,7 @@ class News extends BaseActiveModule
     /*
     Fetch the latest newsitem
     */
-    function get_last_headline()
+    function getLatestHeadline()
     {
         $query = "SELECT name, news from #___news WHERE type = '2' ORDER BY time DESC LIMIT 1";
         $news = $this->bot->db->select($query, MYSQL_ASSOC);
@@ -268,7 +268,7 @@ class News extends BaseActiveModule
     /*
     Get Raids
     */
-    function get_raids($name)
+    function getRaids($name)
     {
         $inside = "<center>##ao_infoheadline##:::: Planned Raids ::::##end##</center>\n";
         $result = $this->bot->db->select("SELECT id, time  FROM #___news WHERE type = '3' ORDER BY id DESC LIMIT 0, 1");
@@ -308,14 +308,14 @@ class News extends BaseActiveModule
     /*
     Adds news (Access is checked on command level)
     */
-    function set_news($name, $msg, $type)
+    function setNews($name, $msg, $type)
     {
         $this->bot->db->query("INSERT INTO #___news (type, time, name, news) VALUES ('" . $type . "', " . time() . ", '" . $name . "', '" . addslashes($msg) . "')");
         return "Your entry has been submitted.";
     }
 
 
-    function del_news($name, $msg)
+    function delNews($name, $msg)
     {
         $result = $this->bot->db->select("SELECT name  FROM #___news WHERE id = '" . $msg . "'");
         if (empty($result)) {

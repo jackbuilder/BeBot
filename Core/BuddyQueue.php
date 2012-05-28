@@ -45,7 +45,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("buddy_queue");
+        $this->registerModule("buddy_queue");
 
         $this->bot->core("settings")
             ->create("Buddy_Queue", "Enabled", TRUE, "Should buddies be queued or added as requested? (Queueing buddies may slow down the bot.)");
@@ -68,7 +68,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     }
 
 
-    function do_add($uid)
+    function doAdd($uid)
     {
         if (!empty($uid) && $uid != 0 && $uid != -1) {
             if (!($this->bot->core("chat")->buddy_exists($uid))) {
@@ -89,7 +89,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     }
 
 
-    function do_delete($uid)
+    function doDelete($uid)
     {
         if (!empty($uid) && $uid != 0 && $uid != -1) {
             if (($this->bot->core("chat")->buddy_exists($uid))) {
@@ -120,10 +120,10 @@ class Buddy_Queue_Core extends BasePassiveModule
     function queue($module, $info)
     {
         if ($info[1]) {
-            $this->do_add($info[0]);
+            $this->doAdd($info[0]);
         }
         else {
-            $this->do_delete($info[0]);
+            $this->doDelete($info[0]);
         }
     }
 
@@ -131,7 +131,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     /*
     Checks if buddy can be added or removed. true if yes, false it has to be put to queue
     */
-    function check_queue()
+    function checkQueue()
     {
         if (!$this->bot->core("settings")->get("Buddy_Queue", "Enabled")) {
             Return TRUE;
@@ -144,9 +144,9 @@ class Buddy_Queue_Core extends BasePassiveModule
 
     /*
     Puts a buddy into the queue
-    $type is a boolean, true means add the uid, false means delete it
+    $type is a boolean, true means add the userId, false means delete it
     */
-    function into_queue($uid, $type)
+    function intoQueue($uid, $type)
     {
         $info = array(
             $uid,

@@ -46,8 +46,8 @@ class Time_Core extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("time");
-        $this->register_command("all", "time", "GUEST");
+        $this->registerModule("time");
+        $this->registerCommand("all", "time", "GUEST");
         $this->help['description'] = "Shows the time.";
         $this->help['command']['time'] = "Shows the current time.";
         $this->bot->core("settings")
@@ -61,18 +61,18 @@ class Time_Core extends BaseActiveModule
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
-    sutible for output via send_tell, send_pgroup, and send_gc.
+    sutible for output via sendTell, sendPrivateGroup, and sendGuildChat.
     */
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     { // Start function handler()
-        return $this->show_time();
+        return $this->showTime();
     } // End function handler()
 
-    function show_time()
-    { // Start function show_time()
+    function showTime()
+    { // Start function showTime()
         $output = "It is currently " . gmdate("H:i:s F j,");
         if ($this->bot->game == "ao") {
-            $output .= " " . $this->ao_year() . " Rubi-Ka Universal Time. ";
+            $output .= " " . $this->aoYear() . " Rubi-Ka Universal Time. ";
             $e1 = " from Uncle Pumpkin-head";
             $e2 = "Leet";
         }
@@ -88,23 +88,23 @@ class Time_Core extends BaseActiveModule
             $output .= "##red##Merry##end## ##lime##Christmas##end## ##red##from##end## ##lime##Santa##end## ##red##" . $e2 . "!##end##";
         }
         return $output;
-    } // End function show_time()
+    } // End function showTime()
 
     /*
     Return the fictional AO Year based on the current year.
     AO is based 27,474 years in the future.
     */
-    function ao_year()
-    { // Start function ao_year()
+    function aoYear()
+    { // Start function aoYear()
         return 27474 + gmdate("Y", time());
-    } // End function ao_year()
+    } // End function aoYear()
 
     /*
     Calculates the Hours, minutes, and seconds to next gate time.
     Returns an associtive array.
     */
-    function get_DHMS($seconds)
-    { // Start function get_DHMS()
+    function getDhms($seconds)
+    { // Start function getDhms()
         $tmp['days'] = intval($seconds / 86400); // 86400 seconds in a day
         $partDay = $seconds - ($tmp['days'] * 86400);
         $tmp['hours'] = intval($partDay / 3600); // 3600 seconds in an hour
@@ -112,12 +112,12 @@ class Time_Core extends BaseActiveModule
         $tmp['minutes'] = intval($partHour / 60); // 60 seconds in a minute
         $tmp['seconds'] = $partHour - ($tmp['minutes'] * 60);
         return $tmp;
-    } // End function get_DHMS()
+    } // End function getDhms()
 
     /*
     Retruns H:M:S
     */
-    function format_seconds($totalsec)
+    function formatSeconds($totalsec)
     { // Start function format_seconts()
         if ($totalsec < 0) {
             $minus = "-";
@@ -130,7 +130,7 @@ class Time_Core extends BaseActiveModule
         return sprintf($minus . "%02d:%02d:%02d", $hours, $minutes, $seconds);
     } // End function format_seconts()
 
-    function parse_time($timestr)
+    function parseTime($timestr)
     {
         $duration = 0;
         $timesize = 1;
@@ -179,7 +179,7 @@ class Time_Core extends BaseActiveModule
     * Takes $time and calculates how many minutes, hours and days it was ago.
     * The result is returned as a string of the format "X days, Y hours and Z mins ago"
     */
-    function time_ago($time)
+    function timeAgo($time)
     {
         $diftime = time() - $time;
         $timestr = ' ';

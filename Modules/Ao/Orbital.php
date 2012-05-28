@@ -38,7 +38,7 @@ class Orbital extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_event("gmsg", "Org Msg");
+        $this->registerEvent("groupMessage", "Org Msg");
         $classid = $this->bot->core("timer")
             ->create_timer_class("OrbitalWarning", "Notify class used for timer on orbitals.");
         $nextid = $this->bot->core("timer")
@@ -54,14 +54,14 @@ class Orbital extends BasePassiveModule
     }
 
 
-    function gmsg($name, $group, $msg)
+    function groupMessage($name, $group, $msg)
     {
         if (preg_match('/Blammo! (.+) has launched an orbital attack!/i', $msg, $info)) {
             $this->bot->core("timer")
                 ->add_timer(
                 FALSE, $info[1], 60 * 15 + 1, "One type of orbital strike is ready again for " . $this->bot
                 ->core("shortcuts")
-                ->get_short($this->bot->guildname), "gc", 0, "OrbitalWarning"
+                ->get_short($this->bot->guildname), "sendToGuildChat", 0, "OrbitalWarning"
             );
         }
     }

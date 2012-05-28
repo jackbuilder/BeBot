@@ -32,28 +32,28 @@
 class Player
 {
     //Game spesific variables
-    private $uid = FALSE;
-    private $uname = FALSE; //aka nickname
+    private $userId = FALSE;
+    private $userName = FALSE; //aka nickname
     private $firstname = FALSE;
     private $lastname = FALSE;
     private $breed = FALSE;
     private $gender = FALSE;
     private $level = FALSE;
     private $profession = FALSE;
-    private $ai_level = FALSE;
+    private $aiLevel = FALSE;
     private $organization = FALSE;
-    private $org_rank = FALSE;
+    private $orgRank = FALSE;
     //Bot spesific variables
-    private $accesslevel = FALSE;
-    private $user_level = FALSE;
+    private $accessLevel = FALSE;
+    private $userLevel = FALSE;
     private $preferences = array();
 
 
     //When constructing a new player we need to have the bot handle so that the
     //class can look up certain variables automagically.
-    public function __construct(&$bothandle, $data)
+    public function __construct(&$botHandle, $data)
     {
-        $this->bot = $bothandle;
+        $this->bot = $botHandle;
         $this->error = new BotError($this->bot, get_class($this));
         foreach ($data as $key => $value) {
             $this->$key = $value;
@@ -62,20 +62,20 @@ class Player
 
 
     /*
-        This function allows coders to use $player->uid instead of player->get_uid() when wanting to
+        This function allows coders to use $player->userId instead of player->getUserId() when wanting to
         access a variable while still allowing the class to look up any values it has not already cached.
     */
     public function _get($variable)
     {
         switch ($variable) {
-        case 'uid':
+        case 'userId':
         case 'id':
-            return ($this->get_uid());
+            return ($this->getUserId());
             break;
-        case 'uname':
+        case 'userName':
         case 'nick':
         case 'nickname':
-            return ($this->get_uname());
+            return ($this->getUserName());
             break;
         case 'firstname':
         case 'lastname':
@@ -83,15 +83,15 @@ class Player
         case 'gender':
         case 'level':
         case 'profession':
-        case 'ai_level':
+        case 'aiLevel':
         case 'ai_rank':
         case 'organization':
-        case 'org_rank':
-            return ($this->get_whois($variable));
+        case 'orgRank':
+            return ($this->getWhois($variable));
             break;
         case 'pref':
         case 'preferences':
-            return ($this->get_preferences($variable));
+            return ($this->getPreferences($variable));
             break;
         default:
             $this->error->set("Unknown attribute '$variable'.");
@@ -101,48 +101,48 @@ class Player
     }
 
 
-    public function get_uid($uname)
+    public function getUserId($uname)
     {
-        //Make sure we have the uid at hand.
-        if (!$this->uid) {
-            $this->uid = $this->bot->core('player')->get_uid($uname);
-            if ($this->uid instanceof BotError) {
-                //The uid could not be resolved.
-                $this->error = $this->uid;
-                $this->uid = FALSE;
+        //Make sure we have the userId at hand.
+        if (!$this->userId) {
+            $this->userId = $this->bot->core('player')->get_uid($uname);
+            if ($this->userId instanceof BotError) {
+                //The userId could not be resolved.
+                $this->error = $this->userId;
+                $this->userId = FALSE;
                 return $this->error;
             }
         }
-        return $this->uid;
+        return $this->userId;
     }
 
 
-    public function get_uname($uid)
+    public function getUserName($uid)
     {
-        //Make sure we have the uname at hand.
-        if (!$this->uname) {
-            $this->uname = $this->bot->core('player')->get_uname($uid);
-            if ($this->uname instanceof BotError) {
-                //The uid could not be resolved.
-                $this->error = $this->uname;
-                $this->uname = 'Unknown';
+        //Make sure we have the userName at hand.
+        if (!$this->userName) {
+            $this->userName = $this->bot->core('player')->get_uname($uid);
+            if ($this->userName instanceof BotError) {
+                //The userId could not be resolved.
+                $this->error = $this->userName;
+                $this->userName = 'Unknown';
                 return $this->error;
             }
         }
-        return $this->uid;
+        return $this->userId;
     }
 
 
-    public function get_whois($attribute)
+    public function getWhois($attribute)
     {
         //Make sure we have the attribute at hand.
         if (!$this->$attribute) {
-            //Make sure we have a uname
-            if (!$this->uname) {
-                //If we don't have a uname already we should have an uid.
-                $this->get_uname($this->uid);
+            //Make sure we have a userName
+            if (!$this->userName) {
+                //If we don't have a userName already we should have an userId.
+                $this->getUserName($this->userId);
             }
-            $data = $this->bot->core('whois')->lookup($this->uname);
+            $data = $this->bot->core('whoIs')->lookup($this->userName);
             foreach ($data as $key => $value) {
                 $this->$key = $value;
             }
@@ -152,7 +152,7 @@ class Player
 
 
     //Lookup the preferences in the table if we haven't already done that.
-    public function get_preferences($variable)
+    public function getPreferences($variable)
     {
     }
 }

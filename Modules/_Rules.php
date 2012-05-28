@@ -41,23 +41,23 @@ class Rules extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'rules', 'GUEST');
+        $this->registerCommand('all', 'rules', 'GUEST');
     }
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        return $this->make_rules();
+        return $this->makeRules();
     }
 
 
     /*
     Make the rules
     */
-    function make_rules()
+    function makeRules()
     {
         $content = "<font color=CCInfoHeadline> :::: RULES ::::</font>\n\n";
         if (file_exists("./txt/" . $this->bot->botname . "_rules.txt")) {

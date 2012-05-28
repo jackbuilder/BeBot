@@ -1070,7 +1070,7 @@ class Net_SmartIRC_base
             $this->_username = str_replace(' ', '', $username);
         }
         else {
-            $this->_username = str_replace(' ', '', exec('whoami'));
+            $this->_username = str_replace(' ', '', exec('whoAmI'));
         }
 
         if ($password !== NULL) {

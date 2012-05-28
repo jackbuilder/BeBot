@@ -43,7 +43,7 @@ class Conf
         $this->confc = $confc;
         $this->argv = $argv[1];
         $this->check($argv);
-        $this->mysql_check();
+        $this->mysqlCheck();
         $this->load();
     }
 
@@ -106,7 +106,7 @@ class Conf
             Return $this->check();
         }
         elseif ($do == "n") {
-            Return $this->set_conf();
+            Return $this->setConf();
         }
         else {
             $this->todo(TRUE);
@@ -114,7 +114,7 @@ class Conf
     }
 
 
-    function set_conf()
+    function setConf()
     {
         echo "\nCreating Conf File: " . $this->cf . "\n";
         $ao_username = $this->ask("User Name:");
@@ -234,7 +234,7 @@ class Conf
     }
 
 
-    function mysql_check()
+    function mysqlCheck()
     {
         //get botname
         include ("./conf/" . $this->cf);
@@ -247,12 +247,12 @@ class Conf
             Return;
         }
         else {
-            $this->mysql_todo($botname);
+            $this->mysqlToDo($botname);
         }
     }
 
 
-    function mysql_todo($botname, $rep = FALSE)
+    function mysqlToDo($botname, $rep = FALSE)
     {
         if (!$rep) {
             echo $botname . ".MySQL.conf and MySQL.conf Does not Exist\n What do you want to do?\n(r=Retry, n=new, q=quit)\n";
@@ -263,18 +263,18 @@ class Conf
             Die("The bot has been shutdown\n");
         }
         elseif ($do == "r") {
-            Return $this->mysql_check();
+            Return $this->mysqlCheck();
         }
         elseif ($do == "n") {
-            Return $this->mysql_set_conf($botname);
+            Return $this->mysqlSetConf($botname);
         }
         else {
-            $this->mysql_todo(TRUE);
+            $this->mysqlToDo(TRUE);
         }
     }
 
 
-    function mysql_set_conf($botname)
+    function mysqlSetConf($botname)
     {
         echo "\nCreating MySQL Conf File\n";
         echo "Would u like to use botname like botname.MySQL.conf  (y/yes or n/no)\n";

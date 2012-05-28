@@ -73,9 +73,9 @@ class Security_Core extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
 
-        $this->register_module("security");
-        $this->register_event("cron", "12hour");
-        $this->register_event("connect");
+        $this->registerModule("security");
+        $this->registerEvent("cron", "12hour");
+        $this->registerEvent("connect");
 
         // Create security_groups table.
         $this->bot->db->query(
@@ -109,15 +109,15 @@ class Security_Core extends BaseActiveModule
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_org", "true") . "
 					(org_gov VARCHAR(25) NOT NULL,
-					org_rank VARCHAR(25) NOT NULL,
-					org_rank_id TINYINT UNSIGNED NOT NULL,
+					orgRank VARCHAR(25) NOT NULL,
+					orgRankId TINYINT UNSIGNED NOT NULL,
 					access_level TINYINT UNSIGNED NOT NULL DEFAULT 2,
-					PRIMARY KEY (org_gov, org_rank, org_rank_id))
+					PRIMARY KEY (org_gov, orgRank, orgRankId))
 					"
         );
 
         // Insert Ranks into table.
-        $sql = "INSERT IGNORE INTO #___security_org (org_gov, org_rank, org_rank_id) VALUES ";
+        $sql = "INSERT IGNORE INTO #___security_org (org_gov, orgRank, orgRankId) VALUES ";
         $sql .= "('Department', 'President', 0), ";
         $sql .= "('Department', 'General', 1), ";
         $sql .= "('Department', 'Squad Commander', 2), ";
@@ -185,12 +185,12 @@ class Security_Core extends BaseActiveModule
     { // Start function connect()
         // Bind the command to the bot
         // Can't be done earlier as otherwise we'd end in a requirement loop with access control
-        $this->register_command("all", "security", "SUPERADMIN");
-        $this->register_command("all", "adduser", "SUPERADMIN");
-        $this->register_command("all", "deluser", "SUPERADMIN");
-        $this->register_command("all", "addgroup", "SUPERADMIN");
-        $this->register_command("all", "delgroup", "SUPERADMIN");
-        $this->register_command("all", "admin", "SUPERADMIN");
+        $this->registerCommand("all", "security", "SUPERADMIN");
+        $this->registerCommand("all", "adduser", "SUPERADMIN");
+        $this->registerCommand("all", "deluser", "SUPERADMIN");
+        $this->registerCommand("all", "addgroup", "SUPERADMIN");
+        $this->registerCommand("all", "delgroup", "SUPERADMIN");
+        $this->registerCommand("all", "admin", "SUPERADMIN");
 
         $this->enable();
 
@@ -208,8 +208,8 @@ class Security_Core extends BaseActiveModule
         }
         if ($this->gocron) {
             // Do cron stuff
-            $this->cache_security();
-            $this->set_government();
+            $this->cacheSecurity();
+            $this->setGovernment();
             // End cron stuff with this.
             if ($this->firstcron) {
                 $this->firstcron = FALSE;
@@ -231,7 +231,7 @@ class Security_Core extends BaseActiveModule
     function enable()
     { // Start function enable()
         $this->cache = array();
-        $this->cache_security(); // Populate the security cache.
+        $this->cacheSecurity(); // Populate the security cache.
         // Customizable Security Settings.
         $longdesc = "Should be run over all alts to get the highest access level for the queried characters?";
         $this->bot->core("settings")
@@ -257,9 +257,9 @@ class Security_Core extends BaseActiveModule
         $longdesc = "Security Access Level required to remove users from security groups.";
         $this->bot->core("settings")
             ->create("Security", "remgroupmember", "SUPERADMIN", $longdesc, "OWNER;SUPERADMIN;ADMIN;LEADER", FALSE, 6);
-        $longdesc = "Security Access Level required to use <pre>security whois name.";
+        $longdesc = "Security Access Level required to use <pre>security whoIs name.";
         $this->bot->core("settings")
-            ->create("Security", "whois", "leader", $longdesc, "OWNER;SUPERADMIN;ADMIN;LEADER", FALSE, 10);
+            ->create("Security", "whoIs", "leader", $longdesc, "OWNER;SUPERADMIN;ADMIN;LEADER", FALSE, 10);
         $longdesc = "Security Access Level required to change settings for all modules.";
         $this->bot->core("settings")
             ->create("Security", "settings", "SUPERADMIN", $longdesc, "OWNER;SUPERADMIN;ADMIN;LEADER", FALSE, 99);
@@ -273,7 +273,7 @@ class Security_Core extends BaseActiveModule
     /*
     Unified message handler
     */
-    function command_handler($source, $msg, $msgtype)
+    function commandHandler($source, $msg, $msgtype)
     { // Start funciton handler
         $vars = explode(' ', strtolower($msg));
 
@@ -283,19 +283,19 @@ class Security_Core extends BaseActiveModule
         case 'security':
             switch ($vars[1]) {
             case "changelevel":
-                if ($this->check_access($source, "SUPERADMIN")) {
+                if ($this->checkAccess($source, "SUPERADMIN")) {
                     //The following is in URGENT NEED of comments!
                     if (preg_match("/^security changelevel (Department) (Squad|Unit|Board) (Commander|Leader|Member) (.+)$/i", $msg, $info)) {
-                        return $this->change_level($info[2] . " " . $info[3], $info[4], $info[1]); // SA
+                        return $this->changeLevel($info[2] . " " . $info[3], $info[4], $info[1]); // SA
                     }
                     elseif (preg_match("/^security changelevel (Faction) (Board Member) (.+)$/i", $msg, $info)) {
-                        return $this->change_level($info[2], $info[3], $info[1]); // SA
+                        return $this->changeLevel($info[2], $info[3], $info[1]); // SA
                     }
                     elseif (preg_match("/^security changelevel (.+?) (.+?) (.+)$/i", $msg, $info)) {
-                        return $this->change_level($info[2], $info[3], $info[1]); // SA
+                        return $this->changeLevel($info[2], $info[3], $info[1]); // SA
                     }
                     elseif (preg_match("/^security changelevel (.+?) (.+)$/i", $msg, $info)) {
-                        return $this->change_level($info[1], $info[2]); // SA
+                        return $this->changeLevel($info[1], $info[2]); // SA
                     }
                 }
                 else {
@@ -304,20 +304,20 @@ class Security_Core extends BaseActiveModule
                 }
                 break;
             case "levels":
-                if ($this->check_access($source, "SUPERADMIN")) {
-                    return $this->show_security_levels($msgtype); // A
+                if ($this->checkAccess($source, "SUPERADMIN")) {
+                    return $this->showSecurityLevels($msgtype); // A
                 }
                 else {
                     $this->error->set("Only SUPERADMINs can modify the access levels.");
                     return $this->error;
                 }
-            case "whois":
-                if ($this->check_access(
+            case "whoIs":
+                if ($this->checkAccess(
                     $source, $this->bot
                         ->core("settings")->get('Security', 'Whois')
                 )
                 ) {
-                    return $this->whois($vars[2]);
+                    return $this->whoIs($vars[2]);
                 }
                 else {
                     $this->error->set(
@@ -325,23 +325,23 @@ class Security_Core extends BaseActiveModule
                             $this->bot
                                 ->core("settings")
                                 ->get('Security', 'Whois')
-                        ) . " access or higher to use <pre>security whois"
+                        ) . " access or higher to use <pre>security whoIs"
                     );
                     return $this->error;
                 }
                 break;
-            case "whoami":
-                if ($this->check_access($source, "GUEST")) {
-                    return $this->whoami($source);
+            case "whoAmI":
+                if ($this->checkAccess($source, "GUEST")) {
+                    return $this->whoAmI($source);
                 }
                 else {
-                    $this->bot->log("SECURITY", "DENIED", "Player " . $source . " was denied access to <pre>security whoami.");
+                    $this->bot->log("SECURITY", "DENIED", "Player " . $source . " was denied access to <pre>security whoAmI.");
                     return FALSE;
                 }
                 break;
             case "groups":
-                if ($this->check_access($source, "GUEST")) {
-                    return $this->show_groups();
+                if ($this->checkAccess($source, "GUEST")) {
+                    return $this->showGroups();
                 }
                 else {
                     $this->error->set("You need to be GUEST or higher to access 'groups'");
@@ -349,11 +349,11 @@ class Security_Core extends BaseActiveModule
                 }
                 break;
             default:
-                if ($this->check_access($source, "GUEST")) {
-                    return $this->show_security_menu($source);
+                if ($this->checkAccess($source, "GUEST")) {
+                    return $this->showSecurityMenu($source);
                 }
                 else {
-                    $this->error->set("You need to be GUEST or higher to access 'check_access'");
+                    $this->error->set("You need to be GUEST or higher to access 'checkAccess'");
                     return $this->error;
                 }
                 break;
@@ -361,12 +361,12 @@ class Security_Core extends BaseActiveModule
             break;
         case 'adduser': // adduser username group
             if (isset($vars[2])) {
-                if ($this->check_access(
+                if ($this->checkAccess(
                     $source, $this->bot
                         ->core("settings")->get('Security', 'Addgroupmember')
                 )
                 ) {
-                    return $this->add_group_member($vars[1], $vars[2], $source);
+                    return $this->addGroupMember($vars[1], $vars[2], $source);
                 }
                 else {
                     $this->error->set(
@@ -380,12 +380,12 @@ class Security_Core extends BaseActiveModule
                 }
             }
             else {
-                if ($this->check_access(
+                if ($this->checkAccess(
                     $source, $this->bot
                         ->core("settings")->get('Security', 'Adduser')
                 )
                 ) {
-                    return $this->add_user($source, $vars[1]);
+                    return $this->addUser($source, $vars[1]);
                 }
                 else {
                     $this->error->set(
@@ -401,12 +401,12 @@ class Security_Core extends BaseActiveModule
             break;
         case 'deluser':
             if (isset($vars[2])) {
-                if ($this->check_access(
+                if ($this->checkAccess(
                     $source, $this->bot
                         ->core("settings")->get('Security', 'Remgroupmember')
                 )
                 ) {
-                    return $this->rem_group_member($vars[1], $vars[2], $source);
+                    return $this->remGroupMember($vars[1], $vars[2], $source);
                 }
                 else {
                     $this->error->set(
@@ -420,12 +420,12 @@ class Security_Core extends BaseActiveModule
                 }
             }
             else {
-                if ($this->check_access(
+                if ($this->checkAccess(
                     $source, $this->bot
                         ->core("settings")->get('Security', 'Deluser')
                 )
                 ) {
-                    return $this->del_user($source, $vars[1]);
+                    return $this->delUser($source, $vars[1]);
                 }
                 else {
                     $this->error->set(
@@ -440,16 +440,16 @@ class Security_Core extends BaseActiveModule
             }
             break;
         case 'addgroup':
-            if ($this->check_access(
+            if ($this->checkAccess(
                 $source, $this->bot->core("settings")
                     ->get('Security', 'Addgroup')
             )
             ) {
                 if (preg_match("/^addgroup (.+?) (.+)$/i", $msg, $info)) {
-                    return $this->add_group($info[1], $info[2], $source);
+                    return $this->addGroup($info[1], $info[2], $source);
                 }
                 else {
-                    $this->error->set("Not enough paramaters given. Try /tell <botname> <pre>addgroup groupname description.");
+                    $this->error->set("Not enough paramaters given. Try /sendTell <botname> <pre>addgroup groupname description.");
                 }
             }
             else {
@@ -464,16 +464,16 @@ class Security_Core extends BaseActiveModule
             }
             break;
         case 'delgroup':
-            if ($this->check_access(
+            if ($this->checkAccess(
                 $source, $this->bot->core("settings")
                     ->get('Security', 'Delgroup')
             )
             ) {
                 if (isset($vars[1])) {
-                    return $this->del_group($vars[1], $source);
+                    return $this->delGroup($vars[1], $source);
                 }
                 else {
-                    $this->error->set("Not enough paramaters given. Try /tell <botname> <pre>delgroup groupname.");
+                    $this->error->set("Not enough paramaters given. Try /sendTell <botname> <pre>delgroup groupname.");
                     return $this->error;
                 }
             }
@@ -490,8 +490,8 @@ class Security_Core extends BaseActiveModule
             break;
         case 'admin':
             if (preg_match("/^admin group(s){0,1}$/i", $msg)) {
-                if ($this->check_access($source, "guest")) {
-                    return $this->show_groups();
+                if ($this->checkAccess($source, "guest")) {
+                    return $this->showGroups();
                 }
                 else {
                     return FALSE; // FIXME: Nothing returned?
@@ -499,12 +499,12 @@ class Security_Core extends BaseActiveModule
             }
             else {
                 if (preg_match("/^admin group add (.+?) (.+)$/i", $msg, $info)) {
-                    if ($this->check_access(
+                    if ($this->checkAccess(
                         $source, $this->bot
                             ->core("settings")->get('Security', 'Addgroupmember')
                     )
                     ) {
-                        return $this->add_group($info[1], $info[2], $source);
+                        return $this->addGroup($info[1], $info[2], $source);
                     }
                     else {
                         $this->error->set(
@@ -519,12 +519,12 @@ class Security_Core extends BaseActiveModule
                 }
                 else {
                     if (preg_match("/^admin group add ([a-zA-Z0-9]+)$/i", $msg, $info)) {
-                        if ($this->check_access(
+                        if ($this->checkAccess(
                             $source, $this->bot
                                 ->core("settings")->get('Security', 'Addgroupmember')
                         )
                         ) {
-                            return $this->add_group($info[1], " ", $source); // No group description
+                            return $this->addGroup($info[1], " ", $source); // No group description
                         }
                         else {
                             $this->error->set(
@@ -539,12 +539,12 @@ class Security_Core extends BaseActiveModule
                     }
                     else {
                         if (preg_match("/^admin group (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
-                            if ($this->check_access(
+                            if ($this->checkAccess(
                                 $source, $this->bot
                                     ->core("settings")->get('Security', 'Delgroup')
                             )
                             ) {
-                                return $this->del_group($info[2], $source);
+                                return $this->delGroup($info[2], $source);
                             }
                             else {
                                 $this->error->set(
@@ -559,12 +559,12 @@ class Security_Core extends BaseActiveModule
                         }
                         else {
                             if (preg_match("/^admin add ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
-                                if ($this->check_access(
+                                if ($this->checkAccess(
                                     $source, $this->bot
                                         ->core("settings")->get('Security', 'Addgroupmember')
                                 )
                                 ) {
-                                    return $this->add_group_member($info[2], $info[1], $source);
+                                    return $this->addGroupMember($info[2], $info[1], $source);
                                 }
                                 else {
                                     $this->error->set(
@@ -579,12 +579,12 @@ class Security_Core extends BaseActiveModule
                             }
                             else {
                                 if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
-                                    if ($this->check_access(
+                                    if ($this->checkAccess(
                                         $source, $this->bot
                                             ->core("settings")->get('Security', 'Remgroupmember')
                                     )
                                     ) {
-                                        return $this->rem_group_member($info[3], $info[2], $source);
+                                        return $this->remGroupMember($info[3], $info[2], $source);
                                     }
                                     else {
                                         $this->error->set(
@@ -599,12 +599,12 @@ class Security_Core extends BaseActiveModule
                                 }
                                 else {
                                     if (preg_match("/^admin (remove|rem|del) ([a-zA-Z0-9]+)$/i", $msg, $info)) {
-                                        if ($this->check_access(
+                                        if ($this->checkAccess(
                                             $source, $this->bot
                                                 ->core("settings")->get('Security', 'Deluser')
                                         )
                                         ) {
-                                            return $this->del_user($source, $info[2]);
+                                            return $this->delUser($source, $info[2]);
                                         }
                                         else {
                                             $this->error->set(
@@ -635,8 +635,8 @@ class Security_Core extends BaseActiveModule
     /*
     Adds a group.
     */
-    function add_group($groupname, $description, $caller = "Internal Process")
-    { // Start function add_group()
+    function addGroup($groupname, $description, $caller = "Internal Process")
+    { // Start function addGroup()
         $groupname = strtolower($groupname);
         if ($groupname == "leader" || $groupname == "admin" || $groupname == "superadmin" || $groupname == "member"
             || $groupname == "guest"
@@ -682,16 +682,16 @@ class Security_Core extends BaseActiveModule
             "access_level" => 0
         );
         $tmp['members'] = array();
-        $this->cache_mgr("add", "groups", $tmp);
+        $this->cacheManager("add", "groups", $tmp);
         $this->bot->log("SECURITY", "ADDGROUP", $caller . " Created group " . $groupname . " with anonymous level privileges.");
         return "Created group " . $groupname . " with anonymous level privileges.";
-    } // End function add_group()
+    } // End function addGroup()
 
     /*
     Deletes a group.
     */
-    function del_group($target, $caller = "Internal Process")
-    { // Start function del_group()
+    function delGroup($target, $caller = "Internal Process")
+    { // Start function delGroup()
         $target = strtolower($target);
         if ($target == "leader" || $target == "admin" || $target == "superadmin") {
             $this->error->set($target . " cannot be deleted.");
@@ -716,20 +716,20 @@ class Security_Core extends BaseActiveModule
         $sql = "DELETE FROM #___security_groups WHERE gid = '" . $this->cache['groups'][$target]['gid'] . "'";
         $this->bot->db->query($sql);
         $this->bot->log("SECURITY", "DELGROUP", $caller . " Deleted group ID " . $this->cache['groups'][$target]['gid'] . " Name: " . $target . ".");
-        $this->cache_mgr("rem", "groups", $target);
+        $this->cacheManager("rem", "groups", $target);
 
         // Clear the flexible security cache if it exists:
         if ($this->bot->core("flexible_security") != NULL) {
             $this->bot->core("flexible_security")->clear_cache();
         }
         return "Deleted group ID " . $this->cache['groups'][$target]['gid'] . " Name: " . $target . ".";
-    } // End function del_group()
+    } // End function delGroup()
 
     /*
     Adds $target to $group
     */
-    function add_group_member($target, $group, $caller = "Internal Process")
-    { // Start function add_group_member()
+    function addGroupMember($target, $group, $caller = "Internal Process")
+    { // Start function addGroupMember()
         $target = ucfirst(strtolower($target));
         $group = strtolower($group);
         $uid = $this->bot->core('player')->id($target);
@@ -737,13 +737,13 @@ class Security_Core extends BaseActiveModule
             $this->error->set($target . " is not a valid character.");
             return $this->error;
         }
-        $gid = $this->get_gid($group);
+        $gid = $this->getGroupId($group);
         if ($gid == -1) {
             $this->error->set("Unable to find group ID for " . $group . " " . $group . " may not exisit. Check your spelling and try again.");
             return $this->error;
         }
 
-        if (strtolower($caller) != "internal process" && $this->get_access_level($caller) < $this->cache['groups'][$gid]['access_level']) {
+        if (strtolower($caller) != "internal process" && $this->getAccessLevel($caller) < $this->cache['groups'][$gid]['access_level']) {
             $this->error->set("Your Access Level is less than the Access Level of " . $group . ". You cannot add members to " . $group . ".");
             return $this->error;
         }
@@ -751,7 +751,7 @@ class Security_Core extends BaseActiveModule
         if (!isset($this->cache['groups'][$gid]['members'][$target])) {
             $sql = "INSERT INTO #___security_members (name,gid) VALUES ('" . $target . "', " . $gid . ")";
             $this->bot->db->query($sql);
-            $this->cache_mgr("add", "groupmem", $group, $target);
+            $this->cacheManager("add", "groupmem", $group, $target);
             $this->bot->log("SECURITY", "GRPMBR", $caller . " Added " . $target . " to group " . $group . ".");
             return ("Added " . $target . " to group " . $group . ".");
         }
@@ -759,13 +759,13 @@ class Security_Core extends BaseActiveModule
             $this->error->set($target . " is already a member of " . $group);
             return $this->error;
         }
-    } // End function add_group_member()
+    } // End function addGroupMember()
 
     /*
     Removes $target from $group if $name is an admin.
     */
-    function rem_group_member($target, $group, $caller)
-    { // Start function rem_group_member()
+    function remGroupMember($target, $group, $caller)
+    { // Start function remGroupMember()
         $target = ucfirst(strtolower($target));
         $group = strtolower($group);
         $uid = $this->bot->core('player')->id($target);
@@ -774,7 +774,7 @@ class Security_Core extends BaseActiveModule
             return $this->error;
         }
 
-        $gid = $this->get_gid($group);
+        $gid = $this->getGroupId($group);
         if ($gid == -1) {
             $this->error->set("Unable to find group ID for " . $group . " " . $group . " may not exisit. Check your spelling and try again.");
             return $this->error;
@@ -782,7 +782,7 @@ class Security_Core extends BaseActiveModule
 
 
         if (!preg_match("/^Internal Process: (.*)$/i", $caller)) {
-            if ($this->get_access_level($caller) < $this->cache['groups'][$group]['access_level']) {
+            if ($this->getAccessLevel($caller) < $this->cache['groups'][$group]['access_level']) {
                 $this->error->set("Your Access Level is lower than " . $group . "'s Access Level. You cannot remove members from " . $group . ".");
                 return $this->error;
             }
@@ -791,7 +791,7 @@ class Security_Core extends BaseActiveModule
         if (isset($this->cache['groups'][$group]['members'][$target])) {
             $sql = "DELETE FROM #___security_members WHERE name = '" . $target . "' AND gid = " . $this->cache['groups'][$group]['gid'];
             $this->bot->db->query($sql);
-            $this->cache_mgr("rem", "groupmem", $group, $target);
+            $this->cacheManager("rem", "groupmem", $group, $target);
             $this->bot->log("SECURITY", "GRPMBR", $caller . " Removed " . $target . " from " . $group);
             return "Removed " . $target . " from " . $group;
         }
@@ -799,28 +799,28 @@ class Security_Core extends BaseActiveModule
             $this->error->set($target . " is not a member of " . $group);
             return $this->error;
         }
-    } // End function rem_group_member()
+    } // End function remGroupMember()
 
     /*
     Adds a user as a guest or member.
     $admin = person setting the ban.
     $target = person being banned.
     */
-    function add_user($admin, $target)
-    { // Start function add_user()
+    function addUser($admin, $target)
+    { // Start function addUser()
         $admin = ucfirst(strtolower($admin));
         $target = ucfirst(strtolower($target));
         $level = strtoupper($level);
         $uid = $this->bot->core('player')->id($target);
         // Check to see if user is banned.
-        if ($this->is_banned($target)) {
+        if ($this->isBanned($target)) {
             $this->error->set($target . " is banned.");
             return $this->error;
         }
 
-        // Get whois data & check for errors.
+        // Get whoIs data & check for errors.
         if ($this->bot->game == "ao") {
-            $who = $this->bot->core("whois")->lookup($target);
+            $who = $this->bot->core("whoIs")->lookup($target);
             if ($who instanceof BotError) {
                 return $who;
             }
@@ -845,21 +845,21 @@ class Security_Core extends BaseActiveModule
             return $this->error;
         }
         else {
-            $this->cache_mgr("add", $cache, $target);
-            $sql = "INSERT INTO #___users (char_id, nickname, added_by, added_at, user_level, updated_at) ";
+            $this->cacheManager("add", $cache, $target);
+            $sql = "INSERT INTO #___users (char_id, nickname, added_by, added_at, userLevel, updated_at) ";
             $sql .= "VALUES (" . $uid . ", '" . $target . "', '" . mysql_real_escape_string($admin) . "', " . time() . ", " . $lvlnum . ", " . time() . ") ";
-            $sql .= "ON DUPLICATE KEY UPDATE added_by = VALUES(added_by), added_at = VALUES(added_at), user_level=VALUES(user_level), updated_at = VALUES(updated_at)";
+            $sql .= "ON DUPLICATE KEY UPDATE added_by = VALUES(added_by), added_at = VALUES(added_at), userLevel=VALUES(userLevel), updated_at = VALUES(updated_at)";
             $this->bot->db->query($sql);
             $this->bot->log("SECURITY", "ADDUSER", $admin . " Added " . $target . " as a " . $level);
             return "Added " . $target . " as a " . $level;
         }
-    } // End function add_user()
+    } // End function addUser()
 
     /*
     Removes a user
     */
-    function del_user($admin, $target)
-    { // Start function del_user()
+    function delUser($admin, $target)
+    { // Start function delUser()
         $admin = ucfirst(strtolower($admin));
         $target = ucfirst(strtolower($target));
         if (!isset($this->cache["members"][$target]) && !isset($this->cache["guests"][$target])) {
@@ -867,34 +867,34 @@ class Security_Core extends BaseActiveModule
             return $this->error;
         }
         else {
-            $this->cache_mgr("rem", "members", $target);
-            $this->cache_mgr("rem", "guests", $target);
-            $groups = $this->get_groups($target);
+            $this->cacheManager("rem", "members", $target);
+            $this->cacheManager("rem", "guests", $target);
+            $groups = $this->getGroups($target);
             if ($groups <> -1) {
                 foreach ($groups as $gid) {
-                    $this->rem_group_member($target, $this->cache['groups'][$gid]['name']);
+                    $this->remGroupMember($target, $this->cache['groups'][$gid]['name']);
                 }
             }
             $this->bot->core("notify")->del($target);
             $sql
                 =
-                "UPDATE #___users SET user_level = 0, deleted_by = '" . mysql_real_escape_string($admin) . "', deleted_at = " . time() . ", notify = 0 WHERE nickname = '" . $target
+                "UPDATE #___users SET userLevel = 0, deleted_by = '" . mysql_real_escape_string($admin) . "', deleted_at = " . time() . ", notify = 0 WHERE nickname = '" . $target
                     . "'";
             $this->bot->db->query($sql);
             $this->bot->log("SECURITY", "DELUSER", $admin . " " . $target . " has been removed from <botname>.");
             return $target . " has been removed from <botname>.";
         }
-    } // End function del_user()
+    } // End function delUser()
 
     /*
     $admin = person setting the ban.
     $target = person being banned.
     */
-    function set_ban(
+    function setBan(
         $admin, $target, $caller = "Internal Process",
         $reason = "None given.", $endtime = 0
     )
-    { // Start function set_ban()
+    { // Start function setBan()
         $admin = ucfirst(strtolower($admin));
         $target = ucfirst(strtolower($target));
 
@@ -903,7 +903,7 @@ class Security_Core extends BaseActiveModule
             return $this->error;
         }
 
-        if ($this->check_access($target, "OWNER")) {
+        if ($this->checkAccess($target, "OWNER")) {
             $this->error->set($target . " is the bot owner and cannot be banned.");
             return $this->error;
         }
@@ -913,43 +913,43 @@ class Security_Core extends BaseActiveModule
             return $this->error;
         }
         elseif (isset($this->cache['guests'][$target])) {
-            $this->cache_mgr("rem", "guests", $target);
-            $this->cache_mgr("add", "banned", $target);
-            $sql = "UPDATE #___users SET user_level = -1, banned_by = '" . mysql_real_escape_string($admin) . "', banned_at = " . time() . ", banned_for = '"
+            $this->cacheManager("rem", "guests", $target);
+            $this->cacheManager("add", "banned", $target);
+            $sql = "UPDATE #___users SET userLevel = -1, banned_by = '" . mysql_real_escape_string($admin) . "', banned_at = " . time() . ", banned_for = '"
                 . mysql_real_escape_string($reason) . "', banned_until = " . $endtime . " WHERE nickname = '" . $target . "'";
         }
         elseif (isset($this->cache['members'][$target])) {
-            $this->cache_mgr("rem", "members", $target);
-            $this->cache_mgr("add", "banned", $target);
-            $sql = "UPDATE #___users SET user_level = -1, banned_by = '" . mysql_real_escape_string($admin) . "', banned_at = " . time() . ", updated_at = " . time()
+            $this->cacheManager("rem", "members", $target);
+            $this->cacheManager("add", "banned", $target);
+            $sql = "UPDATE #___users SET userLevel = -1, banned_by = '" . mysql_real_escape_string($admin) . "', banned_at = " . time() . ", updated_at = " . time()
                 . ", banned_for = '" . mysql_real_escape_string($reason) . "', banned_until = " . $endtime . " WHERE nickname = '" . $target . "'";
         }
         else // They are not in the member table at all.
         {
-            $who = $this->bot->core("whois")->lookup($target);
+            $who = $this->bot->core("whoIs")->lookup($target);
             if ($who instanceof BotError) {
                 return $who;
             }
-            $this->cache_mgr("add", "banned", $target);
-            $sql = "INSERT INTO #___users (char_id,nickname,added_by,added_at,banned_by,banned_at,banned_for,banned_until,notify,user_level,updated_at) ";
+            $this->cacheManager("add", "banned", $target);
+            $sql = "INSERT INTO #___users (char_id,nickname,added_by,added_at,banned_by,banned_at,banned_for,banned_until,notify,userLevel,updated_at) ";
             $sql
                 .=
                 "VALUES ('" . $who['id'] . "', '" . $who['nickname'] . "', '" . mysql_real_escape_string($admin) . "', " . time() . ", '" . mysql_real_escape_string($admin) . "', "
                     . time() . ", '" . mysql_real_escape_string($reason) . "', " . $endtime . ", 0, -1, " . time() . ") ";
-            $sql .= " ON DUPLICATE KEY UPDATE banned_by = VALUES(banned_by), banned_at = VALUES(banned_at), user_level = VALUES(user_level), updated_at = VALUES(updated_at), banned_for = VALUES(banned_for), banned_until = VALUES(banned_until)";
+            $sql .= " ON DUPLICATE KEY UPDATE banned_by = VALUES(banned_by), banned_at = VALUES(banned_at), userLevel = VALUES(userLevel), updated_at = VALUES(updated_at), banned_for = VALUES(banned_for), banned_until = VALUES(banned_until)";
         }
         $this->bot->db->query($sql);
         $this->bot->core("player_notes")->add($target, $admin, $reason, 1);
         $this->bot->core("notify")->del($target);
         $this->bot->log("SECURITY", "BAN", $caller . " Banned " . $target . " from " . $this->bot->botname . ".");
         return "Banned " . $target . " from " . $this->bot->botname . ".";
-    } // End function set_ban()
+    } // End function setBan()
 
     /*
     Removes a ban.
     */
-    function rem_ban($admin, $target, $caller = "Internal Process")
-    { // Start function rem_ban()
+    function remBan($admin, $target, $caller = "Internal Process")
+    { // Start function remBan()
         $admin = ucfirst(strtolower($admin));
         $target = ucfirst(strtolower($target));
         if (!isset($this->cache['banned'][$target])) {
@@ -957,32 +957,32 @@ class Security_Core extends BaseActiveModule
             return $this->error;
         }
         else {
-            $this->cache_mgr("rem", "banned", $target);
-            $sql = "UPDATE #___users SET user_level = 0 WHERE nickname = '" . $target . "'";
+            $this->cacheManager("rem", "banned", $target);
+            $sql = "UPDATE #___users SET userLevel = 0 WHERE nickname = '" . $target . "'";
             $this->bot->db->query($sql);
             $return = "Unbanned " . $target . " from " . $this->bot->botname . ". " . $target . " is now anonymous.";
             $this->bot->log("SECURITY", "BAN", $caller . " " . $return);
             return $return;
         }
-    } // End function rem_ban()
+    } // End function remBan()
 
     /*
     Returns the group id for $groupname.
     Returns -1 if the group doesn't exisit.
     */
-    function get_gid($groupname)
-    { // Start function get_gid()
+    function getGroupId($groupname)
+    { // Start function getGroupId()
         if (isset($this->cache['groups'][$groupname]['gid'])) {
             return $this->cache['groups'][$groupname]['gid'];
         }
         else {
             return -1;
         }
-    } // End function get_gid()
+    } // End function getGroupId()
 
     // Shows the security commands.
-    function show_security_menu($source)
-    { // Start function show_security_menu
+    function showSecurityMenu($source)
+    { // Start function showSecurityMenu
         $inside = "Security System Main Menu\n\n";
         $inside .= "[" . $this->bot->core("tools")
             ->chatcmd("security groups", "Security Groups") . "]\n";
@@ -991,18 +991,18 @@ class Security_Core extends BaseActiveModule
         $inside .= "[" . $this->bot->core("tools")
             ->chatcmd("settings security", "Security Settings") . "]\n";
         $inside .= "[" . $this->bot->core("tools")
-            ->chatcmd("security whoami", "Your Security Level and Group Membership") . "]\n";
+            ->chatcmd("security whoAmI", "Your Security Level and Group Membership") . "]\n";
         $inside .= "\n";
-        $inside .= "To see someone elses Security Level and Group Membership type\n /tell <botname> <pre>security whois &lt;playername&gt;\n";
+        $inside .= "To see someone elses Security Level and Group Membership type\n /sendTell <botname> <pre>security whoIs &lt;playername&gt;\n";
         return $this->bot->core("tools")->make_blob("Security System", $inside);
-    } // End function show_security_menu
+    } // End function showSecurityMenu
 
     /*
     Shows the groups, their ID numbers, and access levels.
     If called by a superadmin, allows changing access levels.
     */
-    function show_security_levels($msgtype)
-    { // Start function show_security_levels()
+    function showSecurityLevels($msgtype)
+    { // Start function showSecurityLevels()
         $sql = "SELECT gid,name,description,access_level FROM #___security_groups ";
         $sql .= "WHERE name != 'superadmin' AND name != 'admin' AND name != 'leader' ";
         $sql .= "ORDER BY access_level DESC, name ASC";
@@ -1011,66 +1011,66 @@ class Security_Core extends BaseActiveModule
             foreach ($result as $group) {
                 if ($group['access_level'] == SUPERADMIN && $group['name'] <> "superadmin") {
                     $superadmin .= "+ Security Group " . $group['name'] . " (" . stripslashes($group['description']) . "):\n    Change " . $group['name'] . " Access Level To: "
-                        . $this->change_links(SUPERADMIN, $group['gid'], $msgtype) . "\n";
+                        . $this->changeLinks(SUPERADMIN, $group['gid'], $msgtype) . "\n";
                 }
                 if ($group['access_level'] == ADMIN && $group['name'] <> "admin") {
                     $admin .= "+ Security Group " . $group['name'] . " (" . stripslashes($group['description']) . "):\n    Change " . $group['name'] . " Access Level To: "
-                        . $this->change_links(ADMIN, $group['gid'], $msgtype) . "\n";
+                        . $this->changeLinks(ADMIN, $group['gid'], $msgtype) . "\n";
                 }
                 if ($group['access_level'] == LEADER && $group['name'] <> "leader") {
                     $leader .= "+ Security Group " . $group['name'] . " (" . stripslashes($group['description']) . "):\n    Change " . $group['name'] . " Access Level To: "
-                        . $this->change_links(LEADER, $group['gid'], $msgtype) . "\n";
+                        . $this->changeLinks(LEADER, $group['gid'], $msgtype) . "\n";
                 }
                 if ($group['access_level'] == MEMBER && $group['name'] <> "member") {
                     $member .= "+ Security Group " . $group['name'] . " (" . stripslashes($group['description']) . "):\n    Change " . $group['name'] . " Access Level To: "
-                        . $this->change_links(MEMBER, $group['gid'], $msgtype) . "\n";
+                        . $this->changeLinks(MEMBER, $group['gid'], $msgtype) . "\n";
                 }
                 if ($group['access_level'] == GUEST && $group['name'] <> "guest") {
                     $guest .= "+ Security Group " . $group['name'] . " (" . stripslashes($group['description']) . "):\n    Change " . $group['name'] . " Access Level To: "
-                        . $this->change_links(GUEST, $group['gid'], $msgtype) . "\n";
+                        . $this->changeLinks(GUEST, $group['gid'], $msgtype) . "\n";
                 }
                 if ($group['access_level'] == ANONYMOUS && $group['name'] <> "anonymous") {
                     $anonymous .= "+ Security Group " . $group['name'] . " (" . stripslashes($group['description']) . "):\n    Change " . $group['name'] . " Access Level To: "
-                        . $this->change_links(ANONYMOUS, $group['gid'], $msgtype) . "\n";
+                        . $this->changeLinks(ANONYMOUS, $group['gid'], $msgtype) . "\n";
                 }
             }
         }
         unset($result);
         if ($this->bot->guildbot) {
-            $sql = "SELECT org_rank, org_rank_id, access_level FROM #___security_org ";
+            $sql = "SELECT orgRank, orgRankId, access_level FROM #___security_org ";
             $sql .= "WHERE org_gov = '" . $this->bot->core("settings")
                 ->get('Security', 'Orggov') . "' ";
-            $sql .= "ORDER BY org_rank_id ASC, access_level DESC";
+            $sql .= "ORDER BY orgRankId ASC, access_level DESC";
             $result = $this->bot->db->select($sql, MYSQL_ASSOC);
             if (!empty($result)) // This really should never be empty as this module automaticaly inserts data here.
             {
                 foreach ($result as $rank) {
                     if ($rank['access_level'] == SUPERADMIN) {
                         $superadmin
-                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->change_links(SUPERADMIN, $rank, $msgtype)
+                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(SUPERADMIN, $rank, $msgtype)
                             . "\n";
                     }
                     if ($rank['access_level'] == ADMIN) {
                         $admin
-                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->change_links(ADMIN, $rank, $msgtype) . "\n";
+                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(ADMIN, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == LEADER) {
                         $leader
                             .=
-                            "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->change_links(LEADER, $rank, $msgtype) . "\n";
+                            "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(LEADER, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == MEMBER) {
                         $member
                             .=
-                            "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->change_links(MEMBER, $rank, $msgtype) . "\n";
+                            "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(MEMBER, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == GUEST) {
                         $guest
-                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->change_links(GUEST, $rank, $msgtype) . "\n";
+                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(GUEST, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == ANONYMOUS) {
                         $anonymous
-                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->change_links(ANONYMOUS, $rank, $msgtype)
+                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(ANONYMOUS, $rank, $msgtype)
                             . "\n";
                     }
                 }
@@ -1106,11 +1106,11 @@ class Security_Core extends BaseActiveModule
             ->chatcmd("security groups", "Security: Security Groups") . "] ";
         return $this->bot->core("tools")
             ->make_blob("Security Access Levels", $return);
-    } // End function show_security_levels()
+    } // End function showSecurityLevels()
 
     // Displays security groups, the group's access level, and the members of the group.
-    function show_groups()
-    { // Start function show_groups()
+    function showGroups()
+    { // Start function showGroups()
         $sql = "SELECT gid, name, description, access_level FROM #___security_groups ";
         $sql .= "ORDER BY access_level DESC, gid ASC, name";
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
@@ -1124,37 +1124,37 @@ class Security_Core extends BaseActiveModule
             if ($group['access_level'] == SUPERADMIN) {
                 $superadmins .= " + " . $group['name'] . " (" . stripslashes($group['description']) . ") ";
                 $superadmins .= "\n";
-                $superadmins .= $this->make_group_member_list($group['gid']);
+                $superadmins .= $this->makeGroupMemberList($group['gid']);
                 $superadmins .= "\n";
             }
             elseif ($group['access_level'] == ADMIN) {
                 $admins .= " + " . $group['name'] . " (" . stripslashes($group['description']) . ") ";
                 $admins .= "\n";
-                $admins .= $this->make_group_member_list($group['gid']);
+                $admins .= $this->makeGroupMemberList($group['gid']);
                 $admins .= "\n";
             }
             elseif ($group['access_level'] == LEADER) {
                 $leaders .= " + " . $group['name'] . " (" . stripslashes($group['description']) . ") ";
                 $leaders .= "\n";
-                $leaders .= $this->make_group_member_list($group['gid']);
+                $leaders .= $this->makeGroupMemberList($group['gid']);
                 $leaders .= "\n";
             }
             elseif ($group['access_level'] == MEMBER) {
                 $members .= " + " . $group['name'] . " (" . stripslashes($group['description']) . ") ";
                 $members .= "\n";
-                $members .= $this->make_group_member_list($group['gid']);
+                $members .= $this->makeGroupMemberList($group['gid']);
                 $members .= "\n";
             }
             elseif ($group['access_level'] == GUEST) {
                 $guests .= " + " . $group['name'] . " (" . stripslashes($group['description']) . ") ";
                 $guests .= "\n";
-                $guests .= $this->make_group_member_list($group['gid']);
+                $guests .= $this->makeGroupMemberList($group['gid']);
                 $guests .= "\n";
             }
             elseif ($group['access_level'] == ANONYMOUS) {
                 $anon .= " + " . $group['name'] . " (" . stripslashes($group['description']) . ") ";
                 $anon .= "\n";
-                $anon .= $this->make_group_member_list($group['gid']);
+                $anon .= $this->makeGroupMemberList($group['gid']);
                 $anon .= "\n";
             }
         }
@@ -1176,11 +1176,11 @@ class Security_Core extends BaseActiveModule
         $return .= "[" . $this->bot->core("tools")
             ->chatcmd("security levels", "Security: Access Levels") . "] ";
         return $this->bot->core("tools")->make_blob("Security Groups", $return);
-    } // End function show_groups()
+    } // End function showGroups()
 
-    // Makes the list of group members for show_groups()
-    function make_group_member_list($gid)
-    { // Start function make_group_member_list()
+    // Makes the list of group members for showGroups()
+    function makeGroupMemberList($gid)
+    { // Start function makeGroupMemberList()
         $tmp = "";
         if (empty($this->cache['groups'][$gid]['members'])) {
             return "        - No members.";
@@ -1191,7 +1191,7 @@ class Security_Core extends BaseActiveModule
             $tmp .= "        - " . $member . "\n";
         }
         return rtrim($tmp);
-    } // End function make_group_member_list()
+    } // End function makeGroupMemberList()
 
     // Displays all admins.
     function show_admins($source)
@@ -1199,19 +1199,19 @@ class Security_Core extends BaseActiveModule
     } // End function show_admins()
 
     /*
-    Creates the proper change links for a group, called by show_groups.
+    Creates the proper change links for a group, called by showGroups.
     $levelid = numeric access level
     $groupid = group id number or name/shortname
-    $source = source of command (pgmsg, gc, tell)
+    $source = source of command (sendToGroup, sendToGuildChat, sendTell)
     */
-    function change_links($levelid, $groupid, $msgtype)
-    { // Start function change_links
+    function changeLinks($levelid, $groupid, $msgtype)
+    { // Start function changeLinks
         if (!is_numeric($levelid)) {
             return NULL;
         }
         if (is_array($groupid)) {
             $vars = $this->bot->core("settings")
-                ->get('Security', 'Orggov') . " " . $groupid['org_rank'];
+                ->get('Security', 'Orggov') . " " . $groupid['orgRank'];
         }
         else {
             $vars = $groupid;
@@ -1247,13 +1247,13 @@ class Security_Core extends BaseActiveModule
                 ->chatcmd($chatcmd . ANONYMOUS, "ANONYMOUS", $msgtype) . "] ";
         }
         return $return;
-    } // End function change_links
+    } // End function changeLinks
 
     /*
     Changes the access level of a security group or org rank.
     */
-    function change_level($groupid, $newacl, $government = NULL)
-    { // Start function change_level()
+    function changeLevel($groupid, $newacl, $government = NULL)
+    { // Start function changeLevel()
         if (!is_numeric($newacl)) {
             return "Access Levels should be an integer.";
         }
@@ -1263,7 +1263,7 @@ class Security_Core extends BaseActiveModule
         if (is_numeric($groupid) && is_null($government)) {
             $orgrank = FALSE;
             $sql = "UPDATE #___security_groups SET access_level = " . $newacl . " WHERE gid = " . $groupid;
-            $return = "Group ID " . $groupid . " changed to access level " . $this->get_access_name($newacl);
+            $return = "Group ID " . $groupid . " changed to access level " . $this->getAccessName($newacl);
         }
         elseif (strtolower($government) == strtolower(
             $this->bot
@@ -1271,9 +1271,9 @@ class Security_Core extends BaseActiveModule
         )
         ) {
             $orgrank = TRUE;
-            $sql = "UPDATE #___security_org SET access_level = " . $newacl . " WHERE org_gov = '" . mysql_real_escape_string($government) . "' AND org_rank = '"
+            $sql = "UPDATE #___security_org SET access_level = " . $newacl . " WHERE org_gov = '" . mysql_real_escape_string($government) . "' AND orgRank = '"
                 . mysql_real_escape_string($groupid) . "'";
-            $return = "Org Rank " . $groupid . " changed to access level " . $this->get_access_name($newacl);
+            $return = "Org Rank " . $groupid . " changed to access level " . $this->getAccessName($newacl);
         }
         else {
             $sql = FALSE;
@@ -1283,16 +1283,16 @@ class Security_Core extends BaseActiveModule
         if ($this->bot->db->returnQuery($sql)) // Success
         {
             if ($orgrank) {
-                $this->cache_mgr("add", "orgranks", $groupid, $newacl);
+                $this->cacheManager("add", "orgranks", $groupid, $newacl);
             }
             else {
                 $tmp = array(
                     'gid' => $groupid,
                     'name' => $this->cache['groups'][$groupid]['name']
                 );
-                $this->cache_mgr("add", "groups", $tmp, $newacl);
+                $this->cacheManager("add", "groups", $tmp, $newacl);
             }
-            $this->bot->log("SECURITY", "UPDATE", "Access level for $groupid changed to " . $this->get_access_name($newacl) . ".");
+            $this->bot->log("SECURITY", "UPDATE", "Access level for $groupid changed to " . $this->getAccessName($newacl) . ".");
 
             // Clear the flexible security cache if it exists:
             if ($this->bot->core("flexible_security") != NULL) {
@@ -1305,14 +1305,14 @@ class Security_Core extends BaseActiveModule
             $this->bot->log("SECURITY", "ERROR", "MySQL Error: " . $sql);
             return "Error updating database. Check logfile for details.";
         }
-    } // End function change_level()
+    } // End function changeLevel()
 
 
     /*
     Return an array contining the group ids $name is a member of.
     */
-    function get_groups($name)
-    { // Start function get_groups()
+    function getGroups($name)
+    { // Start function getGroups()
         $name = ucfirst(strtolower($name));
         $tmp = array();
         if (!isset($this->cache['membership'][$name]) || empty($this->cache['membership'][$name])) {
@@ -1323,12 +1323,12 @@ class Security_Core extends BaseActiveModule
         }
         sort($tmp);
         return $tmp;
-    } // End function get_groups()
+    } // End function getGroups()
 
     /*
     Get group name from a gid
     */
-    function get_group_info($gid)
+    function getGroupInfo($gid)
     { // Start function get_group_name()
         $sql = "SELECT * FROM #___security_groups WHERE gid = " . $gid;
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
@@ -1347,8 +1347,8 @@ class Security_Core extends BaseActiveModule
     This function only checks the specified character,
     no alts.
     */
-    function get_access_level_player($player)
-    { // Start function get_access_level()
+    function getPlayerAccessLevel($player)
+    { // Start function getAccessLevel()
 
         $uid = $this->bot->core("player")->id($player);
         // If user does not exist return ANONYMOUS access right away
@@ -1359,8 +1359,8 @@ class Security_Core extends BaseActiveModule
         $dbuid = $this->bot->core("user")->get_db_uid($player);
         if ($uid && $dbuid && ($uid != $dbuid)) {
             // Danger rodger wilco. We have a rerolled player which have not yet been deleted from users table.
-            //$this -> bot -> core("user") -> erase("Security", $player, FALSE, $uid);
-            //echo "Debug1: $uid does not match $dbuid \n";
+            //$this -> bot -> core("user") -> erase("Security", $player, FALSE, $userId);
+            //echo "Debug1: $userId does not match $dbuid \n";
             return 0;
         }
 
@@ -1395,10 +1395,10 @@ class Security_Core extends BaseActiveModule
 
         // Check Org Rank Access.
         if ($this->bot->guildbot && isset($this->cache['members'][$player])) {
-            $highestlevel = $this->org_rank_access($player, $highestlevel);
+            $highestlevel = $this->orgRankAccess($player, $highestlevel);
         }
         // Check default and custom groups.
-        $highestlevel = $this->group_access($player, $highestlevel);
+        $highestlevel = $this->groupAccess($player, $highestlevel);
 
         // Check if the flexible security module is enabled, if yes check there:
         if ($this->bot->core("flexible_security") != NULL) {
@@ -1423,7 +1423,7 @@ class Security_Core extends BaseActiveModule
 
         // All checks done, return the result.
         return $highestlevel;
-    } // End function get_access_level()
+    } // End function getAccessLevel()
 
     /*
     Returns the access level of the passed player
@@ -1434,7 +1434,7 @@ class Security_Core extends BaseActiveModule
     If one alt is banned the user as a total will
     be considered banned!
     */
-    function get_access_level($player)
+    function getAccessLevel($player)
     {
         // If setting UseAlts got changed since last round whipe mains cache:
         if ($this->last_alts_status != $this->bot->core("settings")
@@ -1510,8 +1510,8 @@ class Security_Core extends BaseActiveModule
         $dbuid = $this->bot->core("user")->get_db_uid($player);
         if ($uid && $dbuid && ($uid != $dbuid)) {
             // Danger rodger wilco. We have a rerolled player which have not yet been deleted from users table.
-            //$this -> bot -> core("user") -> erase("Security", $player, FALSE, $uid);
-            //echo "Debug: $uid does not match $dbuid \n";
+            //$this -> bot -> core("user") -> erase("Security", $player, FALSE, $userId);
+            //echo "Debug: $userId does not match $dbuid \n";
             return 0;
         }
 
@@ -1522,7 +1522,7 @@ class Security_Core extends BaseActiveModule
                 return $this->cache['mains'][$player];
             }
             // Otherwise get highest access level, cache it, and then return it.
-            $highest = $this->get_access_level_player($player);
+            $highest = $this->getPlayerAccessLevel($player);
             $this->cache['mains'][$player] = $highest;
             return $highest;
         }
@@ -1566,7 +1566,7 @@ class Security_Core extends BaseActiveModule
         }
 
         // Get access rights of main
-        $access = $this->get_access_level_player($main);
+        $access = $this->getPlayerAccessLevel($main);
 
         // if main is banned user is considered banned
         if ($access == -1) {
@@ -1580,7 +1580,7 @@ class Security_Core extends BaseActiveModule
         // if banned return banned.
         if (!empty($alts)) {
             foreach ($alts as $alt) {
-                $newaccess = $this->get_access_level_player($alt);
+                $newaccess = $this->getPlayerAccessLevel($alt);
                 if ($newaccess == -1) {
                     $this->cache['mains'][$main] = -1;
                     return -1;
@@ -1599,10 +1599,10 @@ class Security_Core extends BaseActiveModule
     /*
     Figures out the access level based on org rank.
     */
-    function org_rank_access($player, $highest)
-    { // Start function org_rank_access()
-        $who = $this->bot->core("whois")
-            ->lookup($player, TRUE); // Do whois with no XML lookup, guild members should be cached...
+    function orgRankAccess($player, $highest)
+    { // Start function orgRankAccess()
+        $who = $this->bot->core("whoIs")
+            ->lookup($player, TRUE); // Do whoIs with no XML lookup, guild members should be cached...
         if ($who instanceof BotError) {
             return $highest;
         }
@@ -1615,12 +1615,12 @@ class Security_Core extends BaseActiveModule
         else {
             return $highest;
         }
-    } // End function org_rank_access()
+    } // End function orgRankAccess()
 
-    function org_rank_id($player, $highest)
-    { // Start function org_rank_access()
-        $who = $this->bot->core("whois")
-            ->lookup($player, TRUE); // Do whois with no XML lookup, guild members should be cached...
+    function orgRankId($player, $highest)
+    { // Start function orgRankAccess()
+        $who = $this->bot->core("whoIs")
+            ->lookup($player, TRUE); // Do whoIs with no XML lookup, guild members should be cached...
         if ($who instanceof BotError) {
             return $highest;
         }
@@ -1633,15 +1633,15 @@ class Security_Core extends BaseActiveModule
         else {
             return $highest;
         }
-    } // End function org_rank_access()
+    } // End function orgRankAccess()
 
     /*
     Figure out the access level based on group membership
-    Should only be called by get_access_level()
+    Should only be called by getAccessLevel()
     */
-    function group_access($player, $highest)
-    { // Start function group_access()
-        $groups = $this->get_groups($player);
+    function groupAccess($player, $highest)
+    { // Start function groupAccess()
+        $groups = $this->getGroups($player);
         if ($groups == -1) {
             return $highest; // $player is not a member of any groups.
         }
@@ -1651,28 +1651,28 @@ class Security_Core extends BaseActiveModule
             }
         }
         return $highest;
-    } // End function group_access()
+    } // End function groupAccess()
 
     /*
     Checks $name's access agnist $level.
     Returns TRUE if they meet (or exceede) the specified level, otherwise false.
     Replacment for is_admin(), check_security().
 
-    Reminder: If you do check_access($name, "banned"), this function will return TRUE if they are NOT banned!
+    Reminder: If you do checkAccess($name, "banned"), this function will return TRUE if they are NOT banned!
     IF the user is banned, this function will return FALSE.
     */
-    function check_access($name, $level)
-    { // Start function check_access()
+    function checkAccess($name, $level)
+    { // Start function checkAccess()
         if (!$this->enabled) {
             return FALSE;
         } // No access is granted until the secuirty subsystems are ready.
         $name = ucfirst(strtolower($name));
         $level = strtoupper($level);
         if ($level == "RAIDLEADER") {
-            $this->bot->log("SECURITY", "WARNING", "Deprecated level raidleader passed to check_access().");
+            $this->bot->log("SECURITY", "WARNING", "Deprecated level raidleader passed to checkAccess().");
             $level = "LEADER";
         }
-        $access = $this->get_access_level($name);
+        $access = $this->getAccessLevel($name);
         if (is_numeric($level)) // Just check numbers.
         {
             if ($access >= $level) {
@@ -1741,7 +1741,7 @@ class Security_Core extends BaseActiveModule
                 }
                 break;
             case "BANNED":
-                $this->bot->log("SECURITY", "WARNING", "Consider using the is_banned(\$name) function instead of check_access(\$name, \$level) for ban checking.");
+                $this->bot->log("SECURITY", "WARNING", "Consider using the isBanned(\$name) function instead of checkAccess(\$name, \$level) for ban checking.");
                 if ($access > BANNED) {
                     return TRUE;
                 }
@@ -1754,29 +1754,29 @@ class Security_Core extends BaseActiveModule
                 break;
             } // End switch
         }
-    } // End function check_access()
+    } // End function checkAccess()
 
     // Returns true if the user is banned, otherwise false
-    function is_banned($name)
-    { // Start function is_banned()
+    function isBanned($name)
+    { // Start function isBanned()
         if ($this->enabled) {
             return (isset($this->cache['banned'][ucfirst(strtolower($name))]));
         }
         else {
             return FALSE;
         }
-    } // End function is_banned()
+    } // End function isBanned()
 
     /*
     Sets the org governing form, resets org rank access if the governing form changes.
     */
-    function set_government()
-    { // Start set_government()
+    function setGovernment()
+    { // Start setGovernment()
         if (!$this->bot->guildbot) {
             return FALSE;
         } // Raidbot.
         //$guild = $this -> bot -> db -> select("SELECT org_name FROM #___whois WHERE nickname = '".$this -> bot -> botname."'");
-        $whois = $this->bot->core("whois")->lookup($this->bot->botname);
+        $whois = $this->bot->core("whoIs")->lookup($this->bot->botname);
         if ($whois && !($whois instanceof BotError)) {
             $guild = $whois['org'];
         }
@@ -1784,7 +1784,7 @@ class Security_Core extends BaseActiveModule
         if (empty($guild) || $guild != "") {
             $guild = $this->bot->guildname;
         }
-        $sql = "SELECT DISTINCT org_rank_id,org_rank FROM #___whois WHERE org_name = '" . mysql_real_escape_string($guild) . "' ORDER BY org_rank_id ASC"; // Gets the org ranks.
+        $sql = "SELECT DISTINCT orgRankId,orgRank FROM #___whois WHERE org_name = '" . mysql_real_escape_string($guild) . "' ORDER BY orgRankId ASC"; // Gets the org ranks.
         $result = $this->bot->db->select($sql);
         if (empty($result)) {
             //$this -> bot -> core("settings") -> save("Security", "orggov", "Unknown");
@@ -1837,11 +1837,11 @@ class Security_Core extends BaseActiveModule
                     ->save("Security", "orggov", $orggov);
                 $sql = "UPDATE #___security_org SET access_level = 2";
                 $this->bot->db->query($sql);
-                $this->cache_org_ranks();
+                $this->cacheOrgRanks();
             }
         }
         return $this->bot->core("settings")->get('Security', 'Orggov');
-    } // End set_government()
+    } // End setGovernment()
 
     /*
     Admin.php Functions:
@@ -1857,7 +1857,7 @@ class Security_Core extends BaseActiveModule
 
     Done:
     function in_group($name, $group) // 0.2
-    - in_group() is a wrapper for check_access() in 0.4
+    - in_group() is a wrapper for checkAccess() in 0.4
     */
 
     // --------------------------------------------------
@@ -1871,8 +1871,8 @@ class Security_Core extends BaseActiveModule
     $info: The information to add (or remove)
     $more: Extra informaion needed for some actions.
     */
-    function cache_mgr($action, $cache, $info, $more = NULL)
-    { // Start function cache_mgr()
+    function cacheManager($action, $cache, $info, $more = NULL)
+    { // Start function cacheManager()
         $action = strtolower($action);
         if ($action == "add") {
             $action = TRUE;
@@ -1947,7 +1947,7 @@ class Security_Core extends BaseActiveModule
         case "groupmem":
             $group = strtolower($info);
             $member = ucfirst(strtolower($more));
-            $gid = $this->get_gid($group);
+            $gid = $this->getGroupId($group);
             if ($action) {
                 $this->cache['groups'][$group]['members'][$member] = $member;
                 $this->cache['groups'][$gid]['members'][$member] = $member;
@@ -1980,29 +1980,29 @@ class Security_Core extends BaseActiveModule
             $this->cache['mains'] = array();
             break;
         }
-    } // End function cache_mgr()
+    } // End function cacheManager()
 
     /*
     Loads security information into the cache.
     */
-    function cache_security()
-    { // Start function cache_security()
-        $this->cache_users(); // Cache users security.
-        $this->cache_groups(); // Admin groups and members.
+    function cacheSecurity()
+    { // Start function cacheSecurity()
+        $this->cacheUsers(); // Cache users security.
+        $this->cacheGroups(); // Admin groups and members.
         if ($this->bot->guildbot) {
-            $this->cache_org_ranks(); // Cache org rank security if this is a guildbot.
+            $this->cacheOrgRanks(); // Cache org rank security if this is a guildbot.
         }
-    } // End function cache_security()
+    } // End function cacheSecurity()
 
     // Adds information from the users table to the security cache.
-    function cache_users()
-    { // Start function cache_users()
+    function cacheUsers()
+    { // Start function cacheUsers()
         $this->cache['members'] = array();
         $this->cache['guests'] = array();
         $this->cache['banned'] = array();
         $this->cache['mains'] = array();
         $this->cache['online'] = array();
-        $sql = "SELECT nickname,user_level FROM #___users WHERE user_level != 0";
+        $sql = "SELECT nickname,userLevel FROM #___users WHERE userLevel != 0";
         $result = $this->bot->db->select($sql);
         if (empty($result)) {
             return FALSE;
@@ -2024,14 +2024,14 @@ class Security_Core extends BaseActiveModule
             }
         }
         unset($result);
-    } // End function cache_users()
+    } // End function cacheUsers()
 
-    // Adds the org_rank access levels to the cache.
-    function cache_org_ranks()
-    { // Start function cache_org_ranks()
+    // Adds the orgRank access levels to the cache.
+    function cacheOrgRanks()
+    { // Start function cacheOrgRanks()
         $this->cache['orgranks'] = array();
         if (!($this->bot->core("settings")->exists('Security', 'Orggov'))) {
-            $this->set_government(); // Won't work until the org governing form is identified.
+            $this->setGovernment(); // Won't work until the org governing form is identified.
         }
         if ($this->bot->core("settings")
             ->get('Security', 'Orggov') instanceof BotError
@@ -2041,32 +2041,32 @@ class Security_Core extends BaseActiveModule
         if ($this->bot->core("settings")
             ->get('Security', 'Orggov') == "Unknown"
         ) {
-            $this->set_government(); // Won't work until the org governing form is identified.
+            $this->setGovernment(); // Won't work until the org governing form is identified.
         }
         if ($this->bot->core("settings")
             ->get('Security', 'Orggov') == "Unknown"
         ) {
             return FALSE; // Tried to ID the org government and failed. Try again in 12 hours.
         }
-        $sql = "SELECT org_rank, access_level, org_rank_id FROM #___security_org ";
+        $sql = "SELECT orgRank, access_level, orgRankId FROM #___security_org ";
         $sql .= "WHERE org_gov = '" . $this->bot->core("settings")
             ->get('Security', 'Orggov') . "' ";
-        $sql .= "ORDER BY org_rank_id ASC";
+        $sql .= "ORDER BY orgRankId ASC";
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
         if (empty($result)) {
             return FALSE;
         } // Nothing to cache.
         // Now cache them...
         foreach ($result as $orgrank) {
-            $this->cache['orgranks'][$orgrank['org_rank']] = $orgrank['access_level'];
-            $this->cache['orgrank_ids'][$orgrank['org_rank']] = $orgrank['org_rank_id'];
+            $this->cache['orgranks'][$orgrank['orgRank']] = $orgrank['access_level'];
+            $this->cache['orgrank_ids'][$orgrank['orgRank']] = $orgrank['orgRankId'];
         }
         return TRUE;
-    } // End function cache_org_ranks()
+    } // End function cacheOrgRanks()
 
     // Adds the groups and their members to the cache.
-    function cache_groups()
-    { // Start function cache_groups()
+    function cacheGroups()
+    { // Start function cacheGroups()
         $this->cache['groups'] = array();
         $this->cache['membership'] = array();
         $sql = "SELECT * FROM #___security_groups";
@@ -2078,7 +2078,7 @@ class Security_Core extends BaseActiveModule
         foreach ($result as $group) { //gid, name, description, access_level
             $this->cache['groups'][$group['gid']] = $group;
             $this->cache['groups'][$group['name']] = $group;
-            $gid = $this->get_gid($group['name']);
+            $gid = $this->getGroupId($group['name']);
             $sql = "SELECT name FROM #___security_members WHERE gid = " . $gid;
             $members = $this->bot->db->select($sql, MYSQL_ASSOC);
             $this->cache['groups'][$group['gid']]['members'] = array();
@@ -2097,16 +2097,16 @@ class Security_Core extends BaseActiveModule
             }
 
         }
-    } // End function cache_groups()
+    } // End function cacheGroups()
 
     /*
     Returns highest access level.
     */
-    function whoami($name)
-    { // Start function whoami
+    function whoAmI($name)
+    { // Start function whoAmI
         $groups = $this->bot->core("security")->get_groups($name);
         $access = $this->bot->core("security")->get_access_level($name);
-        $access = $this->get_access_name($access);
+        $access = $this->getAccessName($access);
         $message = "Your access level is " . strtoupper($access) . ".";
         if ($groups <> -1) {
             $groupmsg = " You are a member of the following security groups: ";
@@ -2117,14 +2117,14 @@ class Security_Core extends BaseActiveModule
             $groupmsg = rtrim($groupmsg, ",");
         }
         return $message . $groupmsg;
-    } // End function whoami
+    } // End function whoAmI
 
-    function whois($name)
-    { // Start function whois()
+    function whoIs($name)
+    { // Start function whoIs()
         $player = ucfirst(strtolower($name));
         $groups = $this->bot->core("security")->get_groups($player);
         $access = $this->bot->core("security")->get_access_level($player);
-        $access = $this->get_access_name($access);
+        $access = $this->getAccessName($access);
         $message = $player . "'s highest access level is " . strtoupper($access) . ".";
         if ($groups <> -1) {
             $groupmsg = " " . $player . " is a member of the following security groups: ";
@@ -2135,10 +2135,10 @@ class Security_Core extends BaseActiveModule
             $groupmsg = rtrim($groupmsg, ",");
         }
         return $message . $groupmsg;
-    } // End function whois()
+    } // End function whoIs()
 
-    function get_access_name($access)
-    { // Start function get_access_name()
+    function getAccessName($access)
+    { // Start function getAccessName()
         switch ($access) { // Start switch
         case OWNER:
             $access = "OWNER";
@@ -2169,7 +2169,7 @@ class Security_Core extends BaseActiveModule
             break;
         } // End switch
         return $access;
-    } // End function get_access_name()
+    } // End function getAccessName()
 
 } // End of Class
 ?>

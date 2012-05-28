@@ -41,7 +41,7 @@ class Notify extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "notify", "ADMIN");
+        $this->registerCommand("all", "notify", "ADMIN");
         $this->help['description'] = "Handling of notify list.";
         $this->help['command']['notify'] = "Shows the current notify list.";
         $this->help['command']['notify on <player>'] = "Adds <player> to the notify list.";
@@ -52,9 +52,9 @@ class Notify extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'sub',
@@ -63,9 +63,9 @@ class Notify extends BaseActiveModule
         );
         Switch ($com['sub']) {
         case 'on':
-            return $this->add_notify($name, $com['arg']);
+            return $this->addNotify($name, $com['arg']);
         case 'off':
-            return $this->del_notify($com['arg']);
+            return $this->delNotify($com['arg']);
         case 'cache':
             Switch (strtolower($com['arg'])) {
             case 'clear':
@@ -78,11 +78,11 @@ class Notify extends BaseActiveModule
             }
         case 'list':
         case '':
-            return $this->show_notify_list();
+            return $this->showNotifyList();
         Default:
             if (strtolower($com['arg']) == "on" || strtolower($com['arg']) == "off") // asume they want to turn notify on or off but did wrong order
             {
-                Return $this->command_handler($name, $com['com'] . " " . $com['arg'] . " " . $com['sub'], $origin);
+                Return $this->commandHandler($name, $com['com'] . " " . $com['arg'] . " " . $com['sub'], $origin);
             }
             else {
                 Return ("##error##Error: Unknown Sub Command ##highlight##" . $com['sub'] . "##end####end##");
@@ -91,9 +91,9 @@ class Notify extends BaseActiveModule
     }
 
 
-    function show_notify_list()
+    function showNotifyList()
     {
-        $notlist = $this->bot->db->select("SELECT nickname, user_level FROM #___users WHERE notify = 1 ORDER BY nickname");
+        $notlist = $this->bot->db->select("SELECT nickname, userLevel FROM #___users WHERE notify = 1 ORDER BY nickname");
         if (empty($notlist)) {
             return "Nobody on notify!";
         }
@@ -130,13 +130,13 @@ class Notify extends BaseActiveModule
     }
 
 
-    function add_notify($source, $user)
+    function addNotify($source, $user)
     {
         return $this->bot->core("notify")->add($source, $user);
     }
 
 
-    function del_notify($user)
+    function delNotify($user)
     {
         return $this->bot->core("notify")->del($user);
     }

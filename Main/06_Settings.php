@@ -44,20 +44,20 @@ contains the description of the error.
 get($module, $setting)
 Gets a single setting from the database, returns an array.
 This should only be used if you want to manage settings internally.
-get_all($module)
+getAll($module)
 Gets all the settings for a module, returns an array.
 This should only be used if you want to manage settings internally.
-load_all()
+loadAll()
 Loads all settings into the global settings array.
 save($module, $setting, $value, $noupdate=FALSE)
 Saves a setting to the database and updates the global settings array.
 create ($module, $setting, $value, $longdesc, $hidden, $disporder)
 Creates a new setting, updates the global settings array.
-get_data_type($value)
+getDataType($value)
 Returns the data type of $value.
-set_data_type($value, $datatype)
+setDataType($value, $datatype)
 Changes the data type of $value to $datatype.
-check_data($module, $setting, $value, $longdesc, $defaultoptions)
+checkData($module, $setting, $value, $longdesc, $defaultoptions)
 Used to check data before saving to database.
 del($module, $setting)
 Removes a setting or setting group.
@@ -65,17 +65,17 @@ Support Functions:
 
 Support functions help the main functions.
 
-get_data_type($value)
+getDataType($value)
 Returns the datatype of $value as a string.
 (bool, int, float, string, array)
-set_data_type($value, $datatype)
+setDataType($value, $datatype)
 Sets $value to be the specified datatype.
-remove_space($string)
+removeSpace($string)
 Converts spaces to underscores. Returns the modified string.
-array2string($array)
+arrayToString($array)
 Converts an array to a string. Array elements will be seperated by a
 semicolon in the returned string.
-string2array($string)
+stringToArray($string)
 Converts a string to an array. Array elements should be seperated by a
 semicolon. Returns an array.
 */
@@ -109,12 +109,12 @@ class Settings_Core extends BasePassiveModule
 		               disporder INT UNSIGNED NOT NULL DEFAULT 1,
 		               PRIMARY KEY (module, setting))"
         );
-        $this->register_module("settings");
-        $this->register_event("connect");
-        $this->register_event("cron", "1hour");
+        $this->registerModule("settings");
+        $this->registerEvent("connect");
+        $this->registerEvent("cron", "1hour");
         $this->create("Settings", "Log", TRUE, "Should changes to settings and the loading of the settings be shown in the log? Errors are always logged!");
-        $this->update_settings_table();
-        $this->load_all();
+        $this->updateSettingsTable();
+        $this->loadAll();
         $this->callbacks = array();
         $this->change_user = "";
         if ($this->exists("Maintenance", "info") && $this->get("Maintenance", "info") != "") {
@@ -134,12 +134,12 @@ class Settings_Core extends BasePassiveModule
     */
     function cron()
     { // Start function cron()
-        $this->load_all();
+        $this->loadAll();
     } // End function cron()
 
     function connect()
     {
-        $this->load_all();
+        $this->loadAll();
     }
 
 
@@ -171,8 +171,8 @@ class Settings_Core extends BasePassiveModule
     /*
     Retrives all of a modules settings from the database.
     */
-    function get_all($module)
-    { // Start function get_all()
+    function getAll($module)
+    { // Start function getAll()
         $module = strtolower($module);
         if (!empty($this->settings_cache[$module])) {
             return $this->settings_cache[$module];
@@ -181,13 +181,13 @@ class Settings_Core extends BasePassiveModule
             $this->error->set("No settings exisit for group " . $module . ".");
             return $this->error;
         }
-    } // End function get_all()
+    } // End function getAll()
 
     /*
     Loads all of the settings from the database into the global settings array.
     */
-    function load_all()
-    { // Start function load_all()
+    function loadAll()
+    { // Start function loadAll()
         $sql = "SELECT module,setting,value,datatype FROM #___settings";
         $result = $this->bot->db->select($sql);
         if (empty($result)) {
@@ -202,10 +202,10 @@ class Settings_Core extends BasePassiveModule
                 $value = $data[2];
                 $datatype = $data[3];
                 if ($datatype == "array") {
-                    $value = $this->string2array($value);
+                    $value = $this->stringToArray($value);
                 }
                 else {
-                    $value = $this->set_data_type($value, $datatype);
+                    $value = $this->setDataType($value, $datatype);
                 }
                 $this->settings_cache[$module][$setting] = $value;
             }
@@ -213,7 +213,7 @@ class Settings_Core extends BasePassiveModule
                 $this->bot->log("SETTINGS", "LOAD", "Loaded settings from database.");
             }
         }
-    } // End function load_all()
+    } // End function loadAll()
 
     /*
     Saves a setting to the database and updates the settings array.
@@ -221,9 +221,9 @@ class Settings_Core extends BasePassiveModule
     function save($module, $setting, $value, $noupdate = FALSE)
     { // Start function save()
         // Remove Spaces
-        $module = $this->remove_space($module);
+        $module = $this->removeSpace($module);
         $setting = trim($setting);
-        $setting = $this->remove_space($setting);
+        $setting = $this->removeSpace($setting);
         // Make sure the setting exists already, otherwise fail.
         if (!isset($this->settings_cache[strtolower($module)][strtolower($setting)])) {
             if (!is_null($this->settings_cache[strtolower($module)][strtolower($setting)])) {
@@ -232,7 +232,7 @@ class Settings_Core extends BasePassiveModule
             }
         }
         // Figure out what type of data we have.
-        $datatype = $this->get_data_type($value);
+        $datatype = $this->getDataType($value);
         if ($datatype == "unknown") {
             $this->error->set("Setting " . $setting . " for module " . $module . " could not be saved. Datatype is unknown or not supported.");
             return $this->error;
@@ -252,7 +252,7 @@ class Settings_Core extends BasePassiveModule
             $value = "null";
             $datatype = "null";
         }
-        $status = $this->check_data($module, $setting, $value);
+        $status = $this->checkData($module, $setting, $value);
         if ($status instanceof BotError) {
             return $status;
         }
@@ -276,7 +276,7 @@ class Settings_Core extends BasePassiveModule
                 $this->bot->log("SETTINGS", "SAVED", $setting . " for module " . $module . " set to " . $value . " as datatype " . $datatype);
             }
             $oldvalue = $this->settings_cache[strtolower($module)][strtolower($setting)];
-            $this->settings_cache[strtolower($module)][strtolower($setting)] = $this->set_data_type($value, $datatype);
+            $this->settings_cache[strtolower($module)][strtolower($setting)] = $this->setDataType($value, $datatype);
             if (isset($this->callbacks[strtolower($module)][strtolower($setting)])) {
                 foreach (
                     $this->callbacks[strtolower($module)][strtolower($setting)]
@@ -311,9 +311,9 @@ class Settings_Core extends BasePassiveModule
         // FIXME: Maybe check to see if the setting exists before going farther?
         $sql = "SELECT";
         // Remove whitespace from $module, $setting, and $value
-        $module = $this->remove_space($module);
-        $setting = $this->remove_space($setting);
-        $datatype = $this->get_data_type($value);
+        $module = $this->removeSpace($module);
+        $setting = $this->removeSpace($setting);
+        $datatype = $this->getDataType($value);
         // Convert $value to a string.
         if ($datatype == "bool") {
             $defaultoptions = "On;Off"; // Default options for bool should always be On;Off.
@@ -328,7 +328,7 @@ class Settings_Core extends BasePassiveModule
             $value = "null";
         }
         elseif (is_array($value)) {
-            $value = $this->array2string($value);
+            $value = $this->arrayToString($value);
             $hidden = TRUE; // I am not dealing with arrays in the settings menu. :D
         }
         else {
@@ -341,7 +341,7 @@ class Settings_Core extends BasePassiveModule
             $disporder = intval($disporder);
         }
         // Check for anything that will prevent the setting from being saved to the database.
-        $status = $this->check_data($module, $setting, $value, $longdesc, $defaultoptions);
+        $status = $this->checkData($module, $setting, $value, $longdesc, $defaultoptions);
         if ($status instanceof BotError) {
             return $status;
         }
@@ -392,7 +392,7 @@ class Settings_Core extends BasePassiveModule
                 // $this -> bot -> log("SETTINGS", "WARNING", $status['errordesc']); // FIXME: Comment this when done debugging.
             }
             else {
-                $this->settings_cache[strtolower($module)][strtolower($setting)] = $this->set_data_type($value, $datatype);
+                $this->settings_cache[strtolower($module)][strtolower($setting)] = $this->setDataType($value, $datatype);
                 if ($this->get("Settings", "Log")) {
                     $this->bot->log("SETTINGS", "Created", "Created " . stripslashes($setting) . " for module " . stripslashes($module) . " with value of " . $value);
                 }
@@ -423,8 +423,8 @@ class Settings_Core extends BasePassiveModule
             "SETTINGS", "Notice:",
             "Please note: update() is discontinued and may be removed in the future. create() does updates if changes to the definition of a setting is needed. Called for setting $module $setting"
         );
-        $module = $this->remove_space($module);
-        $setting = $this->remove_space($setting);
+        $module = $this->removeSpace($module);
+        $setting = $this->removeSpace($setting);
         $what = mysql_real_escape_string($what);
         $to = mysql_real_escape_string($to);
         $what = strtolower($what);
@@ -444,8 +444,8 @@ class Settings_Core extends BasePassiveModule
     function del($module, $setting = NULL)
     { // Start function del()
         // Remove whitespace from $module, $setting, and $value
-        $module = $this->remove_space($module);
-        $setting = $this->remove_space($setting);
+        $module = $this->removeSpace($module);
+        $setting = $this->removeSpace($setting);
         if (is_null($setting)) // Delete a setting group.
         {
             if (!isset($this->settings_cache[strtolower($module)])) {
@@ -477,11 +477,11 @@ class Settings_Core extends BasePassiveModule
     Make sure information is OK to save.
     For now, just checks length, but other checks can be added.
     */
-    function check_data(
+    function checkData(
         $module, $setting, $value, $longdesc = NULL,
         $defaultoptions = NULL
     )
-    { // Start function check_data()
+    { // Start function checkData()
         // Pack the data into an array so we can easily itterate through it.
         $check[0] = array(
             "module",
@@ -511,13 +511,13 @@ class Settings_Core extends BasePassiveModule
             }
         }
         return TRUE; // No errors found if we get this far.
-    } // End function check_data()
+    } // End function checkData()
 
     /*
     Retunrns the datatype of the value passed.
     */
-    function get_data_type($value)
-    { // Start function get_data_type()
+    function getDataType($value)
+    { // Start function getDataType()
         if (is_bool($value)) {
             return "bool";
         }
@@ -541,8 +541,8 @@ class Settings_Core extends BasePassiveModule
         }
     } // End function get_data_dype()
 
-    function set_data_type($value, $datatype)
-    { // Start function set_data_type()
+    function setDataType($value, $datatype)
+    { // Start function setDataType()
         $datatype = strtolower($datatype);
         /*
         bool, float, int, and null need to be converted from strings to
@@ -576,12 +576,12 @@ class Settings_Core extends BasePassiveModule
             break;
         } // End switch ($datatype)
         return $value; // Return typed data.
-    } // End function set_data_type()
+    } // End function setDataType()
 
     /*
     Updates the settings table to lastest version.
     */
-    function update_settings_table()
+    function updateSettingsTable()
     {
         $schemaversion = $this->bot->db->get_version("settings");
         Switch ($schemaversion) {
@@ -657,35 +657,35 @@ class Settings_Core extends BasePassiveModule
     /*
     Removes spaces from a string
     */
-    function remove_space($string)
-    { // Start function remove_space()
+    function removeSpace($string)
+    { // Start function removeSpace()
         return str_replace(" ", "_", $string);
-    } // End function remove_space()
+    } // End function removeSpace()
 
     /*
     Converts an array to a string.
     Array elements are seperated with a semicolon.
     */
-    function array2string($array)
-    { // Start function array2string()
+    function arrayToString($array)
+    { // Start function arrayToString()
         return implode(";", $array);
-    } // End function array2string()
+    } // End function arrayToString()
 
     /*
     Converts a string to an array.
     */
-    function string2array($string)
-    { // Start function string2array()
+    function stringToArray($string)
+    { // Start function stringToArray()
         return explode(";", $string);
-    } // End function string2array()
+    } // End function stringToArray()
 
-    function set_change_user($name)
+    function setChangeUser($name)
     {
         $this->change_user = $name;
     }
 
 
-    function register_callback($module, $setting, &$reg_module)
+    function registerCallback($module, $setting, &$reg_module)
     {
         $module_name = get_class($reg_module);
         if (isset($this->callbacks[strtolower($module)][strtolower($setting)][$module_name])) {
@@ -696,7 +696,7 @@ class Settings_Core extends BasePassiveModule
     }
 
 
-    function unregister_callback($module, $setting, &$reg_module)
+    function unregisterCallback($module, $setting, &$reg_module)
     {
         $module_name = get_class($reg_module);
         if (!isset($this->callbacks[strtolower($module)][strtolower($setting)][$module_name])) {

@@ -54,10 +54,10 @@ class Logon extends BaseActiveModule
         $this->help['description'] = 'Announces logon logoff events in guildchat.';
         $this->help['command']['logon <message>'] = "Sets a custom logon message to be displayed when you log on.";
         $this->help['command']['logon'] = "Deletes your custom logon message.";
-        $this->register_command("all", "logon", "MEMBER");
-        $this->register_event("buddy");
-        $this->register_event("connect");
-        $this->update_table();
+        $this->registerCommand("all", "logon", "MEMBER");
+        $this->registerEvent("buddy");
+        $this->registerEvent("connect");
+        $this->updateTable();
         $this->bot->core("colors")
             ->define_scheme("logon", "logon_spam", "darkaqua");
         $this->bot->core("colors")
@@ -98,7 +98,7 @@ class Logon extends BaseActiveModule
     }
 
 
-    function update_table()
+    function updateTable()
     {
         if ($this->bot->db->get_version("logon") == 2) {
             return;
@@ -107,19 +107,19 @@ class Logon extends BaseActiveModule
         case 1:
             $this->bot->db->update_table("logon", "id", "alter", "ALTER TABLE #___logon MODIFY id BIGINT NOT NULL");
             $this->bot->db->set_version("logon", 2);
-            $this->update_table();
+            $this->updateTable();
         default:
         }
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^logon (.+)/i", $msg, $info)) {
-            return $this->set_msg($name, $info[1]);
+            return $this->setLogonMessage($name, $info[1]);
         }
         elseif (preg_match("/^logon$/i", $msg, $info)) {
-            return $this->set_msg($name, '');
+            return $this->setLogonMessage($name, '');
         }
         return FALSE;
     }
@@ -135,7 +135,7 @@ class Logon extends BaseActiveModule
                     ->get("Logon", "Enable"))
             ) {
                 if ($this->bot->core("notify")->check($name)) {
-                    $level = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'");
+                    $level = $this->bot->db->select("SELECT userLevel FROM #___users WHERE nickname = '$name'");
                     if (!empty($level)) {
                         $level = $level[0][0];
                     }
@@ -171,7 +171,7 @@ class Logon extends BaseActiveModule
                         }
                         if ($msg == 1) {
                             if ($this->last_log["on"][$name] < (time() - 5)) {
-                                $result = $this->bot->core("whois")
+                                $result = $this->bot->core("whoIs")
                                     ->lookup(
                                     $name, $this->bot->core("settings")
                                         ->get("Logon", "NoLookup")
@@ -225,7 +225,7 @@ class Logon extends BaseActiveModule
                                 if ($this->bot->core("settings")
                                     ->get("Logon", "ShowDetails") == TRUE
                                 ) {
-                                    $res .= " :: " . $this->bot->core("whois")
+                                    $res .= " :: " . $this->bot->core("whoIs")
                                         ->whois_details($name, $result);
                                 }
 
@@ -247,13 +247,13 @@ class Logon extends BaseActiveModule
                                     $res .= "  ::  " . stripslashes($result[0][0]);
                                 }
 
-                                $this->show_logon("##logon_logon_spam##" . $res . "##end##");
+                                $this->showLogon("##logon_logon_spam##" . $res . "##end##");
                                 $this->last_log["on"][$name] = time();
                             }
                         }
                         else {
                             if ($this->last_log["off"][$name] < (time() - 5)) {
-                                $this->show_logon("##logon_logoff_spam##" . $name . " logged off##end##");
+                                $this->showLogon("##logon_logoff_spam##" . $name . " logged off##end##");
                                 $this->last_log["off"][$name] = time();
                             }
                         }
@@ -264,7 +264,7 @@ class Logon extends BaseActiveModule
     }
 
 
-    function show_logon($txt)
+    function showLogon($txt)
     {
         $this->bot->send_gc($txt);
         if ($this->bot->core("settings")->get("Relay", "Logoninpgroup")) {
@@ -298,7 +298,7 @@ class Logon extends BaseActiveModule
     }
 
 
-    function set_msg($name, $message)
+    function setLogonMessage($name, $message)
     {
         $id = $this->bot->core('player')->id($name);
         $message = mysql_real_escape_string($message);

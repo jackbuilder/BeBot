@@ -40,12 +40,12 @@ class testproxy extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('tell', 'testproxy', 'SUPERADMIN');
+        $this->registerCommand('sendTell', 'testproxy', 'SUPERADMIN');
         $this->help['description'] = 'This plugin runs through all the proxies that have been setup and tests each of them.';
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $strip_headers = 0;
         $server_timeout = 25;

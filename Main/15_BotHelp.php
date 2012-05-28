@@ -50,8 +50,8 @@ class BotHelp_Core extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
 
-        $this->register_module("help");
-        $this->register_command("all", "help", "GUEST");
+        $this->registerModule("help");
+        $this->registerCommand("all", "help", "GUEST");
 
         $this->help['description'] = "The bot help system.";
         $this->help['command']['help [command]'] = "Shows help on [command]. If no argument is given shows the help menu";
@@ -59,52 +59,52 @@ class BotHelp_Core extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $vars = explode(' ', $msg);
         unset($vars[0]);
 
         if (empty($this->help_cache)) {
-            $this->update_cache();
+            $this->updateCache();
         }
 
         if (!isset($vars[1])) {
-            return ($this->show_help_menu($name, 'source', $origin));
+            return ($this->showHelpMenu($name, 'source', $origin));
         }
         else {
             switch ($vars[1]) {
-            case 'tell':
-            case 'gc':
-            case 'pgmsg':
-                return ($this->show_help_menu($name, $vars[1]));
+            case 'sendTell':
+            case 'sendToGuildChat':
+            case 'sendToGroup':
+                return ($this->showHelpMenu($name, $vars[1]));
                 break;
             default:
-                return ($this->show_help($name, $vars[1]));
+                return ($this->showHelp($name, $vars[1]));
                 break;
             }
         }
     }
 
 
-    function show_help_menu($name, $section = 'source', $origin = FALSE)
+    function showHelpMenu($name, $section = 'source', $origin = FALSE)
     {
         switch ($section) {
         case 'source':
             switch ($origin) {
-            case 'tell':
-                $window = $this->get_commands($name, 'tell');
+            case 'sendTell':
+                $window = $this->getCommands($name, 'sendTell');
                 break;
-            case 'gc':
-                $window = $this->get_commands($name, 'gc');
+            case 'sendToGuildChat':
+                $window = $this->getCommands($name, 'sendToGuildChat');
                 break;
-            case 'pgmsg':
-                $window = $this->get_commands($name, 'pgmsg');
+            case 'sendToGroup':
+                $window = $this->getCommands($name, 'sendToGroup');
                 break;
             }
             return ($this->bot->core("tools")->make_blob('Help', $window));
             break;
         default:
-            $window = $this->get_commands($name, $section);
+            $window = $this->getCommands($name, $section);
             return ($this->bot->core("tools")->make_blob('Help', $window));
             break;
         }
@@ -114,7 +114,7 @@ class BotHelp_Core extends BaseActiveModule
     /*
     Gets commands for a given channel
     */
-    function get_commands($name, $channel)
+    function getCommands($name, $channel)
     {
         $channel = strtolower($channel);
         $lvl = $this->bot->core("security")->get_access_name(
@@ -126,15 +126,15 @@ class BotHelp_Core extends BaseActiveModule
     }
 
 
-    function update_cache()
+    function updateCache()
     {
-        $this->make_help_blobs("tell");
-        $this->make_help_blobs("pgmsg");
-        $this->make_help_blobs("gc");
+        $this->makeHelpBlobs("sendTell");
+        $this->makeHelpBlobs("sendToGroup");
+        $this->makeHelpBlobs("sendToGuildChat");
     }
 
 
-    function make_help_blobs($channel)
+    function makeHelpBlobs($channel)
     {
         $channel = strtolower($channel);
         $this->help_cache[$channel] = array();
@@ -181,21 +181,21 @@ class BotHelp_Core extends BaseActiveModule
     }
 
 
-    function show_help($name, $command)
+    function showHelp($name, $command)
     {
         if (!$this->bot->core("access_control")
             ->check_for_access($name, $command)
         ) {
             return ("##highlight##$command##end## does not exist or you do not have access to it.");
         }
-        elseif (!empty($this->bot->commands['tell'][$command])) {
-            $com = $this->bot->commands['tell'][$command];
+        elseif (!empty($this->bot->commands['sendTell'][$command])) {
+            $com = $this->bot->commands['sendTell'][$command];
         }
-        elseif (!empty($this->bot->commands['gc'][$command])) {
-            $com = $this->bot->commands['gc'][$command];
+        elseif (!empty($this->bot->commands['sendToGuildChat'][$command])) {
+            $com = $this->bot->commands['sendToGuildChat'][$command];
         }
-        elseif (!empty($this->bot->commands['pgmsg'][$command])) {
-            $com = $this->bot->commands['pgmsg'][$command];
+        elseif (!empty($this->bot->commands['sendToGroup'][$command])) {
+            $com = $this->bot->commands['sendToGroup'][$command];
         }
         else {
             return ("##highlight##$command##end## does not exist or you do not have access to it.");

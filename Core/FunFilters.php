@@ -39,7 +39,7 @@
 	- eleet (l33t Filter)
 	- fudd (Elmer Fudd)
 * Also provides some useful filters:
-	- nofont (removes font tags)
+	- noFont (removes font tags)
 */
 $funfilters = new FunFilters($bot);
 /*
@@ -58,7 +58,7 @@ class FunFilters extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("funfilters");
+        $this->registerModule("funfilters");
     }
 
 
@@ -75,7 +75,7 @@ class FunFilters extends BasePassiveModule
     For BeBot, this should remove all color formatting.
     I don't think font tags are used to change any other properties...
     */
-    function nofont($text)
+    function noFont($text)
     { // Start function nocolor()
         $text = preg_replace("/<font.*?>/", "", $text);
         $text = preg_replace("/</font>/", "", $text);

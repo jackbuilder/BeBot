@@ -51,9 +51,9 @@ class AutoInv extends BaseActiveModule
             ->create("AutoInv", "ShowInfo", TRUE, "Should an informative message telling how to disable autoinvite be sent to all characters that are invited via autoinvite?");
         $this->bot->core('prefs')
             ->create('AutoInv', 'receive_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');
-        $this->register_command("tell", "autoinvite", "GUEST");
+        $this->registerCommand("sendTell", "autoinvite", "GUEST");
         // Register for logon notifies
-        $this->register_event("logon_notify");
+        $this->registerEvent("logon_notify");
         $this->help['description'] = "Automatically invites players to the private group.";
         $this->help['command']['autoinvite'] = 'Shows your current auto-invite status';
         $this->help['command']['autoinvite <(on|off)>'] = "Turns automatic invitation for you on or off.";
@@ -61,9 +61,9 @@ class AutoInv extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'state'
@@ -71,13 +71,13 @@ class AutoInv extends BaseActiveModule
         );
         switch ($com['state']) {
         case '':
-            return ($this->get_status($name));
+            return ($this->getStatus($name));
             break;
         case 'on':
-            return ($this->enable_invite($name));
+            return ($this->enableInvite($name));
             break;
         case 'off':
-            return ($this->disable_invite($name));
+            return ($this->disableInvite($name));
             break;
         default:
             $this->bot->send_help($name, 'autoinvite');
@@ -85,14 +85,14 @@ class AutoInv extends BaseActiveModule
     }
 
 
-    function get_status($name)
+    function getStatus($name)
     {
         return ($this->bot->core('prefs')
             ->get($name, 'AutoInv', 'receive_auto_invite'));
     }
 
 
-    function enable_invite($name)
+    function enableInvite($name)
     {
         $this->bot->core('prefs')
             ->change($name, 'AutoInv', 'receive_auto_invite', 'On');
@@ -100,7 +100,7 @@ class AutoInv extends BaseActiveModule
     }
 
 
-    function disable_invite($name)
+    function disableInvite($name)
     {
         $this->bot->core('prefs')
             ->change($name, 'AutoInv', 'receive_auto_invite', 'Off');
@@ -109,13 +109,13 @@ class AutoInv extends BaseActiveModule
 
 
     // Compare the user level of $name with the setting for who should be autoinvited
-    function check_access($name)
+    function checkAccess($name)
     {
-        $userlevel = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'", MYSQL_ASSOC);
+        $userlevel = $this->bot->db->select("SELECT userLevel FROM #___users WHERE nickname = '$name'", MYSQL_ASSOC);
         if (empty($userlevel)) {
             return FALSE;
         }
-        $userlevel = $userlevel[0]['user_level'];
+        $userlevel = $userlevel[0]['userLevel'];
         switch ($userlevel) {
         case 2:
             if (strtolower(
@@ -159,7 +159,7 @@ class AutoInv extends BaseActiveModule
         if ($this->bot->core("settings")->get("Autoinv", "Activated")) {
             if ($this->bot->core('prefs')
                 ->get($user, 'AutoInv', 'receive_auto_invite') == 'On'
-                && $this->check_access($user)
+                && $this->checkAccess($user)
                 && !($this->bot
                     ->core("online")->in_chat($user))
             ) {
@@ -169,7 +169,7 @@ class AutoInv extends BaseActiveModule
                     $this->bot->send_tell(
                         $user, "If you don't want this bot to invite you in the future, click " . $this->bot
                         ->core("tools")
-                        ->make_blob('here', $blob) . " or type: /tell <botname> <pre>autoinvite off"
+                        ->make_blob('here', $blob) . " or type: /sendTell <botname> <pre>autoinvite off"
                     );
                 }
                 $this->bot->core("chat")->pgroup_invite($user);

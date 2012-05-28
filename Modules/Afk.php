@@ -46,10 +46,10 @@ class AFK extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->afk = array();
         $this->afkalias = array();
-        $this->register_command("all", "afk", 'MEMBER');
-        $this->register_event("privgroup");
-        $this->register_event("gmsg", "org");
-        $this->register_event("buddy");
+        $this->registerCommand("all", "afk", 'MEMBER');
+        $this->registerEvent("privateGroup");
+        $this->registerEvent("groupMessage", "org");
+        $this->registerEvent("buddy");
         //Create default_level access levels
         $this->help['description'] = "Shows other players that you are afk.";
         $this->help['command']['afk <message>'] = "Sets you afk with <message>";
@@ -64,10 +64,10 @@ class AFK extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $this->error->reset();
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'args'
@@ -79,14 +79,14 @@ class AFK extends BaseActiveModule
 
 
     /*
-    Check if the line in privgroup was meant for someone afk or if someone afk is back
+    Check if the line in privateGroup was meant for someone afk or if someone afk is back
     */
-    function privgroup($name, $msg)
+    function privateGroup($name, $msg)
     {
-        if ($this->acheck($name)) {
-            $timegone = $this->afk_time($name);
+        if ($this->awayCheck($name)) {
+            $timegone = $this->afkTime($name);
             $this->back($name);
-            $msgs = $this->msgs($name);
+            $msgs = $this->messages($name);
             $this->bot->send_output($name, $name . " is back. AFK for (" . $timegone . ")  " . $msgs, "both");
         }
         if ($this->bot->core("settings")->get("Afk", "noprefix")) {
@@ -110,7 +110,7 @@ class AFK extends BaseActiveModule
             }
         }
         if (!empty($this->afk)) {
-            $msgcheck = $this->msg_check($name, "", $msg);
+            $msgcheck = $this->checkMessage($name, "", $msg);
         }
         if (!empty($msgcheck)) {
             $this->bot->send_pgroup($msgcheck);
@@ -118,12 +118,12 @@ class AFK extends BaseActiveModule
     }
 
 
-    function gmsg($name, $group, $msg)
+    function groupMessage($name, $group, $msg)
     {
-        if ($this->acheck($name)) {
-            $timegone = $this->afk_time($name);
+        if ($this->awayCheck($name)) {
+            $timegone = $this->afkTime($name);
             $this->back($name);
-            $msgs = $this->msgs($name);
+            $msgs = $this->messages($name);
             $this->bot->send_output($name, $name . " is back. AFK for (" . $timegone . ") " . $msgs, "both");
         }
         if ($this->bot->core("settings")->get("Afk", "noprefix")) {
@@ -149,7 +149,7 @@ class AFK extends BaseActiveModule
             }
         }
         if (!empty($this->afk)) {
-            $msgcheck = $this->msg_check($name, $group, $msg);
+            $msgcheck = $this->checkMessage($name, $group, $msg);
         }
         if (!empty($msgcheck)) {
             $this->bot->send_gc($msgcheck);
@@ -157,7 +157,7 @@ class AFK extends BaseActiveModule
     }
 
 
-    function msg_check($name, $group, $msg)
+    function checkMessage($name, $group, $msg)
     {
         $found = FALSE;
         foreach ($this->afk as $key => $value) {
@@ -167,7 +167,7 @@ class AFK extends BaseActiveModule
                     $name,
                     $msg
                 );
-                return ($key . " has been AFK for " . $this->afk_time($key) . " (" . $value[$msg] . ").");
+                return ($key . " has been AFK for " . $this->afkTime($key) . " (" . $value[$msg] . ").");
             }
         }
         if ($this->bot->core("settings")->get("Afk", "Alias")) {
@@ -181,7 +181,7 @@ class AFK extends BaseActiveModule
                                 $msg
                             );
                             $this->afkmsgid++;
-                            return ($value . " has been AFK for " . $this->afk_time($value) . " (" . $this->afk[$value][msg] . ").");
+                            return ($value . " has been AFK for " . $this->afkTime($value) . " (" . $this->afk[$value][msg] . ").");
                         }
                     }
                 }
@@ -191,7 +191,7 @@ class AFK extends BaseActiveModule
     }
 
 
-    function afk_time($name)
+    function afkTime($name)
     {
         $timenow = "" . time() . "";
         $timeafk = $this->afk[$name]['time'];
@@ -256,7 +256,7 @@ class AFK extends BaseActiveModule
     }
 
 
-    function acheck($name)
+    function awayCheck($name)
     {
         if (isset($this->afk[$name])) {
             return TRUE;
@@ -271,9 +271,9 @@ class AFK extends BaseActiveModule
     {
         $access = $this->bot->core("security")->get_access_level($name);
         if (($msg == 5) && ($access > 1)) {
-            if ($this->acheck($name)) {
+            if ($this->awayCheck($name)) {
                 $this->back($name);
-                $msgs = $this->msgs($name);
+                $msgs = $this->messages($name);
                 if ($this->bot->game == "ao") {
                     $this->bot->send_tell($name, "you have been set as back. " . $msgs . "");
                 }
@@ -281,18 +281,18 @@ class AFK extends BaseActiveModule
         }
         else {
             if (($msg == 3) && ($access > 1)) {
-                if (!$this->acheck($name)) {
+                if (!$this->awayCheck($name)) {
                     $this->gone($name);
-                    $msgs = $this->msgs($name);
+                    $msgs = $this->messages($name);
                     if ($this->bot->game == "ao") {
                         $this->bot->send_tell($name, "you have been set as AFK. " . $msgs . "");
                     }
                 }
             }
             elseif ($msg == 0) {
-                if ($this->acheck($name)) {
+                if ($this->awayCheck($name)) {
                     $this->back($name);
-                    $msgs = $this->msgs($name);
+                    $msgs = $this->messages($name);
                     $this->bot->send_tell($name, "you have been set as back. (Logoff) " . $msgs . "");
                 }
             }
@@ -300,7 +300,7 @@ class AFK extends BaseActiveModule
     }
 
 
-    function msgs($name)
+    function messages($name)
     {
         if (!empty($this->afkmsgs[$name])) {
             $inside = "##blob_title##..:: AFK Messages ::..##end##\n\n";

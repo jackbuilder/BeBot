@@ -47,7 +47,7 @@ Disconnects and then connects the bot from AO Chatserver
 log($first, $second, $msg):
 Writes to console/log file.
 
-make_blob($title, $content):
+makeBlob($title, $content):
 Makes a text blob.
 - Returns blob.
 
@@ -55,35 +55,35 @@ make_chatcommand($link, $title):
 Creates a clickable chatcommand link
 - Returns string
 
-make_item($lowid, $highid, $ql, $name)
+makeItem($lowid, $highid, $ql, $name)
 Makes an item reference.
 - Returns reference blob.
 
-send_tell($to, $msg):
-Sends a tell to character.
+sendTell($to, $msg):
+Sends a sendTell to character.
 
-send_pgroup($msg):
+sendPrivateGroup($msg):
 Sends a msg to the privategroup.
 
-send_gc($msg):
+sendGuildChat($msg):
 Sends a msg to the guildchat.
 
-send_help($to):
-Sends /tell <botname> <pre>help.
+sendHelp($to):
+Sends /sendTell <botname> <pre>help.
 
-send_permission_denied($to, $command, $type)
+sendPermissionDenied($to, $command, $type)
 If $type is missing or 0 error is returned to the calling function, else it
 sends a permission denied error to the apropriate location based on $type for $command.
 
-get_site($url, $strip_headers, $server_timeout, $read_timeout):
+getSite($url, $strip_headers, $server_timeout, $read_timeout):
 Retrives the content of a site
 
-int_to_string($int)
+intToString($int)
 Used to convert an overflowed (unsigned) integer to a string with the correct positive unsigned integer value
 If the passed integer is not negative, the integer is merely passed back in string form with no modifications.
 - Returns a string.
 
-string_to_int($string)
+stringToInt($string)
 Used to convert an unsigned interger in string form to an overflowed (negative) integere
 If the passed string is not an integer large enough to overflow, the string is merely passed back in integer form with no modifications.
 - Returns an integer.
@@ -152,7 +152,7 @@ class Bot
 
     public static function factory($config_file = NULL)
     {
-        require ('./conf/ServerList.php');
+        require ('./Conf/ServerList.php');
         if (!empty($config_file)) {
             $config_file = ucfirst(strtolower($config_file)) . ".Bot.conf";
         }
@@ -160,26 +160,26 @@ class Bot
             $config_file = "Bot.conf";
         }
         //Read config_file
-        if (file_exists("./conf/" . $config_file)) {
-            require_once "./conf/" . $config_file;
-            echo "Loaded bot configuration from conf/" . $config_file . "\n";
+        if (file_exists("./Conf/" . $config_file)) {
+            require_once "./Conf/" . $config_file;
+            echo "Loaded bot configuration from Conf/" . $config_file . "\n";
         }
         else {
-            die("Could not read config file conf/" . $config_file);
+            die("Could not read config file Conf/" . $config_file);
         }
 
         if (empty($ao_password) || $ao_password == "") {
             $fp = fopen('./conf/pw', 'r');
             if ($fp) {
-                $ao_password = fread($fp, filesize('./conf/pw'));
+                $ao_password = fread($fp, filesize('./Conf/pw'));
                 fclose($fp);
-                $fp = fopen('./conf/pw', 'w');
+                $fp = fopen('./Conf/pw', 'w');
                 fwrite($fp, "");
                 fclose($fp);
             }
             else {
                 if (empty($ao_password) || $ao_password == "") {
-                    die("No password set in either ./conf/" . $config_file . " or in conf/pw");
+                    die("No password set in either ./Conf/" . $config_file . " or in Conf/pw");
                 }
             }
         }
@@ -262,7 +262,7 @@ class Bot
     }
 
 
-    public static function get_instance($bothandle)
+    public static function getInstance($bothandle)
     {
         if (!isset(self::$instance[$bothandle])) {
             return FALSE;
@@ -277,7 +277,7 @@ class Bot
     }
 
 
-    function load_files($section, $directory)
+    function loadFiles($section, $directory)
     {
         if (!is_dir($directory)) {
             $this->log("LOAD", "ERROR", "The specified directory '$directory' is inaccessible!");
@@ -311,7 +311,7 @@ class Bot
     */
     function connect()
     {
-        // Make sure all cronjobs are locked, we don't want to run any cronjob before we are logged in!
+        // Make sure all cronjobs are locked, we don't want to run any cronJob before we are logged in!
         $this->cron_activated = FALSE;
         // Get dimension server
         switch ($this->dimension) {
@@ -478,7 +478,7 @@ class Bot
     }
 
 
-    function replace_string_tags($msg)
+    function replaceStringTags($msg)
     {
         $msg = str_replace("<botname>", $this->botname, $msg);
         $msg = str_replace("<guildname>", $this->guildname, $msg);
@@ -488,15 +488,15 @@ class Bot
 
 
     /*
-    sends a tell asking user to use "help"
+    sends a sendTell asking user to use "help"
     */
-    function send_help($to, $command = FALSE)
+    function sendHelp($to, $command = FALSE)
     {
         if ($command == FALSE) {
-            $this->send_tell($to, "/tell <botname> <pre>help");
+            $this->sendTell($to, "/sendTell <botname> <pre>help");
         }
         else {
-            $this->send_tell(
+            $this->sendTell(
                 $to, $this->core("help")
                     ->show_help($to, $command)
             );
@@ -507,10 +507,10 @@ class Bot
     /*
     sends a message over IRC if it's enabled and connected
     */
-    function send_irc($prefix, $name, $msg)
+    function sendIrc($prefix, $name, $msg)
     {
-        //		if (isset($this -> irc) && $this -> exists_module("irc"))
-        if ($this->exists_module("irc")) {
+        //		if (isset($this -> irc) && $this -> existsModule("irc"))
+        if ($this->existsModule("irc")) {
             if ($this->core("settings")->get("Irc", "Connected")) {
                 // Parse the color codes and let the IRC module deal with filtering.
                 $msg = $this->core("colors")->parse($msg);
@@ -523,7 +523,7 @@ class Bot
     /*
     Notifies someone that they are banned, but only once.
     */
-    function send_ban($to, $msg = FALSE)
+    function sendBan($to, $msg = FALSE)
     {
         if (!isset($this->banmsgout[$to]) || $this->banmsgout[$to] < (time() - 60 * 5)) {
             $this->banmsgout[$to] = time();
@@ -545,10 +545,10 @@ class Bot
                 else {
                     $why = ".";
                 }
-                $this->send_tell($to, "You are banned from <botname>" . $why);
+                $this->sendTell($to, "You are banned from <botname>" . $why);
             }
             else {
-                $this->send_tell($to, $msg);
+                $this->sendTell($to, $msg);
             }
         }
         else {
@@ -560,22 +560,22 @@ class Bot
     /*
     Sends a permission denied error to user for the given command.
     */
-    function send_permission_denied($to, $command, $type = 0)
+    function sendPermissionDenied($to, $command, $type = 0)
     {
         $string = "You do not have permission to access $command";
         if ($type = 0) {
             return $string;
         }
         else {
-            $this->send_output($to, $string, $type);
+            $this->sendOutput($to, $string, $type);
         }
     }
 
 
     /*
-    send a tell. Set $low to 1 on tells that are likely to cause spam.
+    send a sendTell. Set $low to 1 on tells that are likely to cause spam.
     */
-    function send_tell(
+    function sendTell(
         $to, $msg, $low = 0, $color = TRUE, $sizecheck = TRUE,
         $parsecolors = TRUE
     )
@@ -589,7 +589,7 @@ class Bot
             if (strlen($msg) < 100000) {
                 if (preg_match("/<a href=\"(.+)\">/isU", $msg, $info)) {
                     if (strlen($info[1]) > $this->maxsize) {
-                        $this->cut_size($msg, "tell", $to, $low);
+                        $this->cutSize($msg, "sendTell", $to, $low);
                         $send = FALSE;
                     }
                 }
@@ -598,14 +598,14 @@ class Bot
                 $info = explode('<a href="', $msg, 2);
                 if (count($info) > 1) {
                     if (strlen($msg) > $this->maxsize) {
-                        $this->cut_size($msg, "tell", $to, $low);
+                        $this->cutSize($msg, "sendTell", $to, $low);
                         $send = FALSE;
                     }
                 }
             }
         }
         if ($send) {
-            $msg = $this->replace_string_tags($msg);
+            $msg = $this->replaceStringTags($msg);
             if ($color && $this->core("settings")->get("Core", "ColorizeTells")
             ) {
                 $msg = $this->core("colors")->colorize("normal", $msg);
@@ -622,7 +622,7 @@ class Bot
                 $this->aoc->send_tell($to, $msg);
             }
             else {
-                $this->core("chat_queue")->into_queue($to, $msg, "tell", $low);
+                $this->core("chat_queue")->into_queue($to, $msg, "sendTell", $low);
             }
         }
     }
@@ -631,7 +631,7 @@ class Bot
     /*
     send a message to privategroup
     */
-    function send_pgroup(
+    function sendPrivateGroup(
         $msg, $group = NULL, $checksize = TRUE,
         $parsecolors = TRUE
     )
@@ -660,13 +660,13 @@ class Bot
         if ($checksize) {
             if (preg_match("/<a href=\"(.+)\">/isU", $msg, $info)) {
                 if (strlen($info[1]) > $this->maxsize) {
-                    $this->cut_size($msg, "pgroup", $group);
+                    $this->cutSize($msg, "pgroup", $group);
                     $send = FALSE;
                 }
             }
         }
         if ($send) {
-            $msg = $this->replace_string_tags($msg);
+            $msg = $this->replaceStringTags($msg);
             $msg = utf8_encode($msg);
             if (strtolower($group) == strtolower($this->botname)) {
                 if ($this->core("settings")->get("Core", "ColorizePGMSG")) {
@@ -684,7 +684,7 @@ class Bot
     /*
     * Send a message to guild channel
     */
-    function send_gc($msg, $low = 0, $checksize = TRUE)
+    function sendGuildChat($msg, $low = 0, $checksize = TRUE)
     {
         if ($this->core("settings")->get("Core", "DisableGC")) {
             Return FALSE;
@@ -695,13 +695,13 @@ class Bot
         if ($checksize) {
             if (preg_match("/<a href=\"(.+)\">/isU", $msg, $info)) {
                 if (strlen($info[1]) > $this->maxsize) {
-                    $this->cut_size($msg, "gc", "", $low);
+                    $this->cutSize($msg, "sendToGuildChat", "", $low);
                     $send = FALSE;
                 }
             }
         }
         if ($send) {
-            $msg = $this->replace_string_tags($msg);
+            $msg = $this->replaceStringTags($msg);
             if ($this->core("settings")->get("Core", "ColorizeGC")) {
                 $msg = $this->core("colors")->colorize("normal", $msg);
             }
@@ -716,13 +716,13 @@ class Bot
                 $this->aoc->send_group($guild, $msg);
             }
             else {
-                $this->core("chat_queue")->into_queue($guild, $msg, "gc", $low);
+                $this->core("chat_queue")->into_queue($guild, $msg, "sendToGuildChat", $low);
             }
         }
     }
 
 
-    function send_output($source, $msg, $type, $low = 0)
+    function sendOutput($source, $msg, $type, $low = 0)
     {
         // Parse color tags now to be sure they don't get changed by output filters
         $msg = $this->core("colors")->parse($msg);
@@ -738,22 +738,22 @@ class Bot
         switch ($type) {
         case '0':
         case '1':
-        case 'tell':
-            $this->send_tell($source, $msg, $low);
+        case 'sendTell':
+            $this->sendTell($source, $msg, $low);
             break;
         case '2':
         case 'pgroup':
-        case 'pgmsg':
-            $this->send_pgroup($msg);
+        case 'sendToGroup':
+            $this->sendPrivateGroup($msg);
             break;
         case '3':
-        case 'gc':
-            $this->send_gc($msg, $low);
+        case 'sendToGuildChat':
+            $this->sendGuildChat($msg, $low);
             break;
         case '4':
         case 'both':
-            $this->send_gc($msg, $low);
-            $this->send_pgroup($msg);
+            $this->sendGuildChat($msg, $low);
+            $this->sendPrivateGroup($msg);
             break;
         default:
             $this->log("OUTPUT", "ERROR", "Broken plugin, type: $type is unknown to me; source: $source, message: $msg");
@@ -766,11 +766,11 @@ class Bot
     * all available commands in $channel. The percentage of match and the closest matching command
     * are returned in an array.
     */
-    function find_similar_command($channel, $cmd)
+    function findSimilarCommand($channel, $cmd)
     {
         $use = array(0);
         $percentage = 0;
-        if (isset($this->commands["tell"][$cmd]) || isset($this->commands["gc"][$cmd]) || isset($this->commands["pgmsg"][$cmd]) || isset($this->commands["extpgmsg"][$cmd])) {
+        if (isset($this->commands["sendTell"][$cmd]) || isset($this->commands["sendToGuildChat"][$cmd]) || isset($this->commands["sendToGroup"][$cmd]) || isset($this->commands["externalPrivateGroupMessage"][$cmd])) {
             return $use;
         }
         $perc = $this->core("settings")->get("Core", "SimilarMinimum");
@@ -790,15 +790,15 @@ class Bot
     /*
     * This function checks if $user got access to $command (with possible subcommands based on $msg)
     * in $channel. If the check is positive the command is executed and TRUE returned, otherwise FALSE.
-    * $pgname is used to identify which external private group issued the command if $channel = extpgmsg.
+    * $pgname is used to identify which external private group issued the command if $channel = externalPrivateGroupMessage.
     */
-    function check_access_and_execute($user, $command, $msg, $channel, $pgname)
+    function checkAccessAndExecute($user, $command, $msg, $channel, $pgname)
     {
         if ($this->commands[$channel][$command] != NULL) {
             if ($this->core("access_control")
                 ->check_rights($user, $command, $msg, $channel)
             ) {
-                if ($channel == "extpgmsg") {
+                if ($channel == "externalPrivateGroupMessage") {
                     $this->commands[$channel][$command]->$channel($pgname, $user, $msg);
                 }
                 else {
@@ -826,18 +826,18 @@ class Bot
     *) search the command library for a similar command, notify user about the typo and execute if found
 
     */
-    function handle_command_input($user, $msg, $channel, $pgname = NULL)
+    function handleCommandInput($user, $msg, $channel, $pgname = NULL)
     {
         $match = FALSE;
         $this->command_error_text = FALSE;
         if (!empty($this->commands[$channel])) {
             if ($this->core("security")->is_banned($user)) {
-                $this->send_ban($user);
+                $this->sendBan($user);
                 return TRUE;
             }
             $stripped_prefix = str_replace("\\", "", $this->commpre);
             // Add missing command prefix in tells if the settings allow for it:
-            if ($channel == "tell"
+            if ($channel == "sendTell"
                 && !$this->core("settings")
                     ->get("Core", "RequireCommandPrefixInTells")
                 && $this->commpre != ""
@@ -859,12 +859,12 @@ class Bot
                 $msg = implode(" ", $cmd);
                 if (isset($this->commands[$channel][$cmd[0]])) {
                     $match = TRUE;
-                    if ($this->check_access_and_execute($user, $cmd[0], $msg, $channel, $pgname)) {
+                    if ($this->checkAccessAndExecute($user, $cmd[0], $msg, $channel, $pgname)) {
                         return TRUE;
                     }
                 }
                 elseif ($this->core("settings")->get("Core", "SimilarCheck")) {
-                    $use = $this->find_similar_command($channel, $cmd[0]);
+                    $use = $this->findSimilarCommand($channel, $cmd[0]);
                     if ($use[0] > 0) {
                         $cmd[0] = $use[1];
                         $msg = explode(" ", $msg, 2);
@@ -872,7 +872,7 @@ class Bot
                         $msg = implode(" ", $msg);
                         if (isset($this->commands[$channel][$use[1]])) {
                             $match = TRUE;
-                            if ($this->check_access_and_execute($user, $use[1], $msg, $channel, $pgname)) {
+                            if ($this->checkAccessAndExecute($user, $use[1], $msg, $channel, $pgname)) {
                                 return TRUE;
                             }
                         }
@@ -923,12 +923,12 @@ class Bot
     * $group is used by external private groups and to listen to specific chat channels outside the bot.
     * Returns true if some module accessing this chat returns true, false otherwise.
     */
-    function hand_to_chat($found, $user, $msg, $channel, $group = NULL)
+    function handToChat($found, $user, $msg, $channel, $group = NULL)
     {
         if ($found) {
             return TRUE;
         }
-        if ($channel == "gmsg") {
+        if ($channel == "groupMessage") {
             if ($group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
                 $group = "org";
             }
@@ -940,13 +940,13 @@ class Bot
         if (!empty($registered)) {
             $keys = array_keys($registered);
             foreach ($keys as $key) {
-                if ($channel == "extprivgroup") {
+                if ($channel == "externalPrivateGroup") {
                     if ($this->commands[$channel][$key] != NULL) {
                         $found = $found | $this->commands[$channel][$key]->$channel($group, $user, $msg);
                     }
                 }
                 else {
-                    if ($channel == "gmsg") {
+                    if ($channel == "groupMessage") {
                         if ($this->commands[$channel][$group][$key] != NULL) {
                             $found = $found | $this->commands[$channel][$group][$key]->$channel($user, $group, $msg);
                         }
@@ -971,15 +971,15 @@ class Bot
     /*
     Incoming Tell
     */
-    function inc_tell($args)
+    function incomingTell($args)
     {
         //Get the name of the user. It's easier to handle... or is it?
         $user = $this->core("player")->name($args[0]);
         $found = FALSE;
         // Ignore bot chat, no need to handle it's own output as input again
         if ($user == 'BOTNAME') {
-            // Danger will robinson. We just sent a tell to ourselves!!!!!!!!!
-            $this->log("CORE", "INC_TELL", "Danger will robinson. Received tell from myself: $args[1]");
+            // Danger will robinson. We just sent a sendTell to ourselves!!!!!!!!!
+            $this->log("CORE", "INC_TELL", "Danger will robinson. Received sendTell from myself: $args[1]");
             return;
         }
         //Silently ignore tells from other bots.
@@ -987,33 +987,33 @@ class Bot
         {
             return;
         }
-        if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match("/.tell (.+)help/i", $args[1]) || preg_match("/I only listen to members of this bot/i", $args[1])
+        if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match("/.sendTell (.+)help/i", $args[1]) || preg_match("/I only listen to members of this bot/i", $args[1])
             || preg_match("/I am away from my keyboard right now,(.+)your message has been logged./i", $args[1])
             || preg_match("/Away From Keyboard/i", $args[1])
         ) {
-            //We probably sendt someone a tell when not here. Let's leave it at that.
+            //We probably sendt someone a sendTell when not here. Let's leave it at that.
             return;
         }
         $args[1] = utf8_decode($args[1]);
         $this->log("TELL", "INC", $user . ": " . $args[1]);
-        $found = $this->handle_command_input($user, $args[1], "tell");
-        $found = $this->hand_to_chat($found, $user, $args[1], "tells");
+        $found = $this->handleCommandInput($user, $args[1], "sendTell");
+        $found = $this->handToChat($found, $user, $args[1], "tells");
         if ($this->command_error_text) {
-            $this->send_tell($args[0], $this->command_error_text);
+            $this->sendTell($args[0], $this->command_error_text);
         }
         elseif (!$found
             && $this->core("security")
                 ->check_access($user, "GUEST")
         ) {
-            $this->send_help($args[0]);
+            $this->sendHelp($args[0]);
         }
         else {
             if (!$found) {
                 if ($this->guild_bot) {
-                    $this->send_tell($args[0], "I only listen to members of " . $this->guildname . ".");
+                    $this->sendTell($args[0], "I only listen to members of " . $this->guildname . ".");
                 }
                 else {
-                    $this->send_tell($args[0], "I only listen to members of this bot.");
+                    $this->sendTell($args[0], "I only listen to members of this bot.");
                 }
             }
         }
@@ -1024,7 +1024,7 @@ class Bot
     /*
     Someone joined privategroup
     */
-    function inc_pgjoin($args)
+    function incomingPrivateGroupJoin($args)
     {
         $pgname = $this->core("player")->name($args[0]);
         if (empty($pgname) || $pgname == "") {
@@ -1033,22 +1033,22 @@ class Bot
         $user = $this->core("player")->name($args[1]);
         if (strtolower($pgname) == strtolower($this->botname)) {
             $this->log("PGRP", "JOIN", $user . " joined privategroup.");
-            if (!empty($this->commands["pgjoin"])) {
-                $keys = array_keys($this->commands["pgjoin"]);
+            if (!empty($this->commands["privateGroupJoin"])) {
+                $keys = array_keys($this->commands["privateGroupJoin"]);
                 foreach ($keys as $key) {
-                    if ($this->commands["pgjoin"][$key] != NULL) {
-                        $this->commands["pgjoin"][$key]->pgjoin($user);
+                    if ($this->commands["privateGroupJoin"][$key] != NULL) {
+                        $this->commands["privateGroupJoin"][$key]->pgjoin($user);
                     }
                 }
             }
         }
         else {
             $this->log("PGRP", "JOIN", $user . " joined the exterior privategroup of " . $pgname . ".");
-            if (!empty($this->commands["extpgjoin"])) {
-                $keys = array_keys($this->commands["extpgjoin"]);
+            if (!empty($this->commands["externalPrivateGroupJoin"])) {
+                $keys = array_keys($this->commands["externalPrivateGroupJoin"]);
                 foreach ($keys as $key) {
-                    if ($this->commands["extpgjoin"][$key] != NULL) {
-                        $this->commands["extpgjoin"][$key]->extpgjoin($pgname, $user);
+                    if ($this->commands["externalPrivateGroupJoin"][$key] != NULL) {
+                        $this->commands["externalPrivateGroupJoin"][$key]->extpgjoin($pgname, $user);
                     }
                 }
             }
@@ -1059,7 +1059,7 @@ class Bot
     /*
     Someone left privategroup
     */
-    function inc_pgleave($args)
+    function incomingPrivateGroupLeave($args)
     {
         $pgname = $this->core("player")->name($args[0]);
         if (empty($pgname) || $pgname == "") {
@@ -1068,11 +1068,11 @@ class Bot
         $user = $this->core("player")->name($args[1]);
         if (strtolower($pgname) == strtolower($this->botname)) {
             $this->log("PGRP", "LEAVE", $user . " left privategroup.");
-            if (!empty($this->commands["pgleave"])) {
-                $keys = array_keys($this->commands["pgleave"]);
+            if (!empty($this->commands["privateGroupLeave"])) {
+                $keys = array_keys($this->commands["privateGroupLeave"]);
                 foreach ($keys as $key) {
-                    if ($this->commands["pgleave"][$key] != NULL) {
-                        $this->commands["pgleave"][$key]->pgleave($user);
+                    if ($this->commands["privateGroupLeave"][$key] != NULL) {
+                        $this->commands["privateGroupLeave"][$key]->pgleave($user);
                     }
                 }
             }
@@ -1094,7 +1094,7 @@ class Bot
     /*
     Message in privategroup
     */
-    function inc_pgmsg($args)
+    function incomingPrivateGroupMessage($args)
     {
         $pgname = $this->core("player")->name($args[0]);
         $user = $this->core("player")->name($args[1]);
@@ -1129,18 +1129,18 @@ class Bot
         if (!isset($this->other_bots[$user])) {
             if (strtolower($pgname) == strtolower($this->botname)) {
                 if (!$dispgmsg) {
-                    $found = $this->handle_command_input($user, $args[2], "pgmsg");
+                    $found = $this->handleCommandInput($user, $args[2], "sendToGroup");
                 }
                 if (!$dispgmsgchat) {
-                    $found = $this->hand_to_chat($found, $user, $args[2], "privgroup");
+                    $found = $this->handToChat($found, $user, $args[2], "privateGroup");
                 }
             }
             else {
-                $found = $this->handle_command_input($user, $args[2], "extpgmsg", $pgname);
-                $found = $this->hand_to_chat($found, $user, $args[2], "extprivgroup", $pgname);
+                $found = $this->handleCommandInput($user, $args[2], "externalPrivateGroupMessage", $pgname);
+                $found = $this->handToChat($found, $user, $args[2], "externalPrivateGroup", $pgname);
             }
             if ($this->command_error_text) {
-                $this->send_pgroup($this->command_error_text, $pgname);
+                $this->sendPrivateGroup($this->command_error_text, $pgname);
             }
             unset($this->command_error_text);
         }
@@ -1150,7 +1150,7 @@ class Bot
     /*
     Incoming group announce
     */
-    function inc_gannounce($args)
+    function incomingGroupAnnounce($args)
     {
         if ($args[2] == 32772 && $this->game == "ao") {
             $this->guildname = $args[1];
@@ -1162,14 +1162,14 @@ class Bot
     /*
     * Incoming private group invite
     */
-    function inc_pginvite($args)
+    function incomingPrivateGroupInvite($args)
     {
         $group = $this->core("player")->name($args[0]);
-        if (!empty($this->commands["pginvite"])) {
-            $keys = array_keys($this->commands["pginvite"]);
+        if (!empty($this->commands["privateGroupInvite"])) {
+            $keys = array_keys($this->commands["privateGroupInvite"]);
             foreach ($keys as $key) {
-                if ($this->commands["pginvite"][$key] != NULL) {
-                    $this->commands["pginvite"][$key]->pginvite($group);
+                if ($this->commands["privateGroupInvite"][$key] != NULL) {
+                    $this->commands["privateGroupInvite"][$key]->pginvite($group);
                 }
             }
         }
@@ -1179,7 +1179,7 @@ class Bot
     /*
     * Incoming group message (Guildchat, towers etc)
     */
-    function inc_gmsg($args)
+    function incomingGroupMessage($args)
     {
         $found = FALSE;
         $group = $this->core("chat")->lookup_group($args[0]);
@@ -1187,7 +1187,7 @@ class Bot
             $group = $this->core("chat")->get_gname($args[0]);
         }
         $args[2] = utf8_decode($args[2]);
-        if (isset($this->commands["gmsg"][$group]) || $group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
+        if (isset($this->commands["groupMessage"][$group]) || $group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
             if ($this->game == "aoc" && $group == "~Guild") {
                 $msg = "[" . $this->guildname . "] ";
             }
@@ -1227,17 +1227,17 @@ class Bot
         if (!isset($this->other_bots[$user])) {
             if ($group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
                 if (!$disgc) {
-                    $found = $this->handle_command_input($user, $args[2], "gc");
+                    $found = $this->handleCommandInput($user, $args[2], "sendToGuildChat");
                 }
 
                 if ($this->command_error_text) {
-                    $this->send_gc($this->command_error_text);
+                    $this->sendGuildChat($this->command_error_text);
                 }
                 unset($this->command_error_text);
             }
 
             if (!$disgcchat) {
-                $found = $this->hand_to_chat($found, $user, $args[2], "gmsg", $group);
+                $found = $this->handToChat($found, $user, $args[2], "groupMessage", $group);
             }
         }
     }
@@ -1246,7 +1246,7 @@ class Bot
     /*
     Does all the checks and work for a specific cron time
     */
-    function cronjob($time, $duration)
+    function cronJob($time, $duration)
     {
         if (($this->cron_job_timer[$duration] <= $time) && ($this->cron_job_active[$duration] == FALSE)) {
             if (!empty($this->cron[$duration])) {
@@ -1279,7 +1279,7 @@ class Bot
             return;
         }
         foreach ($this->cron_times as $interval) {
-            $this->cronjob($time, $interval);
+            $this->cronJob($time, $interval);
         }
     }
 
@@ -1299,9 +1299,9 @@ class Bot
         $msg = preg_replace("/<a href=\"(.+)\">/sU", "[link]", $msg);
         $msg = preg_replace("/<\/a>/U", "[/link]", $msg);
         // Change Encrypted Text to a Simple thing to say its encripted
-        $msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+) /U', "gcr <Encryted Message>", $msg);
-        $msg = preg_replace('/gcr &\$enc\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+)/', "gcr <Encryted Message>", $msg);
-        $msg = $this->replace_string_tags($msg);
+        $msg = preg_replace('/gcr &\$encrypt\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+) /U', "gcr <Encryted Message>", $msg);
+        $msg = preg_replace('/gcr &\$encrypt\$& ([a-z0-9]+) ([a-z0-9]+) ([a-z0-9]+)/', "gcr <Encryted Message>", $msg);
+        $msg = $this->replaceStringTags($msg);
         if ($this->log_timestamp == 'date') {
             $timestamp = "[" . gmdate("Y-m-d") . "]\t";
         }
@@ -1320,10 +1320,10 @@ class Bot
         // Log to the security log and notify guildchat/pgroup.
         if (preg_match("/^security$/i", $second)) {
             if ($this->guildbot) {
-                $this->send_gc($line);
+                $this->sendGuildChat($line);
             }
             else {
-                $this->send_pgroup($line);
+                $this->sendPrivateGroup($line);
             }
             $log = fopen($this->log_path . "/security.txt", "a");
             fputs($log, $line);
@@ -1347,7 +1347,7 @@ class Bot
     /*
     Cut msg into Size Small enough to Send
     */
-    function cut_size($msg, $type, $to = "", $pri = 0)
+    function cutSize($msg, $type, $to = "", $pri = 0)
     {
         if (strlen($msg) < 100000) {
             preg_match("/^(.*)<a href=\"(.+)\">(.*)$/isU", $msg, $info);
@@ -1378,16 +1378,16 @@ class Bot
                 $between = "text://";
             }
             $msg = $info[1] . "<a href=\"" . $between . $result[$i] . "\">" . $info[3] . " <font color=#ffffff>(page " . ($i + 1) . " of " . ($page + 1) . ")</font>";
-            if ($type == "tell") {
-                $this->send_tell($to, $msg, $pri, TRUE, FALSE);
+            if ($type == "sendTell") {
+                $this->sendTell($to, $msg, $pri, TRUE, FALSE);
             }
             else {
                 if ($type == "pgroup") {
-                    $this->send_pgroup($msg, $to, FALSE);
+                    $this->sendPrivateGroup($msg, $to, FALSE);
                 }
                 else {
-                    if ($type == "gc") {
-                        $this->send_gc($msg, $pri, FALSE);
+                    if ($type == "sendToGuildChat") {
+                        $this->sendGuildChat($msg, $pri, FALSE);
                     }
                 }
             }
@@ -1396,7 +1396,7 @@ class Bot
 
 
     // Registers a new reference to a module, used to access the new module by other modules.
-    public function register_module(&$ref, $name)
+    public function registerModule(&$ref, $name)
     {
         if (isset($this->module_links[strtolower($name)])) {
             $this->log(
@@ -1410,14 +1410,14 @@ class Bot
 
 
     // Unregisters a module link.
-    public function unregister_module($name)
+    public function unRegisterModule($name)
     {
         $this->module_links[strtolower($name)] = NULL;
         unset($this->module_links[strtolower($name)]);
     }
 
 
-    public function exists_module($name)
+    public function existsModule($name)
     {
         $name = strtolower($name);
         Return (isset($this->module_links[$name]));
@@ -1437,16 +1437,16 @@ class Bot
 
 
     /*
-    * Interface to register and unregister commands
+    * Interface to register and unRegister commands
     */
-    public function register_command($channel, $command, &$module)
+    public function registerCommand($channel, $command, &$module)
     {
         $channel = strtolower($channel);
         $command = strtolower($command);
         $allchannels = array(
-            "gc",
-            "tell",
-            "pgmsg"
+            "sendToGuildChat",
+            "sendTell",
+            "sendToGroup"
         );
         if ($channel == "all") {
             foreach ($allchannels as $cnl) {
@@ -1459,14 +1459,14 @@ class Bot
     }
 
 
-    public function unregister_command($channel, $command)
+    public function unRegisterCommand($channel, $command)
     {
         $channel = strtolower($channel);
         $command = strtolower($command);
         $allchannels = array(
-            "gc",
-            "tell",
-            "pgmsg"
+            "sendToGuildChat",
+            "sendTell",
+            "sendToGroup"
         );
         if ($channel == "all") {
             foreach ($allchannels as $cnl) {
@@ -1481,15 +1481,15 @@ class Bot
     }
 
 
-    public function exists_command($channel, $command)
+    public function existsCommand($channel, $command)
     {
         $channel = strtolower($channel);
         $command = strtolower($command);
         $exists = FALSE;
         $allchannels = array(
-            "gc",
-            "tell",
-            "pgmsg"
+            "sendToGuildChat",
+            "sendTell",
+            "sendToGroup"
         );
         if ($channel == "all") {
             foreach ($allchannels as $cnl) {
@@ -1503,21 +1503,21 @@ class Bot
     }
 
 
-    public function get_all_commands()
+    public function getAllCommands()
     {
         Return $commands;
     }
 
 
-    public function get_command_handler($channel, $command)
+    public function getCommandHandler($channel, $command)
     {
         $channel = strtolower($channel);
         $command = strtolower($command);
         $handler = "";
         $allchannels = array(
-            "gc",
-            "tell",
-            "pgmsg"
+            "sendToGuildChat",
+            "sendTell",
+            "sendToGroup"
         );
         if ($channel == "all") {
             $handlers = array();
@@ -1534,38 +1534,38 @@ class Bot
 
 
     /*
-    * Interface to register and unregister commands
+    * Interface to register and unRegister commands
     */
-    public function register_event($event, $target, &$module)
+    public function registerEvent($event, $target, &$module)
     {
         $event = strtolower($event);
         $events = array(
             'connect',
             'disconnect',
-            'pgjoin',
-            'pginvite',
-            'pgleave',
-            'extpgjoin',
+            'privateGroupJoin',
+            'privateGroupInvite',
+            'privateGroupLeave',
+            'externalPrivateGroupJoin',
             'extpgleave',
             'cron',
             'settings',
             'timer',
             'logon_notify',
             'buddy',
-            'privgroup',
-            'gmsg',
+            'privateGroup',
+            'groupMessage',
             'tells',
-            'extprivgroup',
+            'externalPrivateGroup',
             'irc'
         );
         if (in_array($event, $events)) {
-            if ($event == 'gmsg') {
+            if ($event == 'groupMessage') {
                 if ($target) {
                     $this->commands[$event][$target][get_class($module)] = &$module;
                     return FALSE;
                 }
                 else {
-                    return "No channel specified for gmsg. Not registering.";
+                    return "No channel specified for groupMessage. Not registering.";
                 }
             }
             elseif ($event == 'cron') {
@@ -1620,29 +1620,29 @@ class Bot
     }
 
 
-    public function unregister_event($event, $target, &$module)
+    public function unRegisterEvent($event, $target, &$module)
     {
         $event = strtolower($event);
         $events = array(
             'connect',
             'disconnect',
-            'pgjoin',
-            'pginvite',
-            'pgleave',
-            'extpgjoin',
+            'privateGroupJoin',
+            'privateGroupInvite',
+            'privateGroupLeave',
+            'externalPrivateGroupJoin',
             'extpgleave',
             'cron',
             'settings',
             'timer',
             'logon_notify',
             'buddy',
-            'privgroup',
-            'gmsg',
+            'privateGroup',
+            'groupMessage',
             'tells',
-            'extprivgroup'
+            'externalPrivateGroup'
         );
         if (in_array($event, $events)) {
-            if ($event == 'gmsg') {
+            if ($event == 'groupMessage') {
                 if (isset($this->commands[$event][$target][get_class($module)])) {
                     $this->commands[$event][$target][get_class($module)] = NULL;
                     unset($this->commands[$event][$target][get_class($module)]);
@@ -1675,7 +1675,7 @@ class Bot
                     return $this->core("settings")
                         ->unregister_callback($target['module'], $target['setting'], $module);
                 }
-                return "No module and/or setting defined, can't unregister!";
+                return "No module and/or setting defined, can't unRegister!";
             }
             else {
                 $this->commands[$event][get_class($module)] = NULL;
@@ -1689,7 +1689,7 @@ class Bot
     }
 
 
-    function debug_bt()
+    function debugBackTrace()
     {
         $trace = debug_backtrace();
         $r = '';

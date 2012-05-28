@@ -33,14 +33,14 @@
 */
 /*
 * This module offers the following functions making queries over online characters easier:
-* pgroup_tablename()
+* privateGroupTableName()
 * - returns the FROM part for a query over all users in private group.
 *
-* gc_tablename()
+* guildChatTableName()
 * - returns the FROM part for a query over all users in guild chat.
 *
-* full_tablename()
-* - returns the FROM part for a query over all bots, including those defined in otherbots.
+* fullTableName()
+* - returns the FROM part for a query over all bots, including those defined in otherBots.
 *   It uses the channels defined by the Channel settings.
 *
 * These functions set aliases for the table names:
@@ -76,13 +76,13 @@ class OnlineDB_Core extends BasePassiveModule
 					 level INT(1) DEFAULT '0',
 		             PRIMARY KEY (nickname, botname))"
         );
-        $this->register_module("online");
-        $this->register_event("pgjoin");
-        $this->register_event("pgleave");
-        $this->register_event("buddy");
-        $this->register_event("connect");
-        $this->register_event("disconnect");
-        $this->update_online_table();
+        $this->registerModule("online");
+        $this->registerEvent("privateGroupJoin");
+        $this->registerEvent("privateGroupLeave");
+        $this->registerEvent("buddy");
+        $this->registerEvent("connect");
+        $this->registerEvent("disconnect");
+        $this->updateOnlineTable();
         if ($this->bot->guildbot) {
             $chan = "both";
         }
@@ -111,7 +111,7 @@ class OnlineDB_Core extends BasePassiveModule
             ->create("Reinvite", "Notify", $reinvnot, "The notify sent on reinvites of silent is disabled.");
         $this->last_seen = array();
         $this->guest_cache = array();
-        $list = $this->bot->db->select("SELECT nickname, last_seen FROM #___users WHERE last_seen > 0");
+        $list = $this->bot->db->select("SELECT nickname, lastSeen FROM #___users WHERE lastSeen > 0");
         if (!empty($list)) {
             foreach ($list as $user) {
                 $this->last_seen[ucfirst(strtolower($user[0]))] = $user[1];
@@ -119,7 +119,7 @@ class OnlineDB_Core extends BasePassiveModule
         }
     } // End function Online()
 
-    function update_online_table()
+    function updateOnlineTable()
     {
         if ($this->bot->core("settings")->exists("Online", "Schemaversion")) {
             $this->bot->db->set_version(
@@ -152,26 +152,26 @@ class OnlineDB_Core extends BasePassiveModule
 
 
     /*
-    This gets called if someone joins the privgroup
+    This gets called if someone joins the privateGroup
     */
-    function pgjoin($name)
-    { // Start function pgjoin()
-        $this->status_change($name, "pg", 1);
+    function privateGroupJoin($name)
+    { // Start function privateGroupJoin()
+        $this->statusChange($name, "pg", 1);
         $this->guest_cache[ucfirst(strtolower($name))] = ucfirst(strtolower($name));
-        // Mark $name for reinvite to chat group (UPDATE works as status_change() creates any needed entries
+        // Mark $name for reinvite to chat group (UPDATE works as statusChange() creates any needed entries
         $this->bot->db->query("UPDATE #___online SET reinvite = '1' WHERE nickname = '" . $name . "' AND botname = '" . $this->bot->botname . "'");
-    } // End function pgjoin()
+    } // End function privateGroupJoin()
 
     /*
-    This gets called if someone leaves the privgroup
+    This gets called if someone leaves the privateGroup
     */
-    function pgleave($name)
-    { // Start function pgleave()
-        $this->status_change($name, "pg", 0);
+    function privateGroupLeave($name)
+    { // Start function privateGroupLeave()
+        $this->statusChange($name, "pg", 0);
         unset($this->guest_cache[ucfirst(strtolower($name))]);
-        // Unmark $name for reinvite to chat group (UPDATE works as status_change() creates any needed entries
+        // Unmark $name for reinvite to chat group (UPDATE works as statusChange() creates any needed entries
         $this->bot->db->query("UPDATE #___online SET reinvite = '0' WHERE nickname = '" . $name . "' AND botname = '" . $this->bot->botname . "'");
-    } // End function pgleave(
+    } // End function privateGroupLeave(
 
     /*
     This gets called if a buddy logs on/off
@@ -182,10 +182,10 @@ class OnlineDB_Core extends BasePassiveModule
             if ($this->bot->core("notify")->check($name)) {
                 if (!isset($this->bot->other_bots[$name])) {
                     if ($msg == 1) {
-                        $this->status_change($name, "gc", 1);
+                        $this->statusChange($name, "sendToGuildChat", 1);
                     }
                     else {
-                        $this->status_change($name, "gc", 0);
+                        $this->statusChange($name, "sendToGuildChat", 0);
                     }
                 }
             }
@@ -197,7 +197,7 @@ class OnlineDB_Core extends BasePassiveModule
     */
     function connect()
     { // Start function connect()
-        $this->everyone_offline();
+        $this->everyoneOffline();
         // Grab all users for reinvite - if reinvite is enabled:
         $inpg = $this->bot->db->select("SELECT nickname FROM #___online WHERE botname = '" . $this->bot->botname . "' AND reinvite = '1'");
         // Unset all reinvite flags for users not yet in pgroup (safety, some users may be faster then this function):
@@ -225,7 +225,7 @@ class OnlineDB_Core extends BasePassiveModule
     */
     function disconnect()
     { // Start function disconnect()
-        $this->everyone_offline(); // FIXME: If doing a proper disconnect, should everyone go offline?
+        $this->everyoneOffline(); // FIXME: If doing a proper disconnect, should everyone go offline?
     } // End function disconnect()
 
     /* --------------------------------------------------
@@ -234,12 +234,12 @@ class OnlineDB_Core extends BasePassiveModule
     *
     * --------------------------------------------------
     */
-    function status_change($name, $where, $newstatus)
-    { // Start function status_change()
+    function statusChange($name, $where, $newstatus)
+    { // Start function statusChange()
         $name = ucfirst(strtolower($name));
         $where = strtolower($where);
         switch ($where) {
-        case "gc":
+        case "sendToGuildChat":
             $column = "status_gc";
             break;
         case "pg":
@@ -249,7 +249,7 @@ class OnlineDB_Core extends BasePassiveModule
             return FALSE;
             break;
         }
-        $level = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'");
+        $level = $this->bot->db->select("SELECT userLevel FROM #___users WHERE nickname = '$name'");
         if (!empty($level)) {
             $level = $level[0][0];
         }
@@ -261,18 +261,18 @@ class OnlineDB_Core extends BasePassiveModule
         $sql .= "ON DUPLICATE KEY UPDATE " . $column . " = '" . $newstatus . "', " . $column . "_changetime = '" . time() . "', level = " . $level;
         $this->bot->db->query($sql);
         // Update last seen field, doesn't matter if logon or logoff, this is last time we saw any change
-        $this->bot->db->query("UPDATE #___users SET last_seen = " . time() . " WHERE nickname = '$name'");
+        $this->bot->db->query("UPDATE #___users SET lastSeen = " . time() . " WHERE nickname = '$name'");
         $this->last_seen[$name] = time();
-    } // End function status_change()
+    } // End function statusChange()
 
     /*
     Sets the status of everyone to offline.
     */
-    function everyone_offline()
-    { // Start function everyone_offline()
+    function everyoneOffline()
+    { // Start function everyoneOffline()
         $sql = "UPDATE #___online SET status_gc = '0', status_pg = '0' WHERE botname = '" . $this->bot->botname . "'";
         $this->bot->db->query($sql);
-    } // End function everyone_offline()
+    } // End function everyoneOffline()
 
     /*
     Remove a player from the online list
@@ -290,7 +290,7 @@ class OnlineDB_Core extends BasePassiveModule
 
 
     // Returns the FROM part for a query over all users in private group.
-    function pgroup_tablename()
+    function privateGroupTableName()
     {
         $str = " #___online AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname AND t1.botname = '";
         $str .= $this->bot->botname . "' AND t1.status_pg = 1 ";
@@ -299,7 +299,7 @@ class OnlineDB_Core extends BasePassiveModule
 
 
     // Returns the FROM part for a query over all users in guild chat.
-    function gc_tablename()
+    function guildChatTableName()
     {
         $str = " #___online AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname AND t1.botname = '";
         $str .= $this->bot->botname . "' AND t1.status_gc = 1 ";
@@ -307,17 +307,17 @@ class OnlineDB_Core extends BasePassiveModule
     }
 
 
-    // Returns the FROM part for a query over all bots, including those defined in otherbots.
+    // Returns the FROM part for a query over all bots, including those defined in otherBots.
     // It uses the channels defined by the Channel settings.
-    function full_tablename()
+    function fullTableName()
     {
-        $str = " #___online AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname AND " . $this->otherbots("t1.");
+        $str = " #___online AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname AND " . $this->otherBots("t1.");
         $str .= " AND " . $this->channels("t1.") . " ";
         return $str;
     }
 
 
-    function get_last_seen($name, $checkalts = FALSE)
+    function getLastSeen($name, $checkalts = FALSE)
     {
         $lastseen = FALSE;
         if ($checkalts) {
@@ -359,7 +359,7 @@ class OnlineDB_Core extends BasePassiveModule
     * 0 User is offline
     * 1 User is online
     */
-    function get_online_state($name)
+    function getOnlineState($name)
     {
         if (!$this->bot->core("chat")->buddy_exists($name)) {
             $return['content'] = "##white##Unknown##end##";
@@ -380,7 +380,7 @@ class OnlineDB_Core extends BasePassiveModule
 
 
     // Checks if $name is in chat group of the bot.
-    function in_chat($name)
+    function inChat($name)
     {
         return isset($this->guest_cache[ucfirst(strtolower($name))]);
     }
@@ -388,7 +388,7 @@ class OnlineDB_Core extends BasePassiveModule
 
     // Returns the WHERE clause to get all botnames to show in online displays.
     // The specific channels which should be included have to be defined in addition to this.
-    function otherbots($prefix = "")
+    function otherBots($prefix = "")
     {
         if ($this->bot->core("settings")->get("Online", "Otherbots") != "") {
             $bots = explode(
@@ -435,12 +435,12 @@ class OnlineDB_Core extends BasePassiveModule
 
 
     //Returns an array of people currently online in $channel
-    //Valid channels are ('gc', 'pg', 'both')
-    function list_users($channel)
+    //Valid channels are ('sendToGuildChat', 'pg', 'both')
+    function listUsers($channel)
     {
         $channel = strtolower($channel);
         switch ($channel) {
-        case 'gc':
+        case 'sendToGuildChat':
         case 'guild':
             $where_clause = 'status_gc = 1';
             break;

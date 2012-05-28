@@ -57,11 +57,11 @@ class ClassName extends BaseActiveModule
         /*
                 Register commands with the bot.
                 Possible values for $channel:
-                tell (incomeing tell)
-                pgmsg (message in privategroup)
-                gc (message in guildchat)
-                all (tell, pgmsg, gc at once)
-                extpgmsg (external private group, this is not covered by the command_handler() on default)
+                sendTell (incomeing sendTell)
+                sendToGroup (message in privategroup)
+                sendToGuildChat (message in guildchat)
+                all (sendTell, sendToGroup, sendToGuildChat at once)
+                externalPrivateGroupMessage (external private group, this is not covered by the commandHandler() on default)
 
                 $command should be a string with the command the module should react to
 
@@ -69,25 +69,25 @@ class ClassName extends BaseActiveModule
 
                 $sub_access_levels is an array of entries in the format "subcommand" => "level" to define the default access level for subcommands
         */
-        $this->register_command($channel, $command, $access_level, $sub_access_levels);
+        $this->registerCommand($channel, $command, $access_level, $sub_access_levels);
         /*
                 Register events with the bot
                 Events are triggered without the use of a command. This can be joins, all tower-messages and so on
         */
-        $this->register_event($event);
+        $this->registerEvent($event);
         /*
                possible values for $event are
-               pgjoin (Someone joining priv group)
-               pgleave (Someone leaving priv group)
-               extpgjoin (someone joins an external private group)
+               privateGroupJoin (Someone joining priv group)
+               privateGroupLeave (Someone leaving priv group)
+               externalPrivateGroupJoin (someone joins an external private group)
                extpgleave (someone leaves an external private group)
                buddy (Buddy logging on/off)
                connect (bot connects)
                disconnect (bot disconnects)
-               privgroup (processes non-command text in the private group)
-               extprivgroup (processes non-command text in external private chat groups)
-               gmsg, group (message in some group. NOTE: Replace the "group" with the group you want to listen to. For example: $this->register_event('gmsg', 'IRRK News Wire');
-               gmsg, "org" (catch any org chat)
+               privateGroup (processes non-command text in the private group)
+               externalPrivateGroup (processes non-command text in external private chat groups)
+               groupMessage, group (message in some group. NOTE: Replace the "group" with the group you want to listen to. For example: $this->registerEvent('groupMessage', 'IRRK News Wire');
+               groupMessage, "org" (catch any org chat)
                cron, interval (cron jobs that occur every 'interval')
                    interval can be
                    1sec (Be very carefull with this. Too many 1 second cronjobs will slow the bot down. Use only when you absolutely need close to realtime turnover)
@@ -104,7 +104,7 @@ class ClassName extends BaseActiveModule
                    12hour
                    18 hour
                    24hour
-                   example: $this->register_event('cron', '2min');
+                   example: $this->registerEvent('cron', '2min');
 
         */
         /*
@@ -148,15 +148,15 @@ class ClassName extends BaseActiveModule
     Unified message handler
     $source: The originating player
     $msg: The actual message, including command prefix and all
-    $type: The channel the message arrived from. This can be either "tell", "pgmsg" or "gc"
+    $type: The channel the message arrived from. This can be either "sendTell", "sendToGroup" or "sendToGuildChat"
     */
-    function command_handler($source, $msg, $origin)
+    function commandHandler($source, $msg, $origin)
     {
         //ALWAYS reset the error handler before parsing the commands to prevent stale errors from giving false reports
         $this->error->reset();
         //The default is to split the command to com, sub and args. If you want to split it some other way change the pattern for it
-        //parse_com() returns an array where the pattern is the keys and the values are split out from $msg
-        $com = $this->parse_com(
+        //parseCommand() returns an array where the pattern is the keys and the values are split out from $msg
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'sub',
@@ -179,33 +179,33 @@ class ClassName extends BaseActiveModule
 
 
     /*
-    This gets called on a msg in the group if you previously registered the event 'gmsg, group'
+    This gets called on a msg in the group if you previously registered the event 'groupMessage, group'
     */
-    function gmsg($name, $group, $msg)
+    function groupMessage($name, $group, $msg)
     {
     }
 
 
     /*
-    This gets called on a msg in the privgroup without a command if you previously registered the event 'privgroup'
+    This gets called on a msg in the privateGroup without a command if you previously registered the event 'privateGroup'
     */
-    function privgroup($name, $msg)
+    function privateGroup($name, $msg)
     {
     }
 
 
     /*
-    This gets called if someone joins the privgroup if you previously registered the event 'pgjoin'
+    This gets called if someone joins the privateGroup if you previously registered the event 'privateGroupJoin'
     */
-    function pgjoin($name)
+    function privateGroupJoin($name)
     {
     }
 
 
     /*
-    This gets called if someone leaves the privgroup if you previously registered the event 'pgleave'
+    This gets called if someone leaves the privateGroup if you previously registered the event 'privateGroupLeave'
     */
-    function pgleave($name)
+    function privateGroupLeave($name)
     {
     }
 

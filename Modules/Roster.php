@@ -38,12 +38,12 @@ class Roster_Handler extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "member", "ADMIN");
-        $this->register_command("all", "guest", "ADMIN");
-        $this->register_command("all", "rosterupdate", "ADMIN");
-        $this->register_command("all", "buddylist", "ADMIN");
+        $this->registerCommand("all", "member", "ADMIN");
+        $this->registerCommand("all", "guest", "ADMIN");
+        $this->registerCommand("all", "rosterupdate", "ADMIN");
+        $this->registerCommand("all", "buddylist", "ADMIN");
         if ($this->bot->game == "ao") {
-            $this->register_event("cron", "1hour");
+            $this->registerEvent("cron", "1hour");
         }
         $this->help['description'] = 'Handles member roster commands.';
         $this->help['command']['member'] = "Shows the members count.";
@@ -72,7 +72,7 @@ class Roster_Handler extends BaseActiveModule
     /*
     Unified message handler
     */
-    function command_handler($source, $msg, $type)
+    function commandHandler($source, $msg, $type)
     {
         $return = FALSE;
         /*
@@ -93,9 +93,9 @@ class Roster_Handler extends BaseActiveModule
                     ->add($source, $vars[2], 0, MEMBER, 0);
                 break;
             case 'list':
-                return $this->memberslist();
+                return $this->membersList();
             default:
-                return $this->memberscount();
+                return $this->membersCount();
             }
         case 'guest':
             switch ($vars[1]) {
@@ -108,7 +108,7 @@ class Roster_Handler extends BaseActiveModule
                 }
                 return $return;
             case 'add':
-                $userlevel = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '" . $vars[2] . "'");
+                $userlevel = $this->bot->db->select("SELECT userLevel FROM #___users WHERE nickname = '" . $vars[2] . "'");
                 if (!empty($userlevel)) {
                     $userlevel = $userlevel[0][0];
                 }
@@ -130,26 +130,26 @@ class Roster_Handler extends BaseActiveModule
                 return $return;
             case 'list':
             default:
-                return $this->guest_list();
+                return $this->guestList();
             }
         case 'rosterupdate':
             if ($this->bot->guildbot) {
-                $this->output_destination($source, "Starting roster update.");
+                $this->outputDestination($source, "Starting roster update.");
                 $this->bot->core("roster_core")->update_guild(TRUE);
                 return FALSE;
             }
             else {
-                $this->output_destination($source, "Starting roster update.");
+                $this->outputDestination($source, "Starting roster update.");
                 $this->bot->core("roster_core")->update_raid(TRUE);
                 return FALSE;
             }
             break;
         case 'buddylist':
             if ($vars[1] == 'clear') {
-                return $this->clear_buddies();
+                return $this->clearBuddies();
             }
             else {
-                return $this->list_buddies();
+                return $this->listBuddies();
             }
             break;
         default:
@@ -162,18 +162,18 @@ class Roster_Handler extends BaseActiveModule
     /*
     Makes a list of current Guests
     */
-    function guest_list()
+    function guestList()
     {
         $inside = "##blob_title##:::: <botname>'s Guest List ::::##end##\n\n";
         $count = 0;
-        $result = $this->bot->db->select("SELECT id, nickname, added_at, added_by FROM #___users WHERE user_level = " . GUEST . " ORDER BY nickname ASC");
+        $result = $this->bot->db->select("SELECT id, nickname, added_at, added_by FROM #___users WHERE userLevel = " . GUEST . " ORDER BY nickname ASC");
         if (!empty($result)) {
             foreach ($result as $val) {
                 if (!empty($val[1])) {
                     $count++;
                     $inside .= "##blob_text##&#8226; " . $val[1] . "##end## " . $this->bot
                         ->core("tools")
-                        ->chatcmd("whois " . $val[1], "[Whois]") . " " . $this->bot
+                        ->chatcmd("whoIs " . $val[1], "[Whois]") . " " . $this->bot
                         ->core("tools")
                         ->chatcmd("guest del " . $val[1], "[Remove]") . "\n";
                     $inside .= "##blob_title##Added:##end## ##blob_text##" . gmdate(
@@ -189,11 +189,11 @@ class Roster_Handler extends BaseActiveModule
     }
 
 
-    function memberslist()
+    function membersList()
     {
         $blob = "";
         $count = 0;
-        $result = $this->bot->db->select("SELECT nickname, last_seen FROM #___users WHERE user_level = " . MEMBER . " ORDER BY nickname ASC");
+        $result = $this->bot->db->select("SELECT nickname, lastSeen FROM #___users WHERE userLevel = " . MEMBER . " ORDER BY nickname ASC");
         if (!empty($result)) {
             $inside = "##blob_title##:::: <botname>'s Member List ::::##end##\n\n";
             foreach ($result as $val) {
@@ -210,7 +210,7 @@ class Roster_Handler extends BaseActiveModule
                     $inside .= ", never seen online";
                 }
                 $inside .= "##end## " . $this->bot->core("tools")
-                    ->chatcmd("whois " . $val[0], "[Whois]") . "\n";
+                    ->chatcmd("whoIs " . $val[0], "[Whois]") . "\n";
             }
             $blob = " :: " . $this->bot->core("tools")
                 ->make_blob("click to view", $inside);
@@ -219,7 +219,7 @@ class Roster_Handler extends BaseActiveModule
     }
 
 
-    function memberscount()
+    function membersCount()
     {
         $blob = "";
         $total = 0;
@@ -236,7 +236,7 @@ class Roster_Handler extends BaseActiveModule
         $counts = $this->bot->db->select(
             "SELECT t2." . $cp . ", COUNT(DISTINCT t1.nickname)
 				FROM #___users AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname
-				 WHERE user_level = " . MEMBER . " AND t2." . $cp . " IN ($profession_list) GROUP BY " . $cp
+				 WHERE userLevel = " . MEMBER . " AND t2." . $cp . " IN ($profession_list) GROUP BY " . $cp
         );
         foreach (
             $this->bot->core('professions')->get_profession_array() as
@@ -261,7 +261,7 @@ class Roster_Handler extends BaseActiveModule
     }
 
 
-    function list_buddies()
+    function listBuddies()
     {
         $buddies = $this->bot->aoc->buddies;
         $count = 0;
@@ -281,7 +281,7 @@ class Roster_Handler extends BaseActiveModule
     }
 
 
-    function clear_buddies()
+    function clearBuddies()
     {
         $buddies = $this->bot->aoc->buddies;
         $count = 0;

@@ -53,7 +53,7 @@ class Raffle extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->output = "group";
         $this->result = "";
-        $this->register_command("all", "raffle", "GUEST");
+        $this->registerCommand("all", "raffle", "GUEST");
         $this->help['description'] = 'Module to handle item lotteries';
         $this->help['command']['raffle start <item>'] = "Starts a raffle for item <item>.";
         $this->help['command']['raffle reannounce'] = "Announces the current raffle again.";
@@ -71,42 +71,42 @@ class Raffle extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^raffle start (.+)/i", $msg, $info)) {
-            $this->raffle_start($name, $info[1]);
+            $this->raffleStart($name, $info[1]);
         }
         else {
             if (preg_match("/^raffle join/i", $msg, $info)) {
-                $this->raffle_join($name);
+                $this->raffleJoin($name);
             }
             else {
                 if (preg_match("/^raffle leave/i", $msg, $info)) {
-                    $this->raffle_leave($name);
+                    $this->raffleLeave($name);
                 }
                 else {
                     if (preg_match("/^raffle output (group|guild|both)$/i", $msg, $info)) {
-                        $this->raffle_output($name, $info[1]);
+                        $this->raffleOutput($name, $info[1]);
                     }
                     else {
                         if (preg_match("/^raffle cancel$/i", $msg, $info)) {
-                            $this->raffle_cancel($name);
+                            $this->raffleCancel($name);
                         }
                         else {
                             if (preg_match("/^raffle reannounce$/i", $msg, $info)) {
-                                $this->raffle_reannounce($name);
+                                $this->raffleReAnnounce($name);
                             }
                             else {
                                 if (preg_match("/^raffle closing$/i", $msg, $info)) {
-                                    $this->raffle_closing($name);
+                                    $this->raffleClosing($name);
                                 }
                                 else {
                                     if (preg_match("/^raffle result$/i", $msg, $info)) {
-                                        $this->raffle_result($name);
+                                        $this->raffleResult($name);
                                     }
                                     else {
                                         if (preg_match("/^raffle admin$/i", $msg, $info)) {
-                                            $this->bot->send_tell($name, $this->make_admin($name));
+                                            $this->bot->send_tell($name, $this->makeAdmin($name));
                                         }
                                     }
                                 }
@@ -122,7 +122,7 @@ class Raffle extends BaseActiveModule
     /*
     End raffle
     */
-    function raffle_result($name)
+    function raffleResult($name)
     {
         if (!empty($this->item) && !empty($this->users)
             && (($this->admin == $name)
@@ -193,7 +193,7 @@ class Raffle extends BaseActiveModule
     /*
     Cancel raffle
     */
-    function raffle_cancel($name)
+    function raffleCancel($name)
     {
         if (!empty($this->item)
             && (($this->admin == $name)
@@ -220,7 +220,7 @@ class Raffle extends BaseActiveModule
     /*
     Reannounces raffle
     */
-    function raffle_reannounce($name, $secs = FALSE)
+    function raffleReAnnounce($name, $secs = FALSE)
     {
         if (isset($this->item)
             && (($this->admin == $name)
@@ -235,7 +235,7 @@ class Raffle extends BaseActiveModule
             else {
                 $output .= "is still running :: ";
             }
-            $output .= $this->click_join("join") . "\n" . "##raffle_highlight##----------------------------------------------------------##end##";
+            $output .= $this->clickJoin("join") . "\n" . "##raffle_highlight##----------------------------------------------------------##end##";
             $this->output($output);
         }
         else {
@@ -252,7 +252,7 @@ class Raffle extends BaseActiveModule
     /*
     Reannounces raffle
     */
-    function raffle_closing($name)
+    function raffleClosing($name)
     {
         if (isset($this->item)
             && (($this->admin == $name)
@@ -261,7 +261,7 @@ class Raffle extends BaseActiveModule
         ) {
             $this->output(
                 "\n##raffle_highlight##----------------------------------------------------------##end##\n" . "  The raffle for ##raffle_highlight##" . $this->item
-                    . "##end## wil be " . "##raffle_highlight##closing soon##end## :: " . $this->click_join("join") . "\n"
+                    . "##end## wil be " . "##raffle_highlight##closing soon##end## :: " . $this->clickJoin("join") . "\n"
                     . "##raffle_highlight##----------------------------------------------------------##end##"
             );
         }
@@ -279,7 +279,7 @@ class Raffle extends BaseActiveModule
     /*
     Change output chan
     */
-    function raffle_output($name, $chan)
+    function raffleOutput($name, $chan)
     {
         if (($this->admin == $name)
             || $this->bot->core("security")
@@ -297,7 +297,7 @@ class Raffle extends BaseActiveModule
     /*
     Join the raffle
     */
-    function raffle_join($name)
+    function raffleJoin($name)
     {
         if (empty($this->item)) {
             $this->bot->send_tell($name, "There is no raffle running at the moment.");
@@ -308,8 +308,8 @@ class Raffle extends BaseActiveModule
             }
             else {
                 $this->users[$name] = 1;
-                $this->bot->send_tell($name, "You have joined the raffle. " . $this->click_join("leave"), 1);
-                $this->output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##joined##end##" . " the raffle ::" . $this->click_join("join"), 1);
+                $this->bot->send_tell($name, "You have joined the raffle. " . $this->clickJoin("leave"), 1);
+                $this->output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##joined##end##" . " the raffle ::" . $this->clickJoin("join"), 1);
             }
         }
     }
@@ -318,7 +318,7 @@ class Raffle extends BaseActiveModule
     /*
     Leave the raffle
     */
-    function raffle_leave($name)
+    function raffleLeave($name)
     {
         if (!isset($this->item)) {
             $this->bot->send_tell($name, "There is no raffle running at the moment.");
@@ -329,8 +329,8 @@ class Raffle extends BaseActiveModule
             }
             else {
                 unset($this->users[$name]);
-                $this->bot->send_tell($name, "You have left the raffle. " . $this->click_join("join"), 1);
-                $this->output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##left##end##" . " the raffle :: " . $this->click_join("join"), 1);
+                $this->bot->send_tell($name, "You have left the raffle. " . $this->clickJoin("join"), 1);
+                $this->output("##raffle_highlight##" . $name . "##end## has ##raffle_highlight##left##end##" . " the raffle :: " . $this->clickJoin("join"), 1);
             }
         }
     }
@@ -339,7 +339,7 @@ class Raffle extends BaseActiveModule
     /*
     Starts the raffle
     */
-    function raffle_start($name, $item)
+    function raffleStart($name, $item)
     {
         if (empty($this->item)) {
             $itemref = explode(" ", $item, 5);
@@ -354,7 +354,7 @@ class Raffle extends BaseActiveModule
             $timer = $this->bot->core("settings")
                 ->get("Raffle", "timer");
             if ($timer > 0) {
-                $this->register_event("cron", "2sec");
+                $this->registerEvent("cron", "2sec");
                 $this->end = time() + $timer;
                 if ($timer > 20) {
                     $this->announce = 2;
@@ -367,10 +367,10 @@ class Raffle extends BaseActiveModule
                 }
             }
             $output = "\n##raffle_highlight##----------------------------------------------------------##end##\n";
-            $output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" . $item . "##end## :: " . $this->click_join("join");
+            $output .= "  ##raffle_highlight##" . $name . "##end## has started a raffle for ##raffle_highlight##" . $item . "##end## :: " . $this->clickJoin("join");
             $output .= "\n##raffle_highlight##----------------------------------------------------------##end##";
             $this->output($output);
-            $this->bot->send_tell($name, $this->make_admin($name));
+            $this->bot->send_tell($name, $this->makeAdmin($name));
         }
         else {
             $this->bot->send_tell($name, "A raffle is already running.");
@@ -381,7 +381,7 @@ class Raffle extends BaseActiveModule
     /*
     Raffle Admin Menu
     */
-    function make_admin($name)
+    function makeAdmin($name)
     {
         if (empty($this->item)) {
             return "There is no raffle running.";
@@ -425,7 +425,7 @@ class Raffle extends BaseActiveModule
     /*
     Makes the "click to join" tag...
     */
-    function click_join($val)
+    function clickJoin($val)
     {
         $inside = "##ao_ccheader##:::: Join/Leave Raffle ::::##end####lightyellow##\n\n";
         $inside .= "Raffle for: ##highlight##" . $this->item_blank . "##end##\n\n";
@@ -455,17 +455,17 @@ class Raffle extends BaseActiveModule
     function cron()
     {
         if ($this->announce == 2 && ($this->end - time()) < 20) {
-            $this->raffle_reannounce($this->admin, 20);
+            $this->raffleReAnnounce($this->admin, 20);
             $this->announce = 1;
         }
         if ($this->announce == 1 && ($this->end - time()) < 10) {
-            $this->raffle_reannounce($this->admin, 10);
+            $this->raffleReAnnounce($this->admin, 10);
             $this->announce = 0;
         }
         if ($this->end < time()) {
-            $this->unregister_event("cron", "2sec");
+            $this->unregisterEvent("cron", "2sec");
             if (!empty($this->users)) {
-                $this->raffle_result($this->admin);
+                $this->raffleResult($this->admin);
             }
             else {
                 $this->output("Raffle for " . $this->item . " ended with no users.");

@@ -46,8 +46,8 @@ class About extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         //Sed default access control levels
-        $this->register_command('all', 'about', 'GUEST');
-        $this->register_alias('about', 'version');
+        $this->registerCommand('all', 'about', 'GUEST');
+        $this->registerAlias('about', 'version');
         $this->help['description'] = "Shows information about the bot.";
         $this->help['command']['about'] = "See description";
     }
@@ -56,7 +56,7 @@ class About extends BaseActiveModule
     /*
     Unified message handler
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $return = FALSE;
         /*
@@ -66,7 +66,7 @@ class About extends BaseActiveModule
         $command = $vars[0];
         switch ($command) {
         case 'about':
-            return $this->about_blob();
+            return $this->aboutBlob();
             break;
         default:
             return "Broken plugin, received unhandled command: $command";
@@ -77,7 +77,7 @@ class About extends BaseActiveModule
     /*
     Makes the about-blob
     */
-    function about_blob()
+    function aboutBlob()
     {
         $version = BOT_VERSION_NAME . " v." . BOT_VERSION;
         $inside .= "##blob_text##Bot Client:##end##\n";

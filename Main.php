@@ -99,7 +99,7 @@ if (isset($argv[1])) {
 else {
     $bothandle = Bot::factory();
 }
-$bot = Bot::get_instance($bothandle);
+$bot = Bot::getInstance($bothandle);
 $bot->dispatcher = new sfEventDispatcher();
 
 //Load modules.

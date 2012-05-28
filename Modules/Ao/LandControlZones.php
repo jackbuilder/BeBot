@@ -97,38 +97,38 @@ class LandControlZones extends BaseActiveModule
         default:
         }
         $this->bot->db->set_version("land_control_zones", 6);
-        $this->register_command("all", "lc", "MEMBER");
+        $this->registerCommand("all", "lc", "MEMBER");
     }
 
 
-    function command_handler($name, $msg, $channel)
+    function commandHandler($name, $msg, $channel)
     {
         if (preg_match("/^lc  (.+)$/i", $msg, $info)) {
-            return $this->show_lc($info[1]);
+            return $this->showLandControl($info[1]);
         }
         elseif (preg_match("/^lc (\d+) (\d+) (.+)$/i", $msg, $info)) {
-            return $this->show_lc($info[3], $info[1], $info[2]);
+            return $this->showLandControl($info[3], $info[1], $info[2]);
         }
         elseif (preg_match("/^lc (\d+) ([^\d]+)$/i", $msg, $info)) {
-            return $this->show_lc($info[2], $info[1], $info[1]);
+            return $this->showLandControl($info[2], $info[1], $info[1]);
         }
         elseif (preg_match("/^lc (\d+) (\d+)$/i", $msg, $info)) {
-            return $this->show_lc(NULL, $info[1], $info[2]);
+            return $this->showLandControl(NULL, $info[1], $info[2]);
         }
         elseif (preg_match("/^lc (\d+)$/i", $msg, $info)) {
-            return $this->show_lc(NULL, $info[1], $info[1]);
+            return $this->showLandControl(NULL, $info[1], $info[1]);
         }
         elseif (preg_match("/^lc ([^\d]+)$/i", $msg, $info)) {
-            return $this->show_lc($info[1]);
+            return $this->showLandControl($info[1]);
         }
         elseif (preg_match("/^lc$/i", $msg, $info)) {
-            return $this->show_lc("--all--");
+            return $this->showLandControl("--all--");
         }
         return FALSE;
     }
 
 
-    function show_lc($iarea = NULL, $lrange = 0, $hrange = 300)
+    function showLandControl($iarea = NULL, $lrange = 0, $hrange = 300)
     {
         if ($iarea == "--all--") {
             $areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones group by area");

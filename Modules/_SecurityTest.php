@@ -45,16 +45,16 @@ class SecurityTest extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "securitytest", "OWNER");
+        $this->registerCommand("all", "securitytest", "OWNER");
     }
 
 
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
-    sutible for output via send_tell, send_pgroup, and send_gc.
+    sutible for output via sendTell, sendPrivateGroup, and sendGuildChat.
     */
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     { // Start function handler()
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
@@ -63,19 +63,19 @@ class SecurityTest extends BaseActiveModule
             switch ($vars[1]) {
             case "cache":
                 if (isset($vars[2])) {
-                    return $this->show_cache($vars[2]);
+                    return $this->showCache($vars[2]);
                 }
                 else {
-                    return $this->show_cache();
+                    return $this->showCache();
                 }
                 break;
-            case "whoami":
-                return $this->whoami($name);
+            case "whoAmI":
+                return $this->whoAmI($name);
                 break;
-            case "whois":
+            case "whoIs":
                 return $this->whois($vars[2]);
             default:
-                return "Pick a test: cache, whoami, whois";
+                return "Pick a test: cache, whoAmI, whoIs";
             }
             break;
         default:
@@ -86,8 +86,8 @@ class SecurityTest extends BaseActiveModule
     /*
     Shows the security cache on the bot console.
     */
-    function show_cache($what = "all")
-    { // Start function show_cache()
+    function showCache($what = "all")
+    { // Start function showCache()
         $what = strtolower($what);
         if ($what == "member" || $what == "members") {
             print_r("Members Cache:\n");
@@ -120,16 +120,16 @@ class SecurityTest extends BaseActiveModule
             print_r($this->bot->core("security")->cache);
             return "Security Cache Array dumped to console.";
         }
-    } // End function show_cache()
+    } // End function showCache()
 
     /*
     Returns highest access level.
     */
-    function whoami($name)
-    { // Start function whoami
+    function whoAmI($name)
+    { // Start function whoAmI
         $groups = $this->bot->core("security")->get_groups($name);
         $access = $this->bot->core("security")->get_access_level($name);
-        $access = $this->get_access_name($access);
+        $access = $this->getAccessName($access);
         $message = "Your access level is " . $access;
         if ($groups != -1) {
             $groupmsg = " You are a member of the following security groups: ";
@@ -138,14 +138,14 @@ class SecurityTest extends BaseActiveModule
             }
         }
         return $message . $groupmsg;
-    } // End function whoami
+    } // End function whoAmI
 
     function whois($name)
-    { // Start function whois()
+    { // Start function whoIs()
         $name = ucfirst(strtolower($name));
         $groups = $this->bot->core("security")->get_groups($name);
         $access = $this->bot->core("security")->get_access_level($name);
-        $access = $this->get_access_name($access);
+        $access = $this->getAccessName($access);
         $message = $name . "'s highest access level is " . $access;
         if ($groups != -1) {
             $groupmsg = $name . " is a member of the following security groups: ";
@@ -154,10 +154,10 @@ class SecurityTest extends BaseActiveModule
             }
         }
         return $message . $groupmsg;
-    } // End function whois()
+    } // End function whoIs()
 
-    function get_access_name($access)
-    { // Start function get_access_name()
+    function getAccessName($access)
+    { // Start function getAccessName()
         switch ($access) { // Start switch
         case 256:
             $access = "Owner";
@@ -188,6 +188,6 @@ class SecurityTest extends BaseActiveModule
             break;
         } // End switch
         return $access;
-    } // End function get_access_name()
+    } // End function getAccessName()
 } // End of Class
 ?>

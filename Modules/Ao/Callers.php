@@ -42,14 +42,14 @@ class Callers extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->callers = array();
-        $this->register_command(
+        $this->registerCommand(
             'all', 'caller', 'GUEST', array(
                 "clear" => "LEADER",
                 "add" => "LEADER",
                 "del" => "LEADER"
             )
         );
-        $this->register_alias("caller", "callers");
+        $this->registerAlias("caller", "callers");
         $this->help['description'] = "Designate and list 'callers' for raids and events";
         $this->help['command']['caller'] = "Lists the set callers";
         $this->help['command']['caller clear'] = "Clears the list of callers";
@@ -58,22 +58,22 @@ class Callers extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^caller clear/i", $msg)) {
-            return $this->clear_callers($name);
+            return $this->clearCallers($name);
         }
         else {
             if (preg_match("/^caller add (.+)/i", $msg, $info)) {
-                return $this->caller_add($info[1]);
+                return $this->callerAdd($info[1]);
             }
             else {
                 if (preg_match("/^caller del (.+)/i", $msg, $info)) {
-                    return $this->caller_del($info[1]);
+                    return $this->callerDel($info[1]);
                 }
                 else {
                     if (preg_match("/^caller/i", $msg)) {
-                        return $this->show_callers();
+                        return $this->showCallers();
                     }
                 }
             }
@@ -84,12 +84,12 @@ class Callers extends BaseActiveModule
     /*
     Add a caller
     */
-    function caller_add($name)
+    function callerAdd($name)
     {
         $name = ucfirst(strtolower($name));
         if ($this->bot->core('player')->id($name)) {
             $this->callers[$name] = 1;
-            return "##YELLOW##" . $name . "##END## has been added to caller list. " . $this->show_callers();
+            return "##YELLOW##" . $name . "##END## has been added to caller list. " . $this->showCallers();
         }
         else {
             return "Player ##YELLOW##" . $name . "##END## does not exist.";
@@ -100,7 +100,7 @@ class Callers extends BaseActiveModule
     /*
     Remove a caller
     */
-    function caller_del($name)
+    function callerDel($name)
     {
         $name = ucfirst(strtolower($name));
         if ($name == "All") {
@@ -111,10 +111,10 @@ class Callers extends BaseActiveModule
             if ($this->bot->core('player')->id($name) != -1) {
                 if (isset($this->callers[$name])) {
                     unset($this->callers[$name]);
-                    return "##YELLOW##" . $name . "##END## has been removed from caller list. " . $this->show_callers();
+                    return "##YELLOW##" . $name . "##END## has been removed from caller list. " . $this->showCallers();
                 }
                 else {
-                    return "##YELLOW##" . $name . "##END## is not on list of callers. " . $this->show_callers();
+                    return "##YELLOW##" . $name . "##END## is not on list of callers. " . $this->showCallers();
                 }
             }
             else {
@@ -124,7 +124,7 @@ class Callers extends BaseActiveModule
     }
 
 
-    function clear_callers($name)
+    function clearCallers($name)
     {
         $name = ucfirst(strtolower($name));
         $this->callers = array();
@@ -135,7 +135,7 @@ class Callers extends BaseActiveModule
     /*
     Return the list of callers
     */
-    function show_callers()
+    function showCallers()
     {
         $call = array_keys($this->callers);
         if (empty($call)) {
@@ -150,11 +150,11 @@ class Callers extends BaseActiveModule
                     $batch .= " \\n ";
                 }
                 $count++;
-                $list .= " - $player: [<a href='chatcmd:///macro $player /assist $player'>Create Macro</a>] [<a href='chatcmd:///assist $player'>Assist</a>]\n";
+                $list .= " - $player: [<a href='chatCommand:///macro $player /assist $player'>Create Macro</a>] [<a href='chatCommand:///assist $player'>Assist</a>]\n";
                 $batch .= "/assist " . $player;
             }
             $list .= "\n";
-            $list .= "All Callers: [<a href='chatcmd://$batch'>Assist</a>]";
+            $list .= "All Callers: [<a href='chatCommand://$batch'>Assist</a>]";
             $list .= "\n\nAll Callers Macro:\n/macro <botname> $batch";
             return $this->bot->core("tools")
                 ->make_blob("List of Callers", $list);

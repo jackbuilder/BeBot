@@ -45,7 +45,7 @@ class message
     }
 
 
-    function set_destination($destination, $overwrite = FALSE)
+    function setDestination($destination, $overwrite = FALSE)
     {
         if (empty($this->destination)) {
             $this->destination[] = $destination;
@@ -57,7 +57,7 @@ class message
     }
 
 
-    function add_destination($destination)
+    function addDestination($destination)
     {
         if (!in_array($destination, $this->destination)) {
             $this->destination[] = $destination;

@@ -56,8 +56,8 @@ class PlayerNotes_Core extends BasePassiveModule
 				class TINYINT NOT NULL DEFAULT 0,
 				timestamp INT UNSIGNED NOT NULL)"
         );
-        $this->register_module("player_notes");
-        $this->update_schema();
+        $this->registerModule("player_notes");
+        $this->updateSchema();
     }
 
 
@@ -143,8 +143,8 @@ class PlayerNotes_Core extends BasePassiveModule
     Retrives player notes.
     $order can be ASC (ascending) or DESC (descending).
     */
-    function get_notes($name, $player = "All", $pnid = "all", $order = "ASC")
-    { // Start function get_notes()
+    function getNotes($name, $player = "All", $pnid = "all", $order = "ASC")
+    { // Start function getNotes()
         $name = ucfirst(strtolower($name)); // Name of person requesting notes.
         $player = ucfirst(strtolower($player)); // Notes attached to this player.
         $sql = "SELECT * FROM #___player_notes";
@@ -169,12 +169,12 @@ class PlayerNotes_Core extends BasePassiveModule
             return ($this->error);
         }
         return $result;
-    } // End function get_notes()
+    } // End function getNotes()
 
     /*
     Updates the player_notes table schema.
     */
-    function update_schema()
+    function updateSchema()
     {
         if ($this->bot->core("settings")
             ->exists('Playernotes', 'Schema_version')

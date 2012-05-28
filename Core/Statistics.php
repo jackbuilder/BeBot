@@ -55,7 +55,7 @@ class statistics extends BasePassiveModule
 					count INT(10) unsigned NOT NULL
 				)"
         );
-        $this->register_module("statistics");
+        $this->registerModule("statistics");
         $this->bot->core("settings")
             ->create('Statistics', "Enabled", FALSE, "Capture Statistics?");
     }
@@ -66,10 +66,10 @@ class statistics extends BasePassiveModule
     but one that will perform some important functions.
     What we're capturing is the module name, the action, and a simple count.
     */
-    function capture_statistic(
+    function captureStatistic(
         $module, $action, $comment = "", $count = 1
     )
-        //function capture_statistic ()
+        //function captureStatistic ()
     {
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $total_count = $this->bot->db->select(

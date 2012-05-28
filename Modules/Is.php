@@ -64,9 +64,9 @@ class Is extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "is", "GUEST");
-        $this->register_event("buddy");
-        $this->register_event("cron", "3sec");
+        $this->registerCommand("all", "is", "GUEST");
+        $this->registerEvent("buddy");
+        $this->registerEvent("cron", "3sec");
         $this->bot->core("settings")
             ->create(
             "Is", "Errormsg", TRUE, "Display error message on invalid username? (Turning this off is reccomended when you are not using a command prefix.)", "On;Off", FALSE, 5
@@ -83,13 +83,13 @@ class Is extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         //Check if a is-request is being processed
         if (isset($this->is_queue[$name])) {
             return ('Please wait until your previous lookup is completed');
         }
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'player'
@@ -181,7 +181,7 @@ class Is extends BaseActiveModule
                                 $this->is_queue[$source][$name] = 'Offline';
                             }
                             // This toon is removed by the inc_buddy() function of the buddy list already.
-                            // No buddy_remove() needed.
+                            // No buddyRemove() needed.
                             $this->queue_counter--;
                         }
                     }
@@ -256,7 +256,7 @@ class Is extends BaseActiveModule
         }
         if (empty($online_list)) {
             $reply = "{$this->is_queue[$name]['trg']} is ##red##Offline##end##";
-            $reply .= $this->last_seen($this->is_queue[$name]['trg']);
+            $reply .= $this->lastSeen($this->is_queue[$name]['trg']);
         }
         else {
             $online = implode(', ', $online_list);
@@ -271,7 +271,7 @@ class Is extends BaseActiveModule
     }
 
 
-    function last_seen($name)
+    function lastSeen($name)
     {
         $seen = $this->bot->core("online")->get_last_seen(
             $name, $this->bot

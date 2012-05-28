@@ -55,13 +55,13 @@ class stringfilter_core extends BasePassiveModule
 				new VARCHAR(255) NOT NULL DEFAULT '**bleep**',
 				PRIMARY KEY (search))"
         );
-        $this->register_module("stringfilter");
-        $this->register_event("connect");
+        $this->registerModule("stringfilter");
+        $this->registerEvent("connect");
         $this->stringlist = array();
         $this->bot->core("settings")
             ->create("Filter", "Enabled", FALSE, "Enable bot output text filter.", "On;Off", FALSE, 1);
         $this->bot->core("settings")
-            ->create("Filter", "Funmode", "off", "Select a fun bot output filter. (See documentation)", "off;chef;eleet;fudd;pirate;nofont;", FALSE, 10);
+            ->create("Filter", "Funmode", "off", "Select a fun bot output filter. (See documentation)", "off;chef;eleet;fudd;pirate;noFont;", FALSE, 10);
     }
 
 
@@ -70,44 +70,44 @@ class stringfilter_core extends BasePassiveModule
     */
     function connect()
     { // Start function connect()
-        $this->get_strings(TRUE);
+        $this->getStrings(TRUE);
     } // End function connect()
 
-    function output_filter($text)
-    { // Start function output_filter()
+    function outputFilter($text)
+    { // Start function outputFilter()
         foreach ($this->stringlist as $search => $new) {
             $text = preg_replace("/" . $search . "/i", $new, $text);
             // $text = str_ireplace($search, $new, $text); // str_ireplace is php5+
         }
         if ($this->bot->core("settings")->get("Filter", "Funmode") != "off") {
-            echo "\nCaling funmode()!\n";
-            $text = $this->funmode(
+            echo "\nCaling funMode()!\n";
+            $text = $this->funMode(
                 $text, $this->bot->core("settings")
                     ->get("Filter", "Funmode")
             );
         }
         return $text;
-    } // End function output_filter()
+    } // End function outputFilter()
 
     /*
     This function can be used to filter input against the string list.
     What else could we do for input filtering?
     */
-    function input_filter($text)
-    { // Start function input_filter()
+    function inputFilter($text)
+    { // Start function inputFilter()
         foreach ($this->stringlist as $search => $new) {
             $text = preg_replace("/" . stripslashes($search) . "/i", stripslashes($new), $text);
             // $text = str_ireplace($search, $new, $text); // str_ireplace is php5+
         }
         return $text;
-    } // End function input_filter()
+    } // End function inputFilter()
 
     /*
     Gets the filterd string list from the database.
     If update is true, the array is refreshed from the database.
     */
-    function get_strings($update = FALSE)
-    { // Start function get_strings()
+    function getStrings($update = FALSE)
+    { // Start function getStrings()
         if ($update) {
             $sql = "SELECT * FROM #___string_filter";
             $result = $this->bot->db->select($sql, MYSQL_ASSOC);
@@ -122,13 +122,13 @@ class stringfilter_core extends BasePassiveModule
             }
         }
         return $this->stringlist;
-    } // End function get_strings()
+    } // End function getStrings()
 
     /*
     Adds a string to the filtered string list.
     */
-    function add_string($search, $new = NULL)
-    { // Start function add_string()
+    function addString($search, $new = NULL)
+    { // Start function addString()
         $search = mysql_real_escape_string(strtolower($search));
         if (isset($this->stringlist[$search])) {
             $this->error->set("The string '" . $search . "' is already on the filtered word list.");
@@ -145,10 +145,10 @@ class stringfilter_core extends BasePassiveModule
         $this->bot->db->query($sql);
         $this->stringlist[$search] = $new;
         return "Added '" . $search . "' to the filterd string list. It will be replaced with '" . $new . "'";
-    } // End function add_string()
+    } // End function addString()
 
-    function rem_string($search)
-    { // Start function rem_string()
+    function remString($search)
+    { // Start function remString()
         $search = mysql_real_escape_string(strtolower($search));
         if (isset($this->stringlist[$search])) {
             unset($this->stringlist[$search]);
@@ -160,13 +160,13 @@ class stringfilter_core extends BasePassiveModule
             $this->error->set($search . " is not on the filtered string list.");
             return $this->error;
         }
-    } // End function rem_string()
+    } // End function remString()
 
     /*
     Returns garbled text. ;-)
     */
-    function funmode($text, $filter)
-    { // Start function funmode()
+    function funMode($text, $filter)
+    { // Start function funMode()
         $filter = strtolower($filter);
         switch ($filter) {
         case "rot13":
@@ -184,7 +184,7 @@ class stringfilter_core extends BasePassiveModule
         case "pirate":
             return $this->bot->core("funfilters")->pirate($text);
             break;
-        case "nofont":
+        case "noFont":
             return $this->bot->core("funfilters")->nofont($text);
             break;
         default:
@@ -192,6 +192,6 @@ class stringfilter_core extends BasePassiveModule
             return $text;
             break;
         }
-    } // End function funmode()
+    } // End function funMode()
 } // End of Class
 ?>

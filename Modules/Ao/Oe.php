@@ -41,17 +41,17 @@ class Oe extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "oe", "GUEST");
+        $this->registerCommand("all", "oe", "GUEST");
         $this->help['description'] = 'Module for calculating over-equipping';
         $this->help['command']['oe <level>'] = "Shows the minimum skill level required to use an item with <level> requirement and ";
         $this->help['command']['oe <level>'] .= "shows the maximum skill level requirement an item can have if your skill level is <level>";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^oe (.+)$/i", $msg, $info)) {
-            return $this->calc_oe($info[1]);
+            return $this->calcOe($info[1]);
         }
         else {
             $this->bot->send_help($name);
@@ -63,7 +63,7 @@ class Oe extends BaseActiveModule
     /*
     Calculate OE reqs
     */
-    function calc_oe($oe)
+    function calcOe($oe)
     {
         return "With a skill of <font color=#ffff00>" . (int)$oe . "</font>, you will be OE above <font color=#ffff00>" . (int)($oe / 0.8) . "</font> skill. "
             . "With a requirement of <font color=#ffff00>" . (int)$oe . "</font> skill, you can have <font color=#ffff00>" . (int)($oe * 0.8) . "</font> without being OE.";

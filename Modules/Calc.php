@@ -41,7 +41,7 @@ class Calc extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'calc', 'GUEST');
+        $this->registerCommand('all', 'calc', 'GUEST');
         $this->bot->core("settings")
             ->create("Calc", "ShowEquation", TRUE, "Should the equation be shown when doing calculations?");
         $this->help['description'] = "Performs simple calculations";
@@ -51,15 +51,15 @@ class Calc extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^calc (.+)/i", $msg, $info)) {
-            return $this->do_calcs($name, $info[1]);
+            return $this->doCalcs($name, $info[1]);
         }
         elseif (preg_match("/^calc$/i", $msg)) {
-            return $this->show_calc($name);
+            return $this->showCalc($name);
         }
         else {
             $this->bot->send_help($name);
@@ -71,7 +71,7 @@ class Calc extends BaseActiveModule
     /*
     Does the evaluation and calculation
     */
-    function do_calcs($name, $calc)
+    function doCalcs($name, $calc)
     {
         $test = str_replace(".", "", $calc);
         $test = str_replace(",", "", $test);
@@ -114,16 +114,16 @@ class Calc extends BaseActiveModule
                 }
             }
             else {
-                return "Wrong syntax, please /tell <botname> <pre>help <pre>calc";
+                return "Wrong syntax, please /sendTell <botname> <pre>help <pre>calc";
             }
         }
         else {
-            return "Wrong syntax, please /tell <botname> <pre>help <pre>calc";
+            return "Wrong syntax, please /sendTell <botname> <pre>help <pre>calc";
         }
     }
 
 
-    function show_calc($name)
+    function showCalc($name)
     {
         if (isset($this->calcu[$name])) {
             $var = "\$calc = " . $this->calcu[$name] . ";";

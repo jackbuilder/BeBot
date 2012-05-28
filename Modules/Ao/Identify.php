@@ -41,19 +41,19 @@ class Identify extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'identify', 'GUEST');
-        $this->register_alias("identify", "bio");
-        $this->register_alias("identify", "inspect");
+        $this->registerCommand('all', 'identify', 'GUEST');
+        $this->registerAlias("identify", "bio");
+        $this->registerAlias("identify", "inspect");
         $this->help['description'] = "Identify the end result of a given item. Useful for biomaterial, galactic gems, and other misc items.";
         $this->help['command']['identify <item>'] = "Identifies the object <item>.";
         $this->help['notes'] = "<item> must be an item reference. Multiple items may be posted at a time.";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^identify (.+)$/i", $msg, $info)) {
-            return $this->item_parser($info[1]);
+            return $this->itemParser($info[1]);
         }
         else {
             return "0 Items Posted";
@@ -61,13 +61,13 @@ class Identify extends BaseActiveModule
     }
 
 
-    function item_parser($msg)
+    function itemParser($msg)
     {
         $items = preg_split('/<\/a>/', $msg, -1, PREG_SPLIT_NO_EMPTY);
         //$items = explode("><",$msg);
         foreach ($items as $item) {
             if (preg_match("/<a href=\"itemref:\/\/([0-9]+)\/([0-9]+)\/([0-9]+)\">/i", $item, $info)) {
-                $return .= $this->identify_item($info[1], $info[2], $info[3]);
+                $return .= $this->identifyItem($info[1], $info[2], $info[3]);
                 $count++;
             }
         }
@@ -85,7 +85,7 @@ class Identify extends BaseActiveModule
     }
 
 
-    function identify_item($low, $high, $ql)
+    function identifyItem($low, $high, $ql)
     {
         switch ($high) {
             // List all the AI Biomaterial items

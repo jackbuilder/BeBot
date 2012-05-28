@@ -41,11 +41,11 @@ class SetDebug extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('tell', 'setdebug', 'OWNER');
+        $this->registerCommand('sendTell', 'setdebug', 'OWNER');
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $this->bot->debug = !$this->bot->debug;
         if ($this->bot->debug) {

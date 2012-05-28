@@ -38,7 +38,7 @@ class User_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("user");
+        $this->registerModule("user");
         if ($this->bot->guildbot) {
             $defnot = TRUE;
         }
@@ -87,7 +87,7 @@ class User_Core extends BasePassiveModule
             return $this->error;
         }
         //Make sure the user is not already added.
-        $result = $this->bot->db->select("SELECT nickname, user_level FROM #___users WHERE char_id = '" . $id . "'");
+        $result = $this->bot->db->select("SELECT nickname, userLevel FROM #___users WHERE char_id = '" . $id . "'");
         if (!empty($result)) {
             if ($result[0][1] == -1 && !($this->bot->guildbot)) {
                 $this->error->set("##highlight##" . $result[0][0] . "##end## is already a member.");
@@ -107,7 +107,7 @@ class User_Core extends BasePassiveModule
                 }
             }
         }
-        $result = $this->bot->db->select("SELECT char_id, user_level FROM #___users WHERE nickname = '" . $name . "'");
+        $result = $this->bot->db->select("SELECT char_id, userLevel FROM #___users WHERE nickname = '" . $name . "'");
         if (!empty($result)) {
             if ($result[0][1] == -1 && !($this->bot->guildbot)) {
                 $this->error->set("##highlight##" . $name . "##end## is banned and cannot be added.");
@@ -128,14 +128,14 @@ class User_Core extends BasePassiveModule
             }
         }
         if ($this->bot->game == "ao") {
-            // Add the user to the whois cache.
-            // If we are just adding the user to the whois cache, why do any error checking here if we are not going to actually use the data for anything?
-            // When adding a new alt that has just been created there will not be any whois data to lookup anyways.
-            $this->bot->core("whois")->lookup($name);
-            /*			$members = $this->bot->core("whois")->lookup($name);
+            // Add the user to the whoIs cache.
+            // If we are just adding the user to the whoIs cache, why do any error checking here if we are not going to actually use the data for anything?
+            // When adding a new alt that has just been created there will not be any whoIs data to lookup anyways.
+            $this->bot->core("whoIs")->lookup($name);
+            /*			$members = $this->bot->core("whoIs")->lookup($name);
                 if ($members instanceof BotError)
                 {
-                    $this->bot->log("USER", "ERROR", "Could not lookup $name whois.");
+                    $this->bot->log("USER", "ERROR", "Could not lookup $name whoIs.");
                 }
             */
         }
@@ -157,13 +157,13 @@ class User_Core extends BasePassiveModule
         // Add the user to the users table
         if ($change_level) {
             $this->bot->db->query(
-                "UPDATE #___users SET user_level = '" . $user_level . "', notify = '" . $notifystate . "', added_by = '" . mysql_real_escape_string($source) . "' WHERE char_id = '"
+                "UPDATE #___users SET userLevel = '" . $user_level . "', notify = '" . $notifystate . "', added_by = '" . mysql_real_escape_string($source) . "' WHERE char_id = '"
                     . $members["id"] . "'"
             );
         }
         else {
             $this->bot->db->query(
-                "INSERT INTO #___users (char_id, nickname, added_by, added_at, user_level, notify) VALUES('" . $members["id"] . "', '" . $members["nickname"] . "', '"
+                "INSERT INTO #___users (char_id, nickname, added_by, added_at, userLevel, notify) VALUES('" . $members["id"] . "', '" . $members["nickname"] . "', '"
                     . mysql_real_escape_string($source) . "', '" . time() . "', '" . $user_level . "', '" . $notifystate . "')"
             );
         }
@@ -190,7 +190,7 @@ class User_Core extends BasePassiveModule
             }
             $this->bot->core("security")->cache_mgr("add", $cache, $name);
         }
-        return "Player ##highlight##" . $name . "##end## has been added to the bot as " . $this->access_name($user_level);
+        return "Player ##highlight##" . $name . "##end## has been added to the bot as " . $this->accessName($user_level);
     }
 
 
@@ -208,7 +208,7 @@ class User_Core extends BasePassiveModule
             return $this->error;
         }
         // Check if we have a member by that name.
-        $result = $this->bot->db->select("SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'");
+        $result = $this->bot->db->select("SELECT char_id, nickname, userLevel FROM #___users WHERE nickname = '" . $name . "'");
         if (empty($result)) {
             $this->error->set("##highlight##" . $name . "##end## is not in the user table, and cannot be deleted.");
             return $this->error;
@@ -247,13 +247,13 @@ class User_Core extends BasePassiveModule
                     // Rerolled character, we need to make sure our information is updated.
                     if ($reroll == 1) {
                         $this->bot->db->query(
-                            "UPDATE #___users SET char_id = '" . $id . "', user_level = '0', deleted_by = '" . mysql_real_escape_string($source) . "', deleted_at = '" . time()
+                            "UPDATE #___users SET char_id = '" . $id . "', userLevel = '0', deleted_by = '" . mysql_real_escape_string($source) . "', deleted_at = '" . time()
                                 . "', notify = '0' WHERE nickname = '" . $name . "'"
                         );
                     }
                     else {
                         $this->bot->db->query(
-                            "UPDATE #___users SET user_level = '0', deleted_by = '" . mysql_real_escape_string($source) . "', deleted_at = '" . time()
+                            "UPDATE #___users SET userLevel = '0', deleted_by = '" . mysql_real_escape_string($source) . "', deleted_at = '" . time()
                                 . "', notify = '0' WHERE char_id = '"
                                 . $id . "'"
                         );
@@ -296,7 +296,7 @@ class User_Core extends BasePassiveModule
             $this->error->set("You have to give a character name to be erased.");
             return $this->error;
         }
-        $result = $this->bot->db->select("SELECT char_id, nickname, user_level FROM #___users WHERE nickname = '" . $name . "'");
+        $result = $this->bot->db->select("SELECT char_id, nickname, userLevel FROM #___users WHERE nickname = '" . $name . "'");
         if (empty($result)) {
             $this->error->set("##highlight##" . $name . "##end## is not in the user table, and cannot be erased.");
             return $this->error;
@@ -352,7 +352,7 @@ class User_Core extends BasePassiveModule
     }
 
 
-    function access_name($level)
+    function accessName($level)
     {
         switch ($level) {
         case '1':
@@ -370,7 +370,7 @@ class User_Core extends BasePassiveModule
     }
 
 
-    function admin_group_name($level)
+    function adminGroupName($level)
     {
         switch ($level) {
         case '4':
@@ -385,7 +385,7 @@ class User_Core extends BasePassiveModule
     }
 
 
-    function admin_group_level($name)
+    function adminGroupLevel($name)
     {
         switch ($name) {
         case 'owner':
@@ -403,7 +403,7 @@ class User_Core extends BasePassiveModule
 
 
     // Grab the userid associated with a name in the users database
-    function get_db_uid($name)
+    function getDbUserId($name)
     {
         $result = $this->bot->db->select("SELECT char_id FROM #___users WHERE nickname = '" . $name . "'");
         if (!empty($result)) {

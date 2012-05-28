@@ -44,7 +44,7 @@ class Profession_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query("DROP TABLE IF EXISTS #___professions");
-        $this->register_module("professions");
+        $this->registerModule("professions");
         if ($this->bot->game == "aoc") {
             $this->cache = array(
                 'Barbarian' => 'barb',
@@ -120,7 +120,7 @@ class Profession_Core extends BasePassiveModule
     // Returns full name of $shortcut,
     // Returns correct cased full name if $shortcut already is a full name
     // Returns BotError if it's neither
-    function full_name($shortcut)
+    function fullName($shortcut)
     {
         $this->error->reset();
         $shortcut = strtolower($shortcut);
@@ -165,34 +165,34 @@ class Profession_Core extends BasePassiveModule
 
 
     //Returns a list of professions separated by $separator
-    function get_professions($separator = ', ')
+    function getProfessions($separator = ', ')
     {
         return (implode($separator, array_keys($this->cache)));
     }
 
 
     //Returns an array with professions
-    function get_profession_array()
+    function getProfessionArray()
     {
         return (array_values(array_flip($this->cache)));
     }
 
 
-    function get_shortcuts($separator = ', ')
+    function getShortcuts($separator = ', ')
     {
         return (implode($separator, $this->cache));
     }
 
 
     //Returns an array with shortcuts
-    function get_shortcut_array()
+    function getShortcutArray()
     {
         return (array_values($this->cache));
     }
 
 
     //Returns an array with all units
-    function get_unit_array()
+    function getUnitArray()
     {
         return (array_keys($this->units));
     }
@@ -200,9 +200,9 @@ class Profession_Core extends BasePassiveModule
 
     //Returns all units $profession is a member of
     //$profession can be a full name or a short hand.
-    function get_units($profession)
+    function getUnits($profession)
     {
-        if (($profession = $this->full_name($profession)) instanceof BotError) {
+        if (($profession = $this->fullName($profession)) instanceof BotError) {
             return $profession;
         }
         $prof_units = array();
@@ -216,9 +216,9 @@ class Profession_Core extends BasePassiveModule
 
 
     //Gets a list of units that $profession is a member of separated by $separator
-    function get_unit_list($profession, $separator = ', ')
+    function getUnitList($profession, $separator = ', ')
     {
-        return (implode($separator, $this->get_units($profession)));
+        return (implode($separator, $this->getUnits($profession)));
     }
 }
 

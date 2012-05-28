@@ -48,10 +48,10 @@ class Gemcut extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'gem', 'GUEST');
-        $this->register_command('all', 'gems', 'GUEST');
-        $this->register_command('all', 'gemcut', 'GUEST');
-        $this->register_command('all', 'geminfo', 'GUEST');
+        $this->registerCommand('all', 'gem', 'GUEST');
+        $this->registerCommand('all', 'gems', 'GUEST');
+        $this->registerCommand('all', 'gemcut', 'GUEST');
+        $this->registerCommand('all', 'geminfo', 'GUEST');
         $this->bot->core("colors")
             ->define_scheme("gemcut", "highlight", "yellow");
         $this->bot->core("colors")->define_scheme("gemcut", "normal", "white");
@@ -285,12 +285,12 @@ class Gemcut extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match('/^gemcut/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('gemcut')));
             if (!empty($words)) {
-                return $this->gemtiers($words);
+                return $this->gemTiers($words);
             }
             else {
                 return "Usage: gemcut [tier]";
@@ -299,7 +299,7 @@ class Gemcut extends BaseActiveModule
         elseif (preg_match('/^geminfo/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('geminfo')));
             if (!empty($words)) {
-                return $this->gem_info($words);
+                return $this->gemInfo($words);
             }
             else {
                 return "Usage: geminfo [Gem Name]";
@@ -412,7 +412,7 @@ class Gemcut extends BaseActiveModule
     }
 
 
-    function gemtiers($msg)
+    function gemTiers($msg)
     {
         switch ($msg) {
         case 1:
@@ -443,7 +443,7 @@ class Gemcut extends BaseActiveModule
     }
 
 
-    function gem_info($msg)
+    function gemInfo($msg)
     {
         $gem_info = $this->gem_array[$msg];
         if (count($gem_info) == 2) {

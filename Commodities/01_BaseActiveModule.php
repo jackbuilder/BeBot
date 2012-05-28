@@ -35,24 +35,24 @@ abstract class BaseActiveModule extends BasePassiveModule
     protected $source;
 
 
-    function __construct(&$bot, $module_name)
+    function __construct(&$bot, $moduleName)
     {
         //Save reference to bot
-        parent::__construct($bot, $module_name);
+        parent::__construct($bot, $moduleName);
     }
 
 
-    // Prototype for the command_handler
-    abstract protected function command_handler($name, $msg, $origin);
+    // Prototype for the commandHandler
+    abstract protected function commandHandler($name, $msg, $origin);
 
 
     // Interface to register command. Now with checks for duplicate command definitions.
-    // $channel is the channel the command should be registered for. "all" can be used to register a command for gc, pgmsg and tell at once.
+    // $channel is the channel the command should be registered for. "all" can be used to register a command for sendToGuildChat, sendToGroup and sendTell at once.
     // $command is the command to register.
     // $access is the minimum access level required to use the command on default.
     // $subcommands is an array with keys of subcommands and entries of access levels to define access
     // rights for possible subcommands. If $subcommands is NULL it will be ignored.
-    protected function register_command(
+    protected function registerCommand(
         $channel, $command,
         $access = "SUPERADMIN",
         $subcommands = NULL
@@ -68,16 +68,16 @@ abstract class BaseActiveModule extends BasePassiveModule
             'OWNER'
         );
         $channels = array(
-            'gc',
-            'pgmsg',
-            'tell',
-            'extpgmsg',
+            'sendToGuildChat',
+            'sendToGroup',
+            'sendTell',
+            'externalPrivateGroupMessage',
             'all'
         );
         $allchannels = array(
-            'gc',
-            'pgmsg',
-            'tell'
+            'sendToGuildChat',
+            'sendToGroup',
+            'sendTell'
         );
         if ((in_array($channel, $channels)) && (in_array($access, $levels))) {
             if (!$this->bot->exists_command($channel, $command)) {
@@ -96,7 +96,7 @@ abstract class BaseActiveModule extends BasePassiveModule
                 $old_module = $this->bot->get_command_handler($channel, $command);
                 $this->error->set(
                     "Duplicate command definition! The command '$command' for channel '$channel'"
-                        . " has already been registered by '$old_module' and is attempted re-registered by {$this->module_name}"
+                        . " has already been registered by '$old_module' and is attempted re-registered by {$this->moduleName}"
                 );
             }
         }
@@ -106,19 +106,19 @@ abstract class BaseActiveModule extends BasePassiveModule
     }
 
 
-    protected function unregister_command($channel, $command)
+    protected function unregisterCommand($channel, $command)
     {
         $channels = array(
-            'gc',
-            'pgmsg',
-            'tell',
-            'extpgmsg',
+            'sendToGuildChat',
+            'sendToGroup',
+            'sendTell',
+            'externalPrivateGroupMessage',
             'all'
         );
         $allchannels = array(
-            'gc',
-            'pgmsg',
-            'tell'
+            'sendToGuildChat',
+            'sendToGroup',
+            'sendTell'
         );
         if (in_array($channel, $channels)) {
             if ($this->bot->exists_command($channel, $command)) {
@@ -129,20 +129,20 @@ abstract class BaseActiveModule extends BasePassiveModule
 
 
     // Registers a command alias for an already defined command.
-    protected function register_alias($command, $alias)
+    protected function registerAlias($command, $alias)
     {
-        $this->bot->core("command_alias")->register($command, $alias);
+        $this->bot->core("commandAlias")->register($command, $alias);
     }
 
 
-    protected function unregister_alias($alias)
+    protected function unregisterAlias($alias)
     {
-        $this->bot->core("command_alias")->del($alias);
+        $this->bot->core("commandAlias")->del($alias);
     }
 
 
     // This function aids in parsing the command.
-    protected function parse_com(
+    protected function parseCommand(
         $command, $pattern
         = array(
             'com',
@@ -195,39 +195,39 @@ abstract class BaseActiveModule extends BasePassiveModule
                 $this->reply($name, $msg->message());
             }
             else {
-                $this->output_destination($name, "##normal##$msg##end##", SAME);
+                $this->outputDestination($name, "##normal##$msg##end##", SAME);
             }
         }
     }
 
 
-    public function tell($name, $msg)
+    public function sendTell($name, $msg)
     {
         $this->source = TELL;
         $this->error->reset();
-        $reply = $this->command_handler($name, $msg, "tell");
+        $reply = $this->commandHandler($name, $msg, "sendTell");
         if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }
 
 
-    public function gc($name, $msg)
+    public function sendToGuildChat($name, $msg)
     {
         $this->source = GC;
         $this->error->reset();
-        $reply = $this->command_handler($name, $msg, "gc");
+        $reply = $this->commandHandler($name, $msg, "sendToGuildChat");
         if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }
     }
 
 
-    public function pgmsg($name, $msg)
+    public function sendToGroup($name, $msg)
     {
         $this->source = PG;
         $this->error->reset();
-        $reply = $this->command_handler($name, $msg, "pgmsg");
+        $reply = $this->commandHandler($name, $msg, "sendToGroup");
         if (($reply !== FALSE) && ($reply !== '')) {
             $this->reply($name, $reply);
         }

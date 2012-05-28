@@ -67,16 +67,16 @@ class BotStatistics_Core extends BasePassiveModule
 				end INT NOT NULL default '0'
 				)"
         );
-        $this->update_table();
+        $this->updateTable();
         $this->start();
-        $this->register_event("cron", "1min");
-        $this->register_event("cron", "24hour");
-        $this->register_event("disconnect");
-        $this->register_module("bot_statistics");
+        $this->registerEvent("cron", "1min");
+        $this->registerEvent("cron", "24hour");
+        $this->registerEvent("disconnect");
+        $this->registerModule("bot_statistics");
     }
 
 
-    function update_table()
+    function updateTable()
     {
         Switch ($this->bot->db->get_version("bots")) {
         case 1:
@@ -121,7 +121,7 @@ class BotStatistics_Core extends BasePassiveModule
     }
 
 
-    function check_bots($name, $origin, $bot = FALSE, $dim = FALSE)
+    function checkBots($name, $origin, $bot = FALSE, $dim = FALSE)
     {
         if (!$dim) {
             $dim = $this->bot->dimension;
@@ -137,10 +137,10 @@ class BotStatistics_Core extends BasePassiveModule
                 $inside = ":::  Bot: " . $bot[0] . "  :::\n";
                 $inside .= "\nStatus: ";
                 if ($bot[3] + (60 * 3) > time()) {
-                    $inside .= "##green##Online##end## for " . $this->timedif($bot[2], $bot[3]);
+                    $inside .= "##green##Online##end## for " . $this->timeDif($bot[2], $bot[3]);
                 }
                 else {
-                    $inside .= "##red##Offline##end## for " . $this->timedif($bot[3], time());
+                    $inside .= "##red##Offline##end## for " . $this->timeDif($bot[3], time());
                 }
                 $log = $this->bot->db->select("SELECT start, end FROM " . $this->DB . "#___bots_log WHERE bot = '" . $bot[0] . "' AND dim = '" . $bot[1] . "'");
                 $day = 60 * 60 * 24;
@@ -215,8 +215,8 @@ class BotStatistics_Core extends BasePassiveModule
                     $perc = 99.9;
                 }
                 $off = $day - $dayon;
-                $off = $this->timedif(0, $off, FALSE);
-                $dayon = $this->timedif(0, $dayon, FALSE);
+                $off = $this->timeDif(0, $off, FALSE);
+                $dayon = $this->timeDif(0, $dayon, FALSE);
                 $inside .= "\n\nLast 24 Hours:\n     Online: $dayon\n     Offline: $off\n     Restarts: $restartd\n     Percent: " . $perc . "%";
                 $perc = ($weekon / $week) * 100;
                 $perc = round($perc, 1);
@@ -224,8 +224,8 @@ class BotStatistics_Core extends BasePassiveModule
                     $perc = 99.9;
                 }
                 $off = $week - $weekon;
-                $off = $this->timedif(0, $off, FALSE);
-                $weekon = $this->timedif(0, $weekon, FALSE);
+                $off = $this->timeDif(0, $off, FALSE);
+                $weekon = $this->timeDif(0, $weekon, FALSE);
                 $inside .= "\n\nLast 7 Days:\n     Online: $weekon\n     Offline: $off\n     Restarts: $restartw\n     Percent: " . $perc . "%";
                 $perc = ($monthon / $month) * 100;
                 $perc = round($perc, 1);
@@ -233,8 +233,8 @@ class BotStatistics_Core extends BasePassiveModule
                     $perc = 99.9;
                 }
                 $off = $month - $monthon;
-                $off = $this->timedif(0, $off, FALSE);
-                $monthon = $this->timedif(0, $monthon, FALSE);
+                $off = $this->timeDif(0, $off, FALSE);
+                $monthon = $this->timeDif(0, $monthon, FALSE);
                 $inside .= "\n\nLast 30 Days:\n     Online: $monthon\n     Offline: $off\n     Restarts: $restartm\n     Percent: " . $perc . "%";
                 $sincestart = time() - $bot[4];
                 $perc = ($allon / $sincestart) * 100;
@@ -243,8 +243,8 @@ class BotStatistics_Core extends BasePassiveModule
                     $perc = 99.9;
                 }
                 $off = $sincestart - $allon;
-                $off = $this->timedif(0, $off, FALSE);
-                $allon = $this->timedif(0, $allon, FALSE);
+                $off = $this->timeDif(0, $off, FALSE);
+                $allon = $this->timeDif(0, $allon, FALSE);
                 $inside .= "\n\nSince Install:\n     Online: $allon\n     Offline: $off\n     Restarts: $restart\n     Percent: " . $perc . "%";
                 Return ("Bot Stats for ##highlight##" . $bot[0] . "##end## :: " . $this->bot
                     ->core("tools")->make_blob("click to view", $inside));
@@ -258,10 +258,10 @@ class BotStatistics_Core extends BasePassiveModule
             if (!empty($result)) {
                 foreach ($result as $bot) {
                     if ($bot[3] + (60 * 3) > time()) {
-                        $status = "##green##Online##end## for " . $this->timedif($bot[2], $bot[3]);
+                        $status = "##green##Online##end## for " . $this->timeDif($bot[2], $bot[3]);
                     }
                     else {
-                        $status = "##red##Offline##end## for " . $this->timedif($bot[3], time());
+                        $status = "##red##Offline##end## for " . $this->timeDif($bot[3], time());
                     }
                     $inside[$bot[1]] .= "\n" . $this->bot->core("tools")
                         ->chatcmd("bots " . $bot[0] . " " . $bot[1], $bot[0], $origin) . " is " . $status;
@@ -284,7 +284,7 @@ class BotStatistics_Core extends BasePassiveModule
     }
 
 
-    function timedif($low, $high, $showmins = TRUE)
+    function timeDif($low, $high, $showmins = TRUE)
     {
         $dif = $high - $low;
         if ($dif < 60 * 60) {

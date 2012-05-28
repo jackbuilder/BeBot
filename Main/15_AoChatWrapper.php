@@ -45,38 +45,38 @@ class AOChatWrapper_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("chat");
+        $this->registerModule("chat");
     }
 
 
     /*
-    This is a wrapper function for aoc->get_uid() that checks the whois cache if aoc->get_uid() fails
+    This is a wrapper function for aoc->getUserId() that checks the whoIs cache if aoc->getUserId() fails
     */
-    function get_uid($user)
+    function getUserId($user)
     {
         $user = ucfirst(strtolower($user));
-        echo "Depreciated AOChatWrapper::get_uid() called for $user. Backtrace:\n";
+        echo "Depreciated AOChatWrapper::getUserId() called for $user. Backtrace:\n";
         $this->bot->log("DEBUG", "BACKTRACE", $this->bot->debug_bt());
-        $this->debug_output("Deprecated call to core('chat')->get_uid(). Use bot->core('player')->id($user)\n");
+        $this->debugOutput("Deprecated call to core('chat')->getUserId(). Use bot->core('player')->id($user)\n");
         return $this->bot->core('player')->id($user);
     }
 
 
     /*
-    This is a wrapper function for aoc->get_uname() that checks the whois cache if aoc->get_uname() failes
+    This is a wrapper function for aoc->getUserName() that checks the whoIs cache if aoc->getUserName() failes
     */
-    function get_uname($user)
+    function getUserName($user)
     {
         $user = ucfirst(strtolower($user));
-        $this->debug_output("Deprecated call to core('chat')->get_uname(). Use bot->core('player')->name($user)\n");
-        echo "Depreciated AOChatWarapper::get_uname() called for $user. Backtrace:\n";
+        $this->debugOutput("Deprecated call to core('chat')->getUserName(). Use bot->core('player')->name($user)\n");
+        echo "Depreciated AOChatWarapper::getUserName() called for $user. Backtrace:\n";
         $this->bot->log("DEBUG", "BACKTRACE", $this->bot->debug_bt());
         return $this->bot->core('player')->name($user);
     }
 
 
     /* Buddies */
-    function buddy_add($user, $que = TRUE)
+    function buddyAdd($user, $que = TRUE)
     {
         $add = TRUE;
         if (is_numeric($user)) {
@@ -135,7 +135,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     }
 
 
-    function buddy_remove($user)
+    function buddyRemove($user)
     {
         $add = FALSE;
         if (empty($user)
@@ -148,7 +148,7 @@ class AOChatWrapper_Core extends BasePassiveModule
             if (($this->bot->aoc->buddy_exists($uid))) {
                 if ($this->bot->core("buddy_queue")->check_queue()) {
                     $this->bot->aoc->buddy_remove($uid);
-                    $this->bot->log("BUDDY", "BUDDY-DEL", $this->get_uname($uid));
+                    $this->bot->log("BUDDY", "BUDDY-DEL", $this->getUserName($uid));
                     return TRUE;
                 }
                 else {
@@ -164,13 +164,13 @@ class AOChatWrapper_Core extends BasePassiveModule
     }
 
 
-    function buddy_exists($who)
+    function buddyExists($who)
     {
         return $this->bot->aoc->buddy_exists($who);
     }
 
 
-    function buddy_online($who)
+    function buddyOnline($who)
     {
         return $this->bot->aoc->buddy_online($who);
     }
@@ -179,7 +179,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     /*
     accept invite to private group
     */
-    function pgroup_join($group)
+    function privateGroupJoin($group)
     {
         if ($group == NULL) {
             return FALSE;
@@ -192,7 +192,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     /*
     leave private group
     */
-    function pgroup_leave($group)
+    function privateGroupLeave($group)
     {
         if ($group == NULL) {
             return FALSE;
@@ -205,7 +205,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     /*
     decline private group
     */
-    function pgroup_decline($group)
+    function privateGroupDecline($group)
     {
         return $this->send_pgroup_leave($group);
     }
@@ -215,7 +215,7 @@ class AOChatWrapper_Core extends BasePassiveModule
     private group status
     added - 2007/Sep/1 - anarchyonline@mafoo.org
     */
-    function pgroup_status($group)
+    function privateGroupStatus($group)
     {
         if ($group == NULL) {
             $group = $this->bot->botname;
@@ -224,34 +224,34 @@ class AOChatWrapper_Core extends BasePassiveModule
     }
 
 
-    function pgroup_invite($user)
+    function privateGroupInvite($user)
     {
         $this->bot->log("PGRP", "INVITE", "Invited " . $user . " to private group");
         return $this->bot->aoc->privategroup_invite($user);
     }
 
 
-    function pgroup_kick($user)
+    function privateGroupKick($user)
     {
         $this->bot->log("PGRP", "KICK", "Kicking " . $user . " from private group");
         return $this->bot->aoc->privategroup_kick($user);
     }
 
 
-    function pgroup_kick_all()
+    function privateGroupKickAll()
     {
         $this->bot->log("PGRP", "KICKALL", "Kicking all user from private group");
         return $this->bot->aoc->privategroup_kick_all();
     }
 
 
-    function lookup_group($arg, $type = 0)
+    function lookupGroup($arg, $type = 0)
     {
         return $this->bot->aoc->lookup_group($arg, $type);
     }
 
 
-    function get_gname($g)
+    function getGroupName($g)
     {
         return $this->bot->aoc->get_gname($g);
     }

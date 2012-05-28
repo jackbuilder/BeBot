@@ -1,5 +1,5 @@
 cd ..
 cd ..
 @cls
-@php -c ./ .\extra\whois-update\whois-update.php
+@php -c ./ .\extra\whoIs-update\whoIs-update.php
 pause

@@ -44,26 +44,26 @@ class Server extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'server', 'MEMBER');
+        $this->registerCommand('all', 'server', 'MEMBER');
         $this->help['description'] = 'Shows the server load.';
         $this->help['command']['server'] = "Shows the load on the server.";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        return $this->server_load();
+        return $this->serverLoad();
     }
 
 
     /*
     Show server load
     */
-    function server_load()
+    function serverLoad()
     {
         $server = $this->bot->core("tools")
             ->get_site("http://probes.funcom.com/ao.xml");
-        $server = explode("name=\"" . $this->select_dimension() . "\"", $server);
+        $server = explode("name=\"" . $this->selectDimension() . "\"", $server);
         $server = explode("</dimension>", $server[1]);
         preg_match("/display-name=\"(.+)\"/U", $server[0], $info);
         $dim_name = $info[1];
@@ -122,7 +122,7 @@ class Server extends BaseActiveModule
     /*
     Pick the correct dimention
     */
-    function select_dimension()
+    function selectDimension()
     {
         switch ($this->bot->dimension) {
         case '0':

@@ -45,11 +45,11 @@ class OnlineDisplay extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "online", "GUEST");
-        $this->register_command("all", "sm", "GUEST");
+        $this->registerCommand("all", "online", "GUEST");
+        $this->registerCommand("all", "sm", "GUEST");
         // Register for logon notifies
-        $this->register_event("logon_notify");
-        $this->register_event("pgjoin");
+        $this->registerEvent("logon_notify");
+        $this->registerEvent("privateGroupJoin");
         if ($this->bot->game == "ao") {
             $cp = "profession";
             $this->cp = "profession";
@@ -112,7 +112,7 @@ class OnlineDisplay extends BaseActiveModule
             ->create("Online", "irc", FALSE, "Should IRC be included in the Online List");
         $this->bot->core("settings")
             ->create(
-            "Online", "whois_alts_cmd", TRUE, "Should <pre>whois be used Instead of <pre>alts for link inside window (default to <pre>alts if alt list isnt shown in whois)"
+            "Online", "whois_alts_cmd", TRUE, "Should <pre>whoIs be used Instead of <pre>alts for link inside window (default to <pre>alts if alt list isnt shown in whoIs)"
         );
         $this->bot->core("settings")
             ->create("Online", "RaidStatus", TRUE, "Should Raid Status Be shown");
@@ -133,7 +133,7 @@ class OnlineDisplay extends BaseActiveModule
                 ->get("Online", "Logonspam")
         ) {
             $this->bot->send_tell(
-                $user, $this->online_msg(
+                $user, $this->onlineMessage(
                     "", $this->bot
                         ->core("settings")->get("Online", "Channel")
                 )
@@ -142,11 +142,11 @@ class OnlineDisplay extends BaseActiveModule
     }
 
 
-    function pgjoin($user)
+    function privateGroupJoin($user)
     {
         if ($this->bot->core("settings")->get("Online", "PgjoinSpam")) {
             $this->bot->send_tell(
-                $user, $this->online_msg(
+                $user, $this->onlineMessage(
                     "", $this->bot
                         ->core("settings")->get("Online", "Channel")
                 )
@@ -155,7 +155,7 @@ class OnlineDisplay extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         return $this->handler(
             $msg, $this->bot->core("settings")
@@ -167,15 +167,15 @@ class OnlineDisplay extends BaseActiveModule
     function handler($msg, $what, $name = FALSE)
     {
         if (preg_match("/^online$/i", $msg)) {
-            return $this->online_msg("", $what);
+            return $this->onlineMessage("", $what);
         }
         else {
             if (preg_match("/^online (.+)$/i", $msg, $info)) {
-                return $this->online_msg($info[1], $what, $name);
+                return $this->onlineMessage($info[1], $what, $name);
             }
             else {
                 if (preg_match("/^sm$/i", $msg)) {
-                    return $this->sm_msg($what);
+                    return $this->smMsg($what);
                 }
             }
         }
@@ -185,7 +185,7 @@ class OnlineDisplay extends BaseActiveModule
     /*
     Makes the message.
     */
-    function online_msg($param, $what, $name = FALSE)
+    function onlineMessage($param, $what, $name = FALSE)
     {
         if ($param == "all") {
             if ($this->bot->core("security")->check_access(
@@ -207,10 +207,10 @@ class OnlineDisplay extends BaseActiveModule
             }
             $profstring = " AND t2." . $this->cp . " = '" . $profname . "' ";
         }
-        $guild = $this->online_list("gc", $profstring, 2);
-        $guests = $this->online_list("gc", $profstring, 1);
-        $other = $this->online_list("gc", $profstring, 0);
-        $pgroup = $this->online_list("pg", $profstring);
+        $guild = $this->onlineList("sendToGuildChat", $profstring, 2);
+        $guests = $this->onlineList("sendToGuildChat", $profstring, 1);
+        $other = $this->onlineList("sendToGuildChat", $profstring, 0);
+        $pgroup = $this->onlineList("pg", $profstring);
         unset($this->listed);
         $online = "";
         $msg = "";
@@ -258,7 +258,7 @@ class OnlineDisplay extends BaseActiveModule
                     && $this->bot
                         ->core("settings")->get("irc", "connected")))
         ) {
-            $irclist = $this->irc_online_list();
+            $irclist = $this->ircOnlineList();
             $online .= "\n" . $this->bot->core("colors")
                 ->colorize("lightbeige", "--------------------------------------------------------------\n\n");
             $online .= $this->bot->core("colors")
@@ -280,7 +280,7 @@ class OnlineDisplay extends BaseActiveModule
     /*
     make the list of online players
     */
-    function online_list($channel, $like, $lvl = FALSE)
+    function onlineList($channel, $like, $lvl = FALSE)
     {
         $andlvl = "";
         if ($this->bot->game == "ao") {
@@ -302,7 +302,7 @@ class OnlineDisplay extends BaseActiveModule
             $andlvl = " AND t1.level = " . $lvl;
         }
         $online = $this->bot->db->select(
-            "SELECT t1.nickname, t2.level, org_rank, org_name, " . $this->cp . $ex2 . ", t1.level FROM "
+            "SELECT t1.nickname, t2.level, orgRank, org_name, " . $this->cp . $ex2 . ", t1.level FROM "
                 . "#___online AS t1 LEFT JOIN #___whois AS t2 ON t1.nickname = t2.nickname WHERE status_" . $channel . "=1" . $andlvl . " AND " . $botstring . $like . $sortstring
         );
         if (strtolower(
@@ -412,7 +412,7 @@ class OnlineDisplay extends BaseActiveModule
                     && $this->bot
                         ->core("settings")->get("Whois", "Alts")
                 ) {
-                    $altcmd = "whois";
+                    $altcmd = "whoIs";
                 }
                 else {
                     $altcmd = "alts";
@@ -480,7 +480,7 @@ class OnlineDisplay extends BaseActiveModule
                 }
                 $online_list .= $this->bot->core("colors")
                     ->colorize("online_characters", " " . $player[0] . " " . $charinfo . $raid . $admin . $alts);
-                if (isset($this->bot->commands["tell"]["afk"]->afk[$player[0]])) {
+                if (isset($this->bot->commands["sendTell"]["afk"]->afk[$player[0]])) {
                     $online_list .= ":: " . $this->bot->core("colors")
                         ->colorize("online_afk", "( AFK )") . "\n";
                 }
@@ -496,7 +496,7 @@ class OnlineDisplay extends BaseActiveModule
     }
 
 
-    function irc_online_list()
+    function ircOnlineList()
     {
         $online = $this->bot->db->select(
             "SELECT nickname FROM #___online WHERE botname = '" . $this->bot
@@ -521,7 +521,7 @@ class OnlineDisplay extends BaseActiveModule
     /*
     Makes the message.
     */
-    function sm_msg($what)
+    function smMsg($what)
     {
         if ($param == "all") {
             $param = "";

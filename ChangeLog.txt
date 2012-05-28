@@ -14,13 +14,13 @@ Version 0.7.0
 - Bot now includes bot name and dimension in user agent on HTTP requests.
 - !roll should work properly now.
 - Improved !raffle logic slightly. Will now determine the number of times to do a roll depending on the number of people in the raffle.
-- Improved the cURL get_site function to support POST and Login.
+- Improved the cURL getSite function to support POST and Login.
 - Added a Link for turning LFT on in click to join blob, can be disabled under settings.
 - Autoinvites users who apear to have LD during a Raid.
 - rally's can now be saved and loaded
-- The bot will now automatically use cURL if it is available. The previous get_site setting has been removed
+- The bot will now automatically use cURL if it is available. The previous getSite setting has been removed
   and a new setting added to allow disabling cURL.
-- The socket method used for get_site should now properly time out instead of waiting for the default
+- The socket method used for getSite should now properly time out instead of waiting for the default
   socket timeout which is 60 seconds for most installs.
 - Removed a bug where cron jobs sometimes didn't execute right on time.
 - Added Tank and Caller Info to Raid Spam.
@@ -32,19 +32,19 @@ Version 0.7.0
 - Xyphos items database now used by default for AO. Please report issues at http://www.xyphos.com/viewforum.php?f=7
 - Added waypoint support to rally
 - Added a General queue module Changed chatqueue buddy_queue and masmsg (invites) to use
-- Added a new setting: tools connect_timeout to allow the get_site function timeout to be adjusted.
+- Added a new setting: tools connect_timeout to allow the getSite function timeout to be adjusted.
 - Inspect has been added as an alias for Identify.
-- The function debug_bt() as been added to Bot.php to allow for displaying a formatted backtrace to console. Returns a string.
-- Multiple new settings to the Logon notice module. Now does not do external lookups by default for whois info nor display details or alts by default.
+- The function debugBackTrace() as been added to Bot.php to allow for displaying a formatted backtrace to console. Returns a string.
+- Multiple new settings to the Logon notice module. Now does not do external lookups by default for whoIs info nor display details or alts by default.
 
 API Changes:
 - Moved aochat event handling out of Main.php and in to AOChat.php
-- Added third optional parameter $header (bol TRUE/FALSE) to make_blob displaying VhaBot like terminal header. Shamelessly borrowed from VhaBot. Defaults to TRUE
-- Added fourth optional parameter $strip (bol TRUE/FALSE) to chatcmd to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
-- Added sixth optional parameter $strip (bol TRUE/FALSE) to make_item to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
-- chatcmd() now allows / as $origin parameter and will not prefix the chatcmd in any way.
-- Added this->bot->core("tools")->my_rand($min=false, $max=false) wrapper to call random number generator.
-- Removed one optional parameter from get_site leaving the parameters now as: url, $strip_headers = FALSE, $read_timeout = FALSE.
+- Added third optional parameter $header (bol TRUE/FALSE) to makeBlob displaying VhaBot like terminal header. Shamelessly borrowed from VhaBot. Defaults to TRUE
+- Added fourth optional parameter $strip (bol TRUE/FALSE) to chatCommand to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
+- Added sixth optional parameter $strip (bol TRUE/FALSE) to makeItem to allow stripping of all formatting for the actual link. This allows custom formatting of links. Defaults to FALSE.
+- chatCommand() now allows / as $origin parameter and will not prefix the chatCommand in any way.
+- Added this->bot->core("tools")->myRand($min=false, $max=false) wrapper to call random number generator.
+- Removed one optional parameter from getSite leaving the parameters now as: url, $strip_headers = FALSE, $read_timeout = FALSE.
   Only $url is a required parameter.
 - AOChat now utilizes the Symfony Event Dispatcher for it's events.
 
@@ -58,8 +58,8 @@ Removed Modules:
 
 +Possible BREAKAGE! - Preliminary testing shows modules appear to be working as expected.
 +- Moving from Status array to BotError. This WILL cause breakage until the checks have been converted as well.
-+- Moving uid/uname cache from AOChat to core/PlayerList.php. Calls to core("chat")->get_u* are now deprecated and PlayerList does return BotError on failures.
-+- rosterupdate seems to output alot of errors todo with failed to get whois (confirmed by luyu)
++- Moving userId/userName cache from AOChat to core/PlayerList.php. Calls to core("chat")->get_u* are now deprecated and PlayerList does return BotError on failures.
++- rosterupdate seems to output alot of errors todo with failed to get whoIs (confirmed by luyu)
  
 +Known breakage
 +- IRC module fails to process commands given in IRC.

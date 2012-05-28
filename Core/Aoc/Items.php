@@ -31,7 +31,7 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$items_core = new Items_Core($bot);
+$itemsCore = new Items_Core($bot);
 class Items_Core extends BasePassiveModule
 {
     var $server = 'http://aocdb.lunevo.net/';
@@ -41,7 +41,7 @@ class Items_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("items");
+        $this->registerModule("items");
     }
 
 
@@ -49,7 +49,7 @@ class Items_Core extends BasePassiveModule
     Takes an item string and returns an array of item arrays - each with lowid, highid, ql, lowcrc, highcc, colour and name.
     If $item is unparsable it returns a BotError
     */
-    function parse_items($itemText)
+    function parseItems($itemText)
     {
         $items = array();
         $count = preg_match_all('/' . $this->itemPattern . '/i', $itemText, $matches, PREG_SET_ORDER);
@@ -70,7 +70,7 @@ class Items_Core extends BasePassiveModule
     /*
     Creates a text blob.  Alternate uses ' instead of ".
     */
-    function make_item($item, $alternate = FALSE)
+    function makeItem($item, $alternate = FALSE)
     {
         if (empty($item)) {
             return '';
@@ -87,7 +87,7 @@ class Items_Core extends BasePassiveModule
 
 
     //Returns true if $item is an itemref, false otherwise.
-    function is_item($item)
+    function isItem($item)
     {
         if (1 > preg_match('/' . $this->itemPattern . '/i', $item)) {
             return FALSE;
@@ -96,7 +96,7 @@ class Items_Core extends BasePassiveModule
     }
 
 
-    function submit_item($item, $name)
+    function submitItem($item, $name)
     {
         if (empty($item)) {
             return -1;
@@ -121,7 +121,7 @@ class Items_Core extends BasePassiveModule
     }
 
 
-    function search_item_db_details($words)
+    function searchItemDbDetails($words)
     {
         $url = $this->server . "botsearch/";
         $url .= '?single=1';
@@ -135,7 +135,7 @@ class Items_Core extends BasePassiveModule
     }
 
 
-    function search_item_db($words)
+    function searchItemDb($words)
     {
         $url = $this->server . "botsearch/";
         $url .= '?search=' . urlencode($words);

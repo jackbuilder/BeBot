@@ -42,51 +42,51 @@ class PlayerNotes_UI extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command(
+        $this->registerCommand(
             "all", "notes", "MEMBER", array(
                 'add' => 'MEMBER',
                 'rem' => 'ADMIN'
             )
         );
-        $this->register_alias("notes", "note");
+        $this->registerAlias("notes", "note");
     }
 
 
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
-    sutible for output via send_tell, send_pgroup, and send_gc.
+    sutible for output via sendTell, sendPrivateGroup, and sendGuildChat.
     */
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     { // Start function handler()
-        $com = $this->parse_com($msg);
+        $com = $this->parseCommand($msg);
         Switch ($com['sub']) {
         case 'add':
-            return $this->add_note($name, $com['args']);
+            return $this->addNote($name, $com['args']);
             break;
         case 'add':
         case 'admin':
             $admin = explode(" ", $msg[2], 2);
             if (strtolower($admin[0]) == "add" || strtolower($admin[0]) == "admin") {
-                return $this->add_note($name, $admin[1], TRUE);
+                return $this->addNote($name, $admin[1], TRUE);
             }
             else {
-                return $this->add_note($name, $msg[2], FALSE);
+                return $this->addNote($name, $msg[2], FALSE);
             }
         case 'rem':
         case 'del':
-            return $this->rem_note($com['args']);
+            return $this->remNote($com['args']);
         case '':
-            return $this->show_all_notes($name, $source);
+            return $this->showAllNotes($name, $source);
         Default:
-            return $this->show_notes($name, $com['sub']);
+            return $this->showNotes($name, $com['sub']);
         }
         return FALSE;
     } // End function handler()
 
-    function add_note($author, $msg, $admin = FALSE)
-    { // Start function add_note()
-        $args = $this->parse_com(
+    function addNote($author, $msg, $admin = FALSE)
+    { // Start function addNote()
+        $args = $this->parseCommand(
             $msg, array(
                 'target',
                 'reason'
@@ -109,18 +109,18 @@ class PlayerNotes_UI extends BaseActiveModule
             return ($this->bot->core("player_notes")
                 ->add($player, $author, $note, "default"));
         }
-    } // End function add_note()
+    } // End function addNote()
 
-    function rem_note($pnid)
-    { // Start function rem_note()
+    function remNote($pnid)
+    { // Start function remNote()
         return ($this->bot->core("player_notes")->del($pnid));
-    } // End function rem_note()
+    } // End function remNote()
 
     /*
     Show notes for a player
     */
-    function show_notes($source, $player)
-    { // Start function show_notes()
+    function showNotes($source, $player)
+    { // Start function showNotes()
         $source = ucfirst(strtolower($source));
         $player = ucfirst(strtolower($player));
         if (!$this->bot->core('player')->id($player)) {
@@ -156,12 +156,12 @@ class PlayerNotes_UI extends BaseActiveModule
             return ("Notes for " . $this->bot->core("tools")
                 ->make_blob($player, $inside));
         }
-    } // End function show_notes()
+    } // End function showNotes()
 
     /*
     Show notes for all players
     */
-    function show_all_notes($source, $origin)
+    function showAllNotes($source, $origin)
     {
         $source = ucfirst(strtolower($source));
         $result = $this->bot->core("player_notes")

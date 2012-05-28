@@ -42,7 +42,7 @@ class tokens extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "tokens", "GUEST");
+        $this->registerCommand("all", "tokens", "GUEST");
         $this->help['description'] = "Token calculator";
         $this->help['command']['tokens'] = "Displays how many side tokens you get per token disk at various levels";
         $this->help['command']['tokens <target/current> <target/current>']
@@ -55,7 +55,7 @@ class tokens extends BaseActiveModule
     /*
     Unified message handler
     */
-    function command_handler($source, $msg, $type)
+    function commandHandler($source, $msg, $type)
     {
         $return = false;
         $clan = false;
@@ -73,7 +73,7 @@ class tokens extends BaseActiveModule
                     return $this->error;
                 }
                 else {
-                    $who = $this->bot->core("whois")->lookup($source);
+                    $who = $this->bot->core("whoIs")->lookup($source);
                     if (!($who instanceof BotError)) {
                         $level = $who["level"];
                         if ($who["faction"] == 'Clan') {
@@ -90,7 +90,7 @@ class tokens extends BaseActiveModule
                         return $this->error;
                     }
                     else {
-                        $who = $this->bot->core("whois")->lookup($source);
+                        $who = $this->bot->core("whoIs")->lookup($source);
                         if (!($who instanceof BotError)) {
                             if ($who["faction"] == 'Clan') {
                                 $clan = true;

@@ -53,7 +53,7 @@ class Log extends BaseActiveModule
 		        second VARCHAR(45) NOT NULL,
 		        timestamp INTEGER UNSIGNED NOT NULL)"
         );
-        $this->register_command("all", "log", "OWNER");
+        $this->registerCommand("all", "log", "OWNER");
         $this->bot->core("settings")
             ->create('Log', 'LimitMessage', 10, 'How many of the last log messages should we show?', '5;10;25;50');
         $this->help['description'] = 'Module to manage and display logs.';
@@ -67,14 +67,14 @@ class Log extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^log$/i", $msg)) {
-            return $this->show_log();
+            return $this->showLog();
         }
         else {
             if (preg_match("/^log (.+)$/i", $msg, $info)) {
-                return $this->show_log($info[1]);
+                return $this->showLog($info[1]);
             }
         }
     }
@@ -83,7 +83,7 @@ class Log extends BaseActiveModule
     /*
     Starts a Log
     */
-    function show_log($category = FALSE)
+    function showLog($category = FALSE)
     {
         if ($category === FALSE) {
             $results = $this->bot->db->select("SELECT DISTINCT first FROM #___log_message ORDER BY first");

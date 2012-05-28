@@ -76,12 +76,12 @@ class TowerAttack extends BaseActiveModule
 				INDEX (win_side),
 				INDEX (zone))"
         );
-        $this->register_command("all", "battle", "GUEST");
-        $this->register_command("all", "victory", "GUEST");
-        $this->register_event("gmsg", "All Towers");
-        $this->register_event("gmsg", "Org Msg");
-        $this->register_event("gmsg", "Tower Battle Outcome");
-        $this->register_event("cron", "5sec");
+        $this->registerCommand("all", "battle", "GUEST");
+        $this->registerCommand("all", "victory", "GUEST");
+        $this->registerEvent("groupMessage", "All Towers");
+        $this->registerEvent("groupMessage", "Org Msg");
+        $this->registerEvent("groupMessage", "Tower Battle Outcome");
+        $this->registerEvent("cron", "5sec");
         $this->bot->core("settings")
             ->create("TowerAttack", "Spam", TRUE, "Is spamming of tower attacks into org chat on or off?");
         $this->bot->core("settings")
@@ -90,7 +90,7 @@ class TowerAttack extends BaseActiveModule
             "Should several attacks on the same site in a short timeframe be collected and spammed as a blob instead of showing each attack singulary?"
         );
         $this->bot->core("settings")
-            ->create("TowerAttack", "SpamTo", "both", "Where should any tower spam be displayed to? Just gc, just pgmsg, or both?", "gc;pgmsg;both");
+            ->create("TowerAttack", "SpamTo", "both", "Where should any tower spam be displayed to? Just sendToGuildChat, just sendToGroup, or both?", "sendToGuildChat;sendToGroup;both");
         $this->bot->core("settings")
             ->create("TowerAttack", "RelayTowerDamage", "none", "Should damage spam of towers be relayed to the private group and/or any linked bots?", "none;pgroup;relay;both");
         $this->bot->core("settings")
@@ -100,27 +100,27 @@ class TowerAttack extends BaseActiveModule
         $this->bot->core("settings")
             ->create(
             "TowerAttack", "AttackStringOrged", "#!off_guild!# attacked #!def_guild!# in##highlight## #!zone!# (#!lca_num!#)##end##! #!blob!#",
-            "This string is used as base for all tower attack spam of orged characters. For more information read the comment in TowerAttack.php for the format_attack_string() function",
+            "This string is used as base for all tower attack spam of orged characters. For more information read the comment in TowerAttack.php for the formatAttackString() function",
             ""
         );
         $this->bot->core("settings")
             ->create(
             "TowerAttack", "AttackStringUnorged", "#!off_player!# attacked #!def_guild!# in##highlight## #!zone!# (#!lca_num!#)##end##! #!blob!#",
-            "This string is used as base for all tower attack spam of orged characters. For more information read the comment in TowerAttack.php for the format_attack_string() function",
+            "This string is used as base for all tower attack spam of orged characters. For more information read the comment in TowerAttack.php for the formatAttackString() function",
             ""
         );
         $this->bot->core("settings")
             ->create(
             "TowerAttack", "BlobStringOrged",
             "#!time!# - #!off_guild!# (#!off_player!#, #!off_level!# #!off_profession!#) attacked #!def_guild!# in #!zone!# (#!lca_num!#, L #!lca_minlevel!# - #!lca_maxlevel!#).",
-            "This string is used as base for every entry in the history blob for tower attacks. For more information read the comment in TowerAttack.php for the format_attack_string() function",
+            "This string is used as base for every entry in the history blob for tower attacks. For more information read the comment in TowerAttack.php for the formatAttackString() function",
             ""
         );
         $this->bot->core("settings")
             ->create(
             "TowerAttack", "BlobStringUnorged",
             "#!time!# - #!off_player!# (#!off_level!# #!off_profession!#) attacked #!def_guild!# in #!zone!# (#!lca_num!#, L #!lca_minlevel!# - #!lca_maxlevel!#).",
-            "This string is used as base for every entry in the history blob for tower attacks. For more information read the comment in TowerAttack.php for the format_attack_string() function",
+            "This string is used as base for every entry in the history blob for tower attacks. For more information read the comment in TowerAttack.php for the formatAttackString() function",
             ""
         );
         $this->bot->core("settings")
@@ -130,14 +130,14 @@ class TowerAttack extends BaseActiveModule
         $this->bot->core("settings")
             ->create(
             "TowerAttack", "VictoryString", "#!time!# - #!off_guild!# won vs #!def_guild!# in #!zone!#!",
-            "This string is used as base for the victory lines in the victory blob. For more information read the comment in TowerAttack.php for the format_attack_string() function",
+            "This string is used as base for the victory lines in the victory blob. For more information read the comment in TowerAttack.php for the formatAttackString() function",
             ""
         );
         $this->bot->core("settings")
             ->create(
             "TowerAttack", "SuppressTime", 30, "This is the time after last attack on same org that the attack with be suppressed for in seconds", "10;20;30;60;120;180;300"
         );
-        $this->update_table();
+        $this->updateTable();
         $this->help['description'] = 'Handle tower attack events.';
         $this->help['command']['battle'] = "Shows recent tower attacks.";
         $this->help['command']['victory'] = "Shows recent tower victories.";
@@ -145,7 +145,7 @@ class TowerAttack extends BaseActiveModule
     }
 
 
-    function update_table()
+    function updateTable()
     {
         if ($this->bot->core("settings")
             ->exists("TowerAttack", "SchemaVersion")
@@ -198,14 +198,14 @@ class TowerAttack extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $channel)
+    function commandHandler($name, $msg, $channel)
     {
         if (preg_match("/^battle$/i", $msg)) {
-            return $this->battle_blob();
+            return $this->battleBlob();
         }
         else {
             if (preg_match("/^victory$/i", $msg)) {
-                return $this->victory_blob();
+                return $this->victoryBlob();
             }
         }
     }
@@ -214,7 +214,7 @@ class TowerAttack extends BaseActiveModule
     /*
     Makes the victory results
     */
-    function victory_blob()
+    function victoryBlob()
     {
         $battle = "##blob_title##:::: Recent Battle Results ::::##end##\n\n";
         $result = $this->bot->db->select(
@@ -227,7 +227,7 @@ class TowerAttack extends BaseActiveModule
             return "No tower victories noticed yet!";
         }
         foreach ($result as $res) {
-            $battle .= "##blob_text##" . $this->format_attack_string(
+            $battle .= "##blob_text##" . $this->formatAttackString(
                 $res, $this->bot
                     ->core("settings")
                     ->get("TowerAttack", "VictoryString"), true
@@ -241,7 +241,7 @@ class TowerAttack extends BaseActiveModule
     /*
     Makes the battle results
     */
-    function battle_blob()
+    function battleBlob()
     {
         $battle = "##blob_title##:::: Recent Tower Battles ::::##end##\n\n";
         $result = $this->bot->db->select(
@@ -262,7 +262,7 @@ class TowerAttack extends BaseActiveModule
                 $str = $this->bot->core("settings")
                     ->get("TowerAttack", "BlobStringUnorged");
             }
-            $battle .= "##blob_text##" . $this->format_attack_string($res, $str) . "</font>\n\n";
+            $battle .= "##blob_text##" . $this->formatAttackString($res, $str) . "</font>\n\n";
         }
         return "Tower Battles: " . $this->bot->core("tools")
             ->make_blob("click to view", $battle);
@@ -272,7 +272,7 @@ class TowerAttack extends BaseActiveModule
     /*
     This gets called on a msg in the group
     */
-    function gmsg($name, $group, $msg)
+    function groupMessage($name, $group, $msg)
     {
         $attack = false;
         $victory = false;
@@ -316,15 +316,15 @@ class TowerAttack extends BaseActiveModule
                 }
                 else {
                     if (preg_match("/The tower (.+) in (.+) was just reduced to (.+) % health by (.+) from the (.+) organization!$/i", $msg, $info)) {
-                        $this->relay_tower_damage($info[1], $info[2], $info[3], $info[4], $info[5]);
+                        $this->relayTowerDamage($info[1], $info[2], $info[3], $info[4], $info[5]);
                     }
                     else {
                         if (preg_match("/The tower (.+) in (.+) was just reduced to (.+) % health by (.+)!$/i", $msg, $info)) {
-                            $this->relay_tower_damage($info[1], $info[2], $info[3], $info[4]);
+                            $this->relayTowerDamage($info[1], $info[2], $info[3], $info[4]);
                         }
                         else {
                             if (preg_match("/The tower (.+) in (.+) was just reduced to (.+) % health!$/i", $msg, $info)) {
-                                $this->relay_tower_damage($info[1], $info[2], $info[3]);
+                                $this->relayTowerDamage($info[1], $info[2], $info[3]);
                             }
                         }
                     }
@@ -333,7 +333,7 @@ class TowerAttack extends BaseActiveModule
         }
         if ($attack) {
             $infos["time"] = time();
-            $player = $this->bot->core("whois")
+            $player = $this->bot->core("whoIs")
                 ->lookup($infos["off_player"]);
             if ($player instanceof BotError) {
                 $player = array(
@@ -370,14 +370,14 @@ class TowerAttack extends BaseActiveModule
                 }
                 else {
                     if ($infos["off_guild"] != "") {
-                        $msg = $this->format_attack_string(
+                        $msg = $this->formatAttackString(
                             $infos, $this->bot
                                 ->core("settings")
                                 ->get("TowerAttack", "AttackStringOrged")
                         );
                     }
                     else {
-                        $msg = $this->format_attack_string(
+                        $msg = $this->formatAttackString(
                             $infos, $this->bot
                                 ->core("settings")
                                 ->get("TowerAttack", "AttackStringUnOrged")
@@ -404,7 +404,7 @@ class TowerAttack extends BaseActiveModule
 
 
     // Gets LCA Area info from LCA Table
-    function get_lcainfo($zone, $x, $y)
+    function getLcaInfo($zone, $x, $y)
     {
         $rad = 290; //Tower Attack Radius for LCA Table Search
         $glca = $this->bot->db->select(
@@ -439,7 +439,7 @@ class TowerAttack extends BaseActiveModule
     // def_side, zone, x_coord, y_coord. time is expected as unix timestamp, meaning seconds since unix 0 time. It is gmdate'd.
     // off_guild, off_player iand def_guild are colorized using off_side information.
     // #!br!# can be used to add linebreaks to the output.
-    function format_attack_string($infos, $string, $victory = false)
+    function formatAttackString($infos, $string, $victory = false)
     {
         if ($victory) {
             $infos["lca_num"] = "";
@@ -449,7 +449,7 @@ class TowerAttack extends BaseActiveModule
             $infos["blob"] = "";
         }
         else {
-            $lca = $this->get_lcainfo($infos["zone"], $infos["x_coord"], $infos["y_coord"]);
+            $lca = $this->getLcaInfo($infos["zone"], $infos["x_coord"], $infos["y_coord"]);
             $infos["lca_num"] = "##red##x" . $lca['pid'] . "</font>";
             $infos["lca_name"] = $lca["name"];
             $infos["lca_minlevel"] = $lca["lrng"];
@@ -472,7 +472,7 @@ class TowerAttack extends BaseActiveModule
                 ->get("Time", "FormatString"), $infos["time"]
         );
         if ($infos["off_side"] == "") {
-            $who = $this->bot->core("whois")->lookup($infos["off_player"]);
+            $who = $this->bot->core("whoIs")->lookup($infos["off_player"]);
             if ($who instanceof BotError) {
                 $infos["off_side"] = "error";
             }
@@ -503,7 +503,7 @@ class TowerAttack extends BaseActiveModule
                         $inside .= "##" . $this->suppressdata[$def_guild][0]["def_side"] . "##" . $def_guild . " ##end##in ";
                         $inside .= $this->suppressdata[$def_guild][0]["zone"] . " at " . $this->suppressdata[$def_guild][0]["x_coord"];
                         $inside .= "x" . $this->suppressdata[$def_guild][0]["y_coord"] . "##end####blob_text##\n";
-                        $lca = $this->get_lcainfo(
+                        $lca = $this->getLcaInfo(
                             $this->suppressdata[$def_guild][0]["zone"], $this->suppressdata[$def_guild][0]["x_coord"], $this->suppressdata[$def_guild][0]["y_coord"]
                         );
                         $inside .= "##white##LCA: ##red##x" . $lca['pid'] . "##end####normal## - " . $lca['name'] . "##end## ##highlight##(L " . $lca['lrng'] . " - " . $lca['hrng']
@@ -533,7 +533,7 @@ class TowerAttack extends BaseActiveModule
     }
 
 
-    function relay_tower_damage(
+    function relayTowerDamage(
         $tower, $zone, $health, $attacker = "",
         $org = ""
     )
@@ -548,7 +548,7 @@ class TowerAttack extends BaseActiveModule
         $msg = "The tower##highlight## " . $tower . "##end## in##highlight## " . $zone;
         $msg .= "##end## was just reduced to##highlight## " . $health . "##end## % health";
         if ($attacker != "") {
-            $who = $this->bot->core("whois")->lookup($attacker);
+            $who = $this->bot->core("whoIs")->lookup($attacker);
             if ($who instanceof BotError) {
                 $msg .= " by##Unknown## " . $attacker . "##end##";
             }

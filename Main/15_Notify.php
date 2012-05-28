@@ -40,12 +40,12 @@ class Notify_Core extends BasePassiveModule
     function Notify_Core(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("notify");
-        $this->update_cache();
+        $this->registerModule("notify");
+        $this->updateCache();
     }
 
 
-    function update_cache()
+    function updateCache()
     {
         $this->cache = array();
         $notifylist = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
@@ -121,7 +121,7 @@ class Notify_Core extends BasePassiveModule
     }
 
 
-    function list_cache()
+    function listCache()
     {
         $count = 0;
         $notify_list = $this->cache;
@@ -154,7 +154,7 @@ class Notify_Core extends BasePassiveModule
     }
 
 
-    function clear_cache()
+    function clearCache()
     {
         $count = 0;
         $count = count($this->cache);
@@ -164,7 +164,7 @@ class Notify_Core extends BasePassiveModule
     }
 
 
-    function get_all()
+    function getAll()
     {
         Return $this->cache;
     }

@@ -58,7 +58,7 @@ class ConfigMagik
     {
         /*		parent::__construct($bot, get_class($this));
 
-                $this -> register_module("ini");
+                $this -> registerModule("ini");
         */
         $this->PATH = $path;
         $this->create_ini($path, $synchronize, $process_sections);

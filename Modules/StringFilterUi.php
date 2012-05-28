@@ -42,7 +42,7 @@ class StringFilter_Interface extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'filter', 'ADMIN');
+        $this->registerCommand('all', 'filter', 'ADMIN');
         $this->help['description'] = 'Add and remove strings to the bot\'s filter.';
         $this->help['command']['filter'] = "- Display the current string filter list.";
         $this->help['command']['filter add <string>'] = "- Replace <strong> with default replacment text.";
@@ -51,7 +51,7 @@ class StringFilter_Interface extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $type)
+    function commandHandler($name, $msg, $type)
     {
         // preg_match just works better than explode for string based input that may have spaces.
         if (preg_match("/^filter add (.+?) replace: (.+)$/i", $msg, $info)) {

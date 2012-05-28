@@ -62,9 +62,9 @@ class AccessControlGUI extends BaseActiveModule
             $this->shortcuts[$long] = $short;
         }
         $this->channels = array(
-            "gc" => "##green##",
-            "pgmsg" => "##white##",
-            "tell" => "##seablue##"
+            "sendToGuildChat" => "##green##",
+            "sendToGroup" => "##white##",
+            "sendTell" => "##seablue##"
         );
         /*
         Create default access right for "commands" by SUPERADMIN if it is not set or set to DISABLED. You always want to be able to change the rights!
@@ -73,42 +73,42 @@ class AccessControlGUI extends BaseActiveModule
             ->get_min_access_level("commands") == OWNER + 1
         ) {
             $this->bot->core("access_control")
-                ->update_access("commands", "tell", "OWNER");
+                ->update_access("commands", "sendTell", "OWNER");
         }
-        $this->register_command("all", "channel", "SUPERADMIN");
-        $this->register_command("all", "commands", "SUPERADMIN");
+        $this->registerCommand("all", "channel", "SUPERADMIN");
+        $this->registerCommand("all", "commands", "SUPERADMIN");
         $this->help['description'] = "Allows you to set access controls for all commands in any channel.";
         $this->help['command']['commands'] = "Shows the GUI for setting access controls";
         $this->help['command']['channel'] = "Shows the current lock status for commands in guild chat and private chat group.";
-        $this->help['command']['channel [lock|unlock] [gc|pgmsg]'] = "Locks or unlocks access to commands in guild chat or private chat group.";
+        $this->help['command']['channel [lock|unlock] [sendToGuildChat|sendToGroup]'] = "Locks or unlocks access to commands in guild chat or private chat group.";
     }
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^commands$/i", $msg)) {
-            return $this->show_channels();
+            return $this->showChannels();
         }
-        elseif (preg_match("/^commands (gc|pgmsg|tell|all|extpgmsg)$/i", $msg, $info)) {
-            return $this->show_levels($name, $info[1]);
+        elseif (preg_match("/^commands (sendToGuildChat|sendToGroup|sendTell|all|externalPrivateGroupMessage)$/i", $msg, $info)) {
+            return $this->showLevels($name, $info[1]);
         }
         elseif (preg_match("/^commands subs ([a-z01-9]+)/i", $msg, $info)) {
-            return $this->show_sub_levels($name, $info[1]);
+            return $this->showSubLevels($name, $info[1]);
         }
-        elseif (preg_match("/^commands update (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
-            return $this->update_level($info[1], $info[2], $info[3]);
+        elseif (preg_match("/^commands update (sendToGuildChat|sendToGroup|sendTell|externalPrivateGroupMessage|all) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
+            return $this->updateLevel($info[1], $info[2], $info[3]);
         }
-        elseif (preg_match("/^commands update (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
-            return $this->update_level($info[1], $info[2], $info[4], $info[3]);
+        elseif (preg_match("/^commands update (sendToGuildChat|sendToGroup|sendTell|externalPrivateGroupMessage|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
+            return $this->updateLevel($info[1], $info[2], $info[4], $info[3]);
         }
-        elseif (preg_match("/^commands add (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
-            return $this->update_level($info[1], $info[2], $info[4], $info[3]);
+        elseif (preg_match("/^commands add (sendToGuildChat|sendToGroup|sendTell|externalPrivateGroupMessage|all) ([a-z01-9]+) ([a-z01-9]+) ([a-zA-Z]+)$/i", $msg, $info)) {
+            return $this->updateLevel($info[1], $info[2], $info[4], $info[3]);
         }
-        elseif (preg_match("/^commands (del|rem) (gc|pgmsg|tell|extpgmsg|all) ([a-z01-9]+) ([a-z01-9]+)$/i", $msg, $info)) {
-            return $this->update_level($info[2], $info[3], "DELETED", $info[4]);
+        elseif (preg_match("/^commands (del|rem) (sendToGuildChat|sendToGroup|sendTell|externalPrivateGroupMessage|all) ([a-z01-9]+) ([a-z01-9]+)$/i", $msg, $info)) {
+            return $this->updateLevel($info[2], $info[3], "DELETED", $info[4]);
         }
         elseif (preg_match("/^commands save (.+?) (.+)$/i", $msg, $info)) {
             return $this->save($info[1], $info[2]);
@@ -120,13 +120,13 @@ class AccessControlGUI extends BaseActiveModule
             return $this->saves();
         }
         elseif (preg_match("/^commands saves (rem|del) (.+)$/i", $msg, $info)) {
-            return $this->del_save($info[2]);
+            return $this->delSave($info[2]);
         }
-        elseif (preg_match("/^channel (lock|unlock) (gc|pgmsg)$/i", $msg, $info)) {
-            return $this->channel_lock($info[2], strtolower($info[1]) == "lock");
+        elseif (preg_match("/^channel (lock|unlock) (sendToGuildChat|sendToGroup)$/i", $msg, $info)) {
+            return $this->channelLock($info[2], strtolower($info[1]) == "lock");
         }
         elseif (preg_match("/^channel$/i", $msg, $info)) {
-            return $this->show_channel_locks();
+            return $this->showChannelLocks();
         }
         else {
             return $this->bot->core("tools")
@@ -138,28 +138,28 @@ class AccessControlGUI extends BaseActiveModule
     /*
     Show the channels with commands of this bot:
     */
-    function show_channels()
+    function showChannels()
     {
         $blob = "##ao_infotext##The following channels contain commands:##end##\n";
-        if ($this->bot->guildbot && !(empty($this->bot->commands["gc"]))) {
+        if ($this->bot->guildbot && !(empty($this->bot->commands["sendToGuildChat"]))) {
             $blob .= "\n" . $this->bot->core("tools")
-                ->chatcmd("commands gc", "Guild Channel");
+                ->chatcmd("commands sendToGuildChat", "Guild Channel");
         }
-        if (!(empty($this->bot->commands["pgmsg"]))) {
+        if (!(empty($this->bot->commands["sendToGroup"]))) {
             $blob .= "\n" . $this->bot->core("tools")
-                ->chatcmd("commands pgmsg", "Private Chatgroup");
+                ->chatcmd("commands sendToGroup", "Private Chatgroup");
         }
-        if (!(empty($this->bot->commands["tell"]))) {
+        if (!(empty($this->bot->commands["sendTell"]))) {
             $blob .= "\n" . $this->bot->core("tools")
-                ->chatcmd("commands tell", "Tells");
+                ->chatcmd("commands sendTell", "Tells");
         }
         if (!(empty($this->bot->commands))) {
             $blob .= "\n" . $this->bot->core("tools")
                 ->chatcmd("commands all", "All");
         }
-        if (!(empty($this->bot->commands["extpgmsg"]))) {
+        if (!(empty($this->bot->commands["externalPrivateGroupMessage"]))) {
             $blob .= "\n\n" . $this->bot->core("tools")
-                ->chatcmd("commands extpgmsg", "External chatgroups");
+                ->chatcmd("commands externalPrivateGroupMessage", "External chatgroups");
         }
         $blob .= "\n\n" . $this->bot->core("tools")
             ->chatcmd("commands saves", "Saved Access Control Levels");
@@ -170,25 +170,25 @@ class AccessControlGUI extends BaseActiveModule
     /*
     Shows the commands with current rights in the selected channel:
     */
-    function show_levels($name, $channel)
+    function showLevels($name, $channel)
     {
         $title = "Current access levels for ";
         $blob = " ##yellow## ::: ##end## ##ao_infotext##The current access levels for ";
         $channel = strtolower($channel);
         switch ($channel) {
-        case "gc":
+        case "sendToGuildChat":
             $blob .= "Guild Chat";
             $title .= "Guild Chat";
             break;
-        case "pgmsg":
+        case "sendToGroup":
             $blob .= "Private Chatgroup";
             $title .= "Private Chatgroup";
             break;
-        case "tell":
+        case "sendTell":
             $blob .= "Tells";
             $title .= "Tells";
             break;
-        case "extpgmsg":
+        case "externalPrivateGroupMessage":
             $blob .= "External Chatgroups";
             $title .= "External Chatgroups";
             break;
@@ -217,7 +217,7 @@ class AccessControlGUI extends BaseActiveModule
             }
         }
         else {
-            if (empty($this->bot->commands["gc"]) && empty($this->bot->commands["pgmsg"]) && empty($this->bot->commands["tell"])) {
+            if (empty($this->bot->commands["sendToGuildChat"]) && empty($this->bot->commands["sendToGroup"]) && empty($this->bot->commands["sendTell"])) {
                 return "No commands defined!";
             }
         }
@@ -253,13 +253,13 @@ class AccessControlGUI extends BaseActiveModule
                 }
             }
             else {
-                if (isset($this->bot->commands['gc'][$command]) || isset($this->bot->commands['pgmsg'][$command]) || isset($this->bot->commands['tell'][$command])) {
+                if (isset($this->bot->commands['sendToGuildChat'][$command]) || isset($this->bot->commands['sendToGroup'][$command]) || isset($this->bot->commands['sendTell'][$command])) {
                     $isset = TRUE;
                 }
             }
             if ($isset) {
                 $blob .= "<br>##highlight##<pre>{$command}##end##:";
-                $blob .= $this->Make_access_string($command, $right, $channel);
+                $blob .= $this->MakeAccessString($command, $right, $channel);
                 if (isset($subs[$command])) {
                     $blob .= "<br>&#8226; ";
                     $blob .= $this->bot->core("tools")
@@ -271,7 +271,7 @@ class AccessControlGUI extends BaseActiveModule
     }
 
 
-    function show_sub_levels($name, $command)
+    function showSubLevels($name, $command)
     {
         $command = strtolower($command);
         $title = "Current access levels for " . $command . " Subcommands";
@@ -283,7 +283,7 @@ class AccessControlGUI extends BaseActiveModule
             $blob .= "<br>" . $key . " = " . $val;
         }
         $blob .= "<br>";
-        if (empty($this->bot->commands['gc'][$command]) && empty($this->bot->commands['pgmsg'][$command]) && empty($this->bot->commands['tell'][$command])) {
+        if (empty($this->bot->commands['sendToGuildChat'][$command]) && empty($this->bot->commands['sendToGroup'][$command]) && empty($this->bot->commands['sendTell'][$command])) {
             return "command ##highlight##" . $command . "##end## Does not Exist!";
         }
         $result = $this->bot->db->select(
@@ -302,7 +302,7 @@ class AccessControlGUI extends BaseActiveModule
             if (isset($this->bot->commands[$channel][$command])) {
                 $blob .= "\n:: " . $channel . " ::\n";
                 foreach ($value as $subcommand => $right) {
-                    $blob .= "##highlight##{$command} {$subcommand}##end##:" . $this->Make_access_string($command . " " . $subcommand, $right, $channel);
+                    $blob .= "##highlight##{$command} {$subcommand}##end##:" . $this->MakeAccessString($command . " " . $subcommand, $right, $channel);
                     $blob .= " [" . $this->bot->core("tools")
                         ->chatcmd("commands del $channel $command $subcommand", "DEL");
                     $blob .= "]<br>";
@@ -313,7 +313,7 @@ class AccessControlGUI extends BaseActiveModule
     }
 
 
-    function Make_access_string($command, $current_level, $channel)
+    function MakeAccessString($command, $current_level, $channel)
     {
         if ($channel == "all") {
             foreach ($this->channels as $chan => $color) {
@@ -352,7 +352,7 @@ class AccessControlGUI extends BaseActiveModule
     /*
     Does some sanity checks before updating the minimal access level.
     */
-    function update_level($channel, $command, $newlevel, $subcommand = FALSE)
+    function updateLevel($channel, $command, $newlevel, $subcommand = FALSE)
     {
         $channel = strtolower($channel);
         $command = strtolower($command);
@@ -368,27 +368,27 @@ class AccessControlGUI extends BaseActiveModule
             return "Invalid access level selected!";
         }
         // Make sure you cannot disabled "commands" in tells at all - you don't want to lock yourself out from the bot!
-        if (($channel == "tell" || $channel == "all") && $command == "commands" && $newlevel == "DISABLED") {
+        if (($channel == "sendTell" || $channel == "all") && $command == "commands" && $newlevel == "DISABLED") {
             return "You cannot disable the commands management at all! You don't want to lock yourself out from the bot!";
         }
         if ($channel == "all") {
             if ($subcommand) {
                 $this->bot->core("access_control")
-                    ->update($command, $subcommand, "gc", $newlevel);
+                    ->update($command, $subcommand, "sendToGuildChat", $newlevel);
                 $this->bot->core("access_control")
-                    ->update($command, $subcommand, "tell", $newlevel);
+                    ->update($command, $subcommand, "sendTell", $newlevel);
                 $this->bot->core("access_control")
-                    ->update($command, $subcommand, "pgmsg", $newlevel);
+                    ->update($command, $subcommand, "sendToGroup", $newlevel);
                 return "Minimal access level to use##highlight## " . $command . " " . $subcommand . "##end## in##highlight## All Channels##end## set to##highlight## " . $newlevel
                     . "##end##";
             }
             else {
                 $this->bot->core("access_control")
-                    ->update_access($command, "gc", $newlevel);
+                    ->update_access($command, "sendToGuildChat", $newlevel);
                 $this->bot->core("access_control")
-                    ->update_access($command, "tell", $newlevel);
+                    ->update_access($command, "sendTell", $newlevel);
                 $this->bot->core("access_control")
-                    ->update_access($command, "pgmsg", $newlevel);
+                    ->update_access($command, "sendToGroup", $newlevel);
                 return "Minimal access level to use##highlight## " . $command . "##end## in##highlight## All Channels##end## set to##highlight## " . $newlevel . "##end##";
             }
         }
@@ -454,7 +454,7 @@ class AccessControlGUI extends BaseActiveModule
     }
 
 
-    function del_save($name)
+    function delSave($name)
     {
         $result = $this->bot->db->select("SELECT name FROM #___access_control_saves WHERE name = '" . mysql_escape_string($name) . "'");
         if (empty($result)) {
@@ -467,12 +467,12 @@ class AccessControlGUI extends BaseActiveModule
     }
 
 
-    function channel_lock($channel, $lock)
+    function channelLock($channel, $lock)
     {
         $channel = strtolower($channel);
         $lock = $lock === TRUE;
         $msg = "##error##Error!##end##";
-        if ($channel == "gc") {
+        if ($channel == "sendToGuildChat") {
             $this->bot->core("settings")
                 ->save("AccessControl", "LockGc", $lock);
             $msg = "All commands in##highlight## guild chat##end## are now ";
@@ -483,7 +483,7 @@ class AccessControlGUI extends BaseActiveModule
                 $msg .= "##green##free to be used##end##!";
             }
         }
-        elseif ($channel == "pgmsg") {
+        elseif ($channel == "sendToGroup") {
             $this->bot->core("settings")
                 ->save("AccessControl", "LockPgroup", $lock);
             $msg = "All commands in##highlight## private group##end## are now ";
@@ -498,7 +498,7 @@ class AccessControlGUI extends BaseActiveModule
     }
 
 
-    function show_channel_locks()
+    function showChannelLocks()
     {
         $msg = "Access to commands in##highlight## guild chat##end## is ";
         if ($this->bot->core("settings")->get("AccessControl", "LockGc")) {

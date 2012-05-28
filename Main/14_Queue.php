@@ -55,8 +55,8 @@ class Queue_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
 
-        $this->register_module("queue");
-        $this->register_event("cron", "1sec");
+        $this->registerModule("queue");
+        $this->registerEvent("cron", "1sec");
 
         $this->queue = array();
         $this->queue_low = array();
@@ -85,7 +85,7 @@ class Queue_Core extends BasePassiveModule
     {
         foreach ($this->link as $name => $mod) {
             if (!empty($this->queue[$name])) {
-                $this->set_queue($name);
+                $this->setQueue($name);
                 foreach ($this->queue[$name] as $key => $value) {
                     if ($this->queue_left[$name] >= 1) {
                         $mod->queue($name, $value);
@@ -96,7 +96,7 @@ class Queue_Core extends BasePassiveModule
                 }
             }
             if (!empty($this->queue_low[$name]) && empty($this->queue[$name])) {
-                $this->set_queue($name);
+                $this->setQueue($name);
                 foreach ($this->queue_low[$name] as $key => $value) {
                     if ($this->queue_left[$name] >= 1) {
                         $mod->queue($name, $value);
@@ -113,7 +113,7 @@ class Queue_Core extends BasePassiveModule
     /*
     Sets messages left...
     */
-    function set_queue($name)
+    function setQueue($name)
     {
         $time = time();
         $add = ($time - $this->last_call[$name]) / $this->delay[$name];
@@ -133,12 +133,12 @@ class Queue_Core extends BasePassiveModule
 
 
     /*
-    Checks if tell can be sent. true if yes, false it has to be put to queue
+    Checks if sendTell can be sent. true if yes, false it has to be put to queue
     */
-    function check_queue($name)
+    function checkQueue($name)
     {
         $name = strtolower($name);
-        $this->set_queue($name);
+        $this->setQueue($name);
         if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
             $this->queue_left[$name] -= 1;
             return TRUE;
@@ -150,7 +150,7 @@ class Queue_Core extends BasePassiveModule
     /*
     Puts a msg into queue
     */
-    function into_queue($name, $info, $priority = 0)
+    function intoQueue($name, $info, $priority = 0)
     {
         $name = strtolower($name);
         if ($priority == 0) {

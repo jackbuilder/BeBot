@@ -47,19 +47,19 @@ class Say extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->whosaidthat = array();
         // Setup Access Control
-        $this->register_command("all", "say", "ADMIN");
-        $this->register_command("all", "whosaidthat", "MEMBER");
+        $this->registerCommand("all", "say", "ADMIN");
+        $this->registerCommand("all", "whoSaidThat", "MEMBER");
         $this->bot->core("settings")
-            ->create("Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either gc, pgmsg, both or original channel.", "gc;pgmsg;both;origin");
+            ->create("Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either sendToGuildChat, sendToGroup, both or original channel.", "sendToGuildChat;sendToGroup;both;origin");
         $this->help['description'] = 'Makes the bot say things.';
         $this->help['command']['say something'] = "Makes that bot say 'something'";
-        $this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
+        $this->help['command']['whoSaidThat'] = "Find out who made the bot say that.";
     }
 
 
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     { // Start function handler()
-        $args = $this->parse_com(
+        $args = $this->parseCommand(
             $msg, array(
                 "com",
                 "args"
@@ -72,23 +72,23 @@ class Say extends BaseActiveModule
                     ->get("Say", "OutputChannel")
             ) == "origin"
             ) {
-                return $this->saythis($name, $args['args']);
+                return $this->sayThis($name, $args['args']);
             }
             else {
                 $this->bot->send_output(
-                    $name, $this->saythis($name, $args['args']), $this->bot
+                    $name, $this->sayThis($name, $args['args']), $this->bot
                         ->core("settings")->get("Say", "OutputChannel")
                 );
             }
             return FALSE;
-        case "whosaidthat":
-            return $this->whosaidthat();
+        case "whoSaidThat":
+            return $this->whoSaidThat();
         }
         $this->bot->send_help($name);
         return FALSE;
     } // End function handler()
 
-    function saythis($name, $message)
+    function sayThis($name, $message)
     {
         $this->whosaidthat['time'] = time();
         $this->whosaidthat['name'] = $name;
@@ -97,7 +97,7 @@ class Say extends BaseActiveModule
     }
 
 
-    function whosaidthat()
+    function whoSaidThat()
     {
         if (empty($this->whosaidthat)) {
             $output = "Nobody has used the say command since I logged in.";

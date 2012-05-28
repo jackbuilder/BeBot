@@ -43,17 +43,17 @@ class Whois extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->help['description'] = 'Shows information about a player';
-        $this->help['command']['whois <name>'] = "Shows information about player <name>.";
-        $this->register_command("all", "whois", "GUEST");
+        $this->help['command']['whoIs <name>'] = "Shows information about player <name>.";
+        $this->registerCommand("all", "whoIs", "GUEST");
         $this->bot->core("colors")
-            ->define_scheme("whois", "alienlevel", "lightgreen");
+            ->define_scheme("whoIs", "alienlevel", "lightgreen");
         $this->bot->core("colors")
-            ->define_scheme("whois", "level", "lightbeige");
-        $this->bot->core("colors")->define_scheme("whois", "name", "yellow");
-        $this->bot->core("colors")->define_scheme("whois", "info", "normal");
+            ->define_scheme("whoIs", "level", "lightbeige");
+        $this->bot->core("colors")->define_scheme("whoIs", "name", "yellow");
+        $this->bot->core("colors")->define_scheme("whoIs", "info", "normal");
         $this->bot->core("colors")
-            ->define_scheme("whois", "profession", "lightbeige");
-        $this->bot->core("colors")->define_scheme("whois", "orginfo", "normal");
+            ->define_scheme("whoIs", "profession", "lightbeige");
+        $this->bot->core("colors")->define_scheme("whoIs", "orginfo", "normal");
         if ($this->bot->guildbot) {
             $altstat = TRUE;
         }
@@ -61,9 +61,9 @@ class Whois extends BaseActiveModule
             $altstat = FALSE;
         }
         $this->bot->core("settings")
-            ->create("Whois", "Details", TRUE, "Should we display a detailed view window with the whois?");
+            ->create("Whois", "Details", TRUE, "Should we display a detailed view window with the whoIs?");
         $this->bot->core("settings")
-            ->create("Whois", "Alts", $altstat, "Should we display known alts window when showing whois info?");
+            ->create("Whois", "Alts", $altstat, "Should we display known alts window when showing whoIs info?");
         $this->bot->core("settings")
             ->create("Whois", "Online", TRUE, "Should we display if the player is online?");
         $this->bot->core("settings")
@@ -72,7 +72,7 @@ class Whois extends BaseActiveModule
             "Should we display the name of a characters main if they are on a registered alt? This only makes sense if Details are enabled and/or Alts is disabled "
         );
         $this->bot->core("settings")
-            ->create("Whois", "Banned", TRUE, "Should Banned Status be returned on a whois?");
+            ->create("Whois", "Banned", TRUE, "Should Banned Status be returned on a whoIs?");
         $this->bot->core("settings")
             ->create("Whois", "ShowOptions", TRUE, "Should we display options and link to other information commands in details window?");
         $this->bot->core("settings")
@@ -84,12 +84,12 @@ class Whois extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $type)
+    function commandHandler($name, $msg, $type)
     {
-        preg_match("/^whois (.+)$/i", $msg, $info);
+        preg_match("/^whoIs (.+)$/i", $msg, $info);
         $id = $this->bot->core("player")->id($info[1]);
         if ($id && !($id instanceof BotError)) {
-            return $this->whois_player($name, $info[1], $type);
+            return $this->whoisPlayer($name, $info[1], $type);
         }
         else {
             return "Player ##highlight##" . $info[1] . " ##end##does not exist.";
@@ -100,14 +100,14 @@ class Whois extends BaseActiveModule
     /*
     Returns info about the player
     */
-    function whois_player($source, $name, $origin)
+    function whoisPlayer($source, $name, $origin)
     {
         $name = ucfirst(strtolower($name));
         if ($this->bot->game == "aoc") {
             $this->name[$name] = $source;
             $this->origin[$name] = $origin;
         }
-        $who = $this->bot->core("whois")->lookup($name);
+        $who = $this->bot->core("whoIs")->lookup($name);
         if (!$who || ($who instanceof BotError)) {
             return FALSE;
         }
@@ -153,7 +153,7 @@ class Whois extends BaseActiveModule
         if ($this->bot->game == "ao") {
             $result .= "##" . $who["faction"] . "##" . $who["faction"] . "##end##";
         }
-        if ($this->bot->core("settings")->get("whois", "banned")) {
+        if ($this->bot->core("settings")->get("whoIs", "banned")) {
             $banned = $this->bot->core("security")
                 ->get_access_level_player($name);
             if ($banned == -1) {
@@ -201,7 +201,7 @@ class Whois extends BaseActiveModule
                     $result .= " :: Alt of $main";
                 }
             }
-            $result .= " :: " . $this->bot->core("whois")
+            $result .= " :: " . $this->bot->core("whoIs")
                 ->whois_details($source, $who);
         }
         elseif ($this->bot->core("settings")->get("Whois", "Alts")) {

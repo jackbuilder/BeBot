@@ -48,8 +48,8 @@ class ModuleCatcher_Core extends BasePassiveModule
     function __construct(&$bot, $core, $mod)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("module_core");
-        $this->register_event("connect");
+        $this->registerModule("module_core");
+        $this->registerEvent("connect");
         $this->core_directories = $core;
         $this->module_directories = $mod;
     }

@@ -1,6 +1,6 @@
 <?php
 /*
-* Whois.php - Funcom XML whois lookup with database caching.
+* Whois.php - Funcom XML whoIs lookup with database caching.
 *
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -32,7 +32,7 @@
 *  USA
 */
 /*
-whois($name):
+whoIs($name):
 Preform an XML lookup for $name
 - On error returns
 instanceof BotError with description of the error.
@@ -53,7 +53,7 @@ $array["at"] - Character alien defender rank name or NULL
 $array["at_id"] - Character alien defender rank id or NULL
 $array["pictureurl"] - URL to character picture
 */
-$whois_core = new Whois_Core($bot);
+$whoisCore = new Whois_Core($bot);
 class Whois_Core extends BasePassiveModule
 {
 
@@ -61,10 +61,10 @@ class Whois_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         /*
-        Create tables for our whois cache if it does not already exsist.
+        Create tables for our whoIs cache if it does not already exsist.
         */
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whois", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whoIs", "false") . " (
 					ID BIGINT NOT NULL default '0',
 					nickname varchar(15) NOT NULL default '',
 					firstname varchar(20) NOT NULL default '',
@@ -83,8 +83,8 @@ class Whois_Core extends BasePassiveModule
 						'20','21','22','23','24','25','26','27','28','29','30') NOT NULL default '0',
 					org_id bigint(10) NOT NULL default '0',
 					org_name varchar(50) NOT NULL default '',
-					org_rank varchar(20) NOT NULL default '',
-					org_rank_id enum('0','1','2','3','4','5','6','7','8','9','10') NOT NULL default '0',
+					orgRank varchar(20) NOT NULL default '',
+					orgRankId enum('0','1','2','3','4','5','6','7','8','9','10') NOT NULL default '0',
 					pictureurl varchar(100) NOT NULL default '',
 					used bigint(25) NOT NULL default '0',
 					updated int(10) NOT NULL default '0',
@@ -100,16 +100,16 @@ class Whois_Core extends BasePassiveModule
 					KEY used (used)
 				)"
         );
-        $this->register_module("whois");
-        $this->register_event("cron", "1hour");
+        $this->registerModule("whoIs");
+        $this->registerEvent("cron", "1hour");
         $this->cache = array();
-        $this->alien_rank_name = array();
-        $this->alien_rank = array();
-        $this->create_name_cache();
+        $this->alienRankName = array();
+        $this->alienRank = array();
+        $this->createNameCache();
         $this->bot->core("settings")
             ->create(
             "Whois", "MaxCacheSize", 100,
-            "What is the maximum number of whois entries that should be cached internally in the bot at the same time to reduce load on the SQL server?",
+            "What is the maximum number of whoIs entries that should be cached internally in the bot at the same time to reduce load on the SQL server?",
             "10;25;50;75;100;200;300;500;1000"
         );
         $this->bot->core("settings")
@@ -121,40 +121,40 @@ class Whois_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create(
             "Whois", "TimeValid", 1,
-            "After how many days should the whois information in a database entry be considered outdated and looked for an update? NOTICE: Only use values higher then one day if you have trouble connecting to the FC website or are running the external updating script.",
+            "After how many days should the whoIs information in a database entry be considered outdated and looked for an update? NOTICE: Only use values higher then one day if you have trouble connecting to the FC website or are running the external updating script.",
             "1;2;3;4;5"
         );
         $this->bot->core("settings")
             ->create('Whois', 'LookupOrder', 'funcom_auno', 'Which order should we use to look up players information?', 'funcom_auno;auno_funcom;funcom_only;auno_only');
         $this->bot->core("settings")
             ->create('Whois', "Debug", FALSE, "Show debug information (such as Character ID, Org ID, etc)");
-        $this->update_table();
+        $this->updateTable();
     }
 
 
-    function update_table()
+    function updateTable()
     {
-        if ($this->bot->db->get_version("whois") == 5) {
+        if ($this->bot->db->get_version("whoIs") == 5) {
             return;
         }
-        switch ($this->bot->db->get_version("whois")) {
+        switch ($this->bot->db->get_version("whoIs")) {
         case 1: // Update Table version to prevent repeat update calls
             //was an update for a setting
-            $this->bot->db->set_version("whois", 2);
-            $this->update_table();
+            $this->bot->db->set_version("whoIs", 2);
+            $this->updateTable();
             return;
         case 2:
-            $this->bot->db->set_version("whois", 3);
-            $this->update_table();
+            $this->bot->db->set_version("whoIs", 3);
+            $this->updateTable();
             return;
         case 3:
-            $this->bot->db->set_version("whois", 4);
-            $this->update_table();
+            $this->bot->db->set_version("whoIs", 4);
+            $this->updateTable();
             return;
         case 4:
-            $this->bot->db->update_table("whois", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
-            $this->bot->db->set_version("whois", 5);
-            $this->update_table();
+            $this->bot->db->update_table("whoIs", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
+            $this->bot->db->set_version("whoIs", 5);
+            $this->updateTable();
             return;
         default:
         }
@@ -162,55 +162,55 @@ class Whois_Core extends BasePassiveModule
     }
 
 
-    function create_name_cache()
+    function createNameCache()
     {
-        $this->alien_rank_name[0] = "None";
-        $this->alien_rank_name[1] = "Fledgling";
-        $this->alien_rank_name[2] = "Amateur";
-        $this->alien_rank_name[3] = "Beginner";
-        $this->alien_rank_name[4] = "Starter";
-        $this->alien_rank_name[5] = "Newcomer";
-        $this->alien_rank_name[6] = "Student";
-        $this->alien_rank_name[7] = "Common";
-        $this->alien_rank_name[8] = "Intermediate";
-        $this->alien_rank_name[9] = "Mediocre";
-        $this->alien_rank_name[10] = "Fair";
-        $this->alien_rank_name[11] = "Able";
-        $this->alien_rank_name[12] = "Accomplished";
-        $this->alien_rank_name[13] = "Adept";
-        $this->alien_rank_name[14] = "Qualified";
-        $this->alien_rank_name[15] = "Competent";
-        $this->alien_rank_name[16] = "Suited";
-        $this->alien_rank_name[17] = "Talented";
-        $this->alien_rank_name[18] = "Trustworthy";
-        $this->alien_rank_name[19] = "Supporter";
-        $this->alien_rank_name[20] = "Backer";
-        $this->alien_rank_name[21] = "Defender";
-        $this->alien_rank_name[22] = "Challenger";
-        $this->alien_rank_name[23] = "Patron";
-        $this->alien_rank_name[24] = "Protector";
-        $this->alien_rank_name[25] = "Medalist";
-        $this->alien_rank_name[26] = "Champ";
-        $this->alien_rank_name[27] = "Hero";
-        $this->alien_rank_name[28] = "Guardian";
-        $this->alien_rank_name[29] = "Vanquisher";
-        $this->alien_rank_name[30] = "Vindicator";
-        foreach ($this->alien_rank_name as $level => $name) {
-            $this->alien_rank[$name] = $level;
+        $this->alienRankName[0] = "None";
+        $this->alienRankName[1] = "Fledgling";
+        $this->alienRankName[2] = "Amateur";
+        $this->alienRankName[3] = "Beginner";
+        $this->alienRankName[4] = "Starter";
+        $this->alienRankName[5] = "Newcomer";
+        $this->alienRankName[6] = "Student";
+        $this->alienRankName[7] = "Common";
+        $this->alienRankName[8] = "Intermediate";
+        $this->alienRankName[9] = "Mediocre";
+        $this->alienRankName[10] = "Fair";
+        $this->alienRankName[11] = "Able";
+        $this->alienRankName[12] = "Accomplished";
+        $this->alienRankName[13] = "Adept";
+        $this->alienRankName[14] = "Qualified";
+        $this->alienRankName[15] = "Competent";
+        $this->alienRankName[16] = "Suited";
+        $this->alienRankName[17] = "Talented";
+        $this->alienRankName[18] = "Trustworthy";
+        $this->alienRankName[19] = "Supporter";
+        $this->alienRankName[20] = "Backer";
+        $this->alienRankName[21] = "Defender";
+        $this->alienRankName[22] = "Challenger";
+        $this->alienRankName[23] = "Patron";
+        $this->alienRankName[24] = "Protector";
+        $this->alienRankName[25] = "Medalist";
+        $this->alienRankName[26] = "Champ";
+        $this->alienRankName[27] = "Hero";
+        $this->alienRankName[28] = "Guardian";
+        $this->alienRankName[29] = "Vanquisher";
+        $this->alienRankName[30] = "Vindicator";
+        foreach ($this->alienRankName as $level => $name) {
+            $this->alienRank[$name] = $level;
         }
     }
 
 
     function cron()
     {
-        $this->cleanup_cache();
+        $this->cleanupCache();
     }
 
 
     // Removes old entries from cache to make room for new ones
     // All entries older then MaxTimeInCache get removed
     // If none meets this requirement the oldest entry gets removed to free one spot
-    function cleanup_cache()
+    function cleanupCache()
     {
         $oldesttime = -1;
         $oldestname = "";
@@ -243,7 +243,7 @@ class Whois_Core extends BasePassiveModule
 
 
     // Remove $who from cache
-    function remove_from_cache($who)
+    function removeFromCache($who)
     {
         if (isset($this->cache[$who])) {
             unset($this->cache[$who]);
@@ -252,13 +252,13 @@ class Whois_Core extends BasePassiveModule
 
 
     // Add $who to cache, make sure cache doesn't grow too large
-    function add_to_cache($who)
+    function addToCache($who)
     {
         // If cache has grown to maximum size clean it up
         if (count($this->cache) >= $this->bot->core("settings")
             ->get("Whois", "MaxCacheSize")
         ) {
-            $this->cleanup_cache();
+            $this->cleanupCache();
         }
         // We got room now, just add the new entry to cache
         $who["timestamp"] = time();
@@ -267,10 +267,10 @@ class Whois_Core extends BasePassiveModule
 
 
     /**
-     * Internal whois function with caching. Code mainly by Alreadythere.
+     * Internal whoIs function with caching. Code mainly by Alreadythere.
      *
-     * @param $name      User name of the player to lookup whois information
-     * @param $noupdate  If no stale data is cached, get whois information by retrieving funcoms xml player list via web.
+     * @param $name      User name of the player to lookup whoIs information
+     * @param $noupdate  If no stale data is cached, get whoIs information by retrieving funcoms xml player list via web.
      * @param $nowait    This has NO MEANING AT ALL! It only exists to be compatible with the AoC equivalent of this function.
      *
      * @return The WHO array, or false, or BotError
@@ -318,12 +318,12 @@ class Whois_Core extends BasePassiveModule
             $who["profession"] = $lookup[0]['profession'];
             $who["class"] = $lookup[0]['profession'];
             $who["faction"] = $lookup[0]['faction'];
-            $who["rank"] = $lookup[0]['org_rank'];
-            $who["rank_id"] = $lookup[0]['org_rank_id'];
+            $who["rank"] = $lookup[0]['orgRank'];
+            $who["rank_id"] = $lookup[0]['orgRankId'];
             $who["org"] = stripslashes($lookup[0]['org_name']);
             $who["org_id"] = $lookup[0]['org_id'];
             $who["at_id"] = $lookup[0]['defender_rank_id'];
-            $who["at"] = $this->alien_rank_name[$who["at_id"]];
+            $who["at"] = $this->alienRankName[$who["at_id"]];
             $who["pictureurl"] = $lookup[0]['pictureurl'];
             // Check if user id needs to be updated, only done if entry in DB has 0 as UID:
             if ($lookup[0]['ID'] == 0 || $lookup[0]['ID'] == -1) {
@@ -335,10 +335,10 @@ class Whois_Core extends BasePassiveModule
             If the result isn't stale yet and the userid's match, use it.
             */
             if ($lookup[0]['updated'] >= (time() - ($this->bot->core("settings")
-                ->get("whois", "timevalid") * 24 * 3600))
+                ->get("whoIs", "timevalid") * 24 * 3600))
                 && $lookup[0]['ID'] == $uid
             ) {
-                $this->add_to_cache($who);
+                $this->addToCache($who);
                 return $who;
             }
         }
@@ -358,14 +358,14 @@ class Whois_Core extends BasePassiveModule
                 //        we already chached and returned it. If it wasn't up-to-date there
                 //        is no point in chaching it. However we might wanna return the
                 //        outdated info, because the caller didn't want to update it.
-                $this->add_to_cache($who);
+                $this->addToCache($who);
                 return $who;
             }
         }
         /*
         Get XML data via the web.
         */
-        $result = $this->get_playerxml($name);
+        $result = $this->getPlayerXml($name);
         /*
         We got a result.
         */
@@ -406,7 +406,7 @@ class Whois_Core extends BasePassiveModule
             if ($who["at_id"] == '') {
                 $who["at_id"] = '0';
             }
-            $who["at"] = $this->alien_rank_name[$who["at_id"]];
+            $who["at"] = $this->alienRankName[$who["at_id"]];
             $who["pictureurl"] = $this->bot->core("tools")
                 ->xmlparse($result, "pictureurl");
             /*
@@ -414,7 +414,7 @@ class Whois_Core extends BasePassiveModule
             */
             $this->update($who);
             // Cache result
-            $this->add_to_cache($who);
+            $this->addToCache($who);
             return $who;
         }
         /*
@@ -442,8 +442,8 @@ class Whois_Core extends BasePassiveModule
     Return whatever we get. If both FunCom and Auno's XML fail,
     you rewrite $xml->description.
     */
-    function get_playerxml($name)
-    { // Start function get_playerxml()
+    function getPlayerXml($name)
+    { // Start function getPlayerXml()
         $name = strtolower($name);
         $fcurl = "http://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower($name) . "/bio.xml";
         $aunourl = "http://auno.org/ao/char.php?output=xml&dimension=" . $this->bot->dimension . "&name=" . strtolower($name);
@@ -476,14 +476,14 @@ class Whois_Core extends BasePassiveModule
             $site1URL = $fcurl;
         }
         $xml = $this->bot->core("tools")->get_site($site1URL);
-        $xml = $this->check_xml($xml);
+        $xml = $this->checkXml($xml);
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $this->bot->core("statistics")
                 ->capture_statistic("Whois", "Lookup", $site1NAME);
         }
         if (($xml instanceof BotError) && $site2NAME) {
             $xml = $this->bot->core("tools")->get_site($site2URL);
-            $xml = $this->check_xml($xml);
+            $xml = $this->checkXml($xml);
             if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
                 $this->bot->core("statistics")
                     ->capture_statistic("Whois", "Lookup", $site2NAME);
@@ -492,7 +492,7 @@ class Whois_Core extends BasePassiveModule
         if ($xml instanceof BotError) {
             // If we get here, both Auno and FunCom XML lookups have failed.
             // Rewrite the error message to reflect this before returning.
-            $xml->set_description("people.anarchy-online.com and www.auno.org lookups have failed for $name.");
+            $xml->setDescription("people.anarchy-online.com and www.auno.org lookups have failed for $name.");
             if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
                 $this->bot->core("statistics")
                     ->capture_statistic("Whois", "Lookup", "BadName");
@@ -500,13 +500,13 @@ class Whois_Core extends BasePassiveModule
         }
         // Retrun whatever we've got at this point.
         return $xml;
-    } // End function get_playerxml()
+    } // End function getPlayerXml()
 
     /*
     Performs a quick check to make sure XML data is parsable.
     */
-    function check_xml($xml)
-    { // Start function check_xml()
+    function checkXml($xml)
+    { // Start function checkXml()
         if ($xml instanceof BotError) {
             return $xml; // The XML is bad to start with, no more checking needed.
         }
@@ -535,10 +535,10 @@ class Whois_Core extends BasePassiveModule
         else {
             return $xml;
         } // If we get here, all should be well.
-    } // End function check_xml()
+    } // End function checkXml()
 
     /*
-    Updates whois cache info with passed array.
+    Updates whoIs cache info with passed array.
     */
     function update($who)
     { // Start function update()
@@ -560,7 +560,7 @@ class Whois_Core extends BasePassiveModule
             */
             $this->bot->db->query(
                 "INSERT INTO #___whois (id, nickname, firstname, lastname, level, gender, breed, faction,"
-                    . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"]
+                    . " profession, defender_rank_id, org_id, org_name, orgRank, orgRankId, pictureurl, updated)" . " VALUES ('" . $who["id"] . "', '" . $who["nickname"]
                     . "', '" . mysql_real_escape_string($who["firstname"]) . "', '" . mysql_real_escape_string($who["lastname"]) . "', '" . $who["level"] . "', '" . $who["gender"]
                     . "', '" . $who["breed"] . "', '" . $who["faction"] . "', '" . $who["profession"] . "', '" . $who["at_id"] . "', '" . $who["org_id"] . "', '"
                     . mysql_real_escape_string($who["org"]) . "', '" . $who["rank"] . "', '" . $who["rank_id"] . "', '" . $who["pictureurl"] . "','" . time()
@@ -568,10 +568,10 @@ class Whois_Core extends BasePassiveModule
                     . "firstname = VALUES(firstname), lastname = VALUES(lastname), level = VALUES(level), gender = VALUES(gender), "
                     . "breed = VALUES(breed), faction = VALUES(faction), profession = VALUES(profession), "
                     . "defender_rank_id = VALUES(defender_rank_id), pictureurl = VALUES(pictureurl), updated = VALUES(updated), "
-                    . "org_id = VALUES(org_id), org_name = VALUES(org_name), org_rank = VALUES(org_rank), org_rank_id = VALUES(org_rank_id)"
+                    . "org_id = VALUES(org_id), org_name = VALUES(org_name), orgRank = VALUES(orgRank), orgRankId = VALUES(orgRankId)"
             );
             // Clear from memory cache
-            $this->remove_from_cache($who["nickname"]);
+            $this->removeFromCache($who["nickname"]);
             return TRUE;
         }
         else {
@@ -579,7 +579,7 @@ class Whois_Core extends BasePassiveModule
         }
     } // End function udpate()
 
-    function whois_details($source, $whois)
+    function whoisDetails($source, $whois)
     {
         $seen = "";
         $alts = "";
@@ -652,7 +652,7 @@ class Whois_Core extends BasePassiveModule
         if ($this->bot->core("settings")->get('Whois', 'Debug')) {
             $whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
             $user_debug = $this->bot->db->select(
-                "SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC
+                "SELECT id,notify,userLevel,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC
             );
             $window .= "\n##red## Debug Information:##end##\n";
             if (isset($whois_debug[0]) && !empty($whois_debug[0]['updated'])) {
@@ -692,21 +692,21 @@ class Whois_Core extends BasePassiveModule
                     $flag .= "Notify";
                     $flag_count++;
                 }
-                if ($user_debug[0]['user_level'] == 2) {
+                if ($user_debug[0]['userLevel'] == 2) {
                     if ($flag_count >= 1) {
                         $flag .= ", ";
                     }
                     $flag .= "Member";
                     $flag_count++;
                 }
-                if ($user_debug[0]['user_level'] == 1) {
+                if ($user_debug[0]['userLevel'] == 1) {
                     if ($flag_count >= 1) {
                         $flag .= ", ";
                     }
                     $flag .= "Guest";
                     $flag_count++;
                 }
-                if ($user_debug[0]['user_level'] == 0) {
+                if ($user_debug[0]['userLevel'] == 0) {
                     if ($flag_count >= 1) {
                         $flag .= ", ";
                     }

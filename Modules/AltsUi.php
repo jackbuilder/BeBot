@@ -45,8 +45,8 @@ class Alts extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "alts", "GUEST", array("confirm" => "ANONYMOUS"));
-        $this->register_command("all", "altadmin", "ADMIN");
+        $this->registerCommand("all", "alts", "GUEST", array("confirm" => "ANONYMOUS"));
+        $this->registerCommand("all", "altadmin", "ADMIN");
         $this->help['description'] = "Shows information about alternative characters.";
         $this->help['command']['alts [player]'] = "Shows information about [player]. If no player is given it shows information about your alts";
         $this->help['command']['alts add <player>'] = "Adds <player> as your alt.";
@@ -63,7 +63,7 @@ class Alts extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $security = FALSE;
         $vars = explode(' ', strtolower($msg));
@@ -80,16 +80,16 @@ class Alts extends BaseActiveModule
         case 'alts':
             switch ($vars[1]) {
             case 'add':
-                return $this->add_alt($name, $vars[2]);
+                return $this->addAlt($name, $vars[2]);
             case 'del':
             case 'rem':
-                return $this->del_alt($name, $vars[2]);
+                return $this->delAlt($name, $vars[2]);
             case '':
-                return $this->display_alts($name);
+                return $this->displayAlts($name);
             case 'confirm':
                 return $this->confirm($name, $vars[2]);
             default:
-                return $this->display_alts($vars[1]);
+                return $this->displayAlts($vars[1]);
             }
         case 'altadmin':
             switch ($vars[1]) {
@@ -108,15 +108,15 @@ class Alts extends BaseActiveModule
                         return "##error##Character ##highlight##$vars[3]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
                     }
                     else {
-                        return $this->add_alt($vars[2], $vars[3], 1);
+                        return $this->addAlt($vars[2], $vars[3], 1);
                     }
                 }
                 else {
-                    return $this->add_alt($vars[2], $vars[3], 1);
+                    return $this->addAlt($vars[2], $vars[3], 1);
                 }
             case 'rem':
             case 'del':
-                return $this->del_alt($vars[2], $vars[3]);
+                return $this->delAlt($vars[2], $vars[3]);
             case 'confirm':
                 return $this->confirm($vars[3], $vars[2]);
             default:
@@ -129,13 +129,13 @@ class Alts extends BaseActiveModule
     }
 
 
-    function display_alts($name)
+    function displayAlts($name)
     {
         if (!$this->bot->core("player")->id($name)) {
             return "##error##Character ##highlight##$name##end## does not exist.##end##";
         }
 
-        $whois = $this->bot->core("whois")->lookup($name);
+        $whois = $this->bot->core("whoIs")->lookup($name);
 
         if ($whois instanceof BotError) {
             $whois = array('nickname' => $name);
@@ -164,7 +164,7 @@ class Alts extends BaseActiveModule
     /*
     Adds an alt to your alt list
     */
-    function add_alt($name, $alt, $admin = 0)
+    function addAlt($name, $alt, $admin = 0)
     {
         $security = FALSE;
         $name = ucfirst(strtolower($name));
@@ -252,7 +252,7 @@ class Alts extends BaseActiveModule
     /*
     Removes an alt form your alt list
     */
-    function del_alt($name, $alt)
+    function delAlt($name, $alt)
     {
         $name = ucfirst(strtolower($name));
         $alt = ucfirst(strtolower($alt));

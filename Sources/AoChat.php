@@ -165,7 +165,7 @@ class AOChat
     /* Initialization */
     private function __construct($bothandle)
     {
-        $this->bot = Bot::get_instance($bothandle);
+        $this->bot = Bot::getInstance($bothandle);
         $this->bothandle = $bothandle;
         $this->disconnect();
         $this->login_num = 0;
@@ -648,7 +648,7 @@ class AOChat
     function get_packet()
     {
         // Get the bot instance
-        $bot = Bot::get_instance($this->bothandle);
+        $bot = Bot::getInstance($this->bothandle);
         // Include a the signal_message (Should probably be included somewhere else)
         //require_once ('Dispatcher/signal_message.php');
         $head = $this->read_data(4);
@@ -700,7 +700,7 @@ class AOChat
             break;
             // invites
         case AOCP_PRIVGRP_INVITE:
-            // Event is a privgroup invite
+            // Event is a privateGroup invite
             list ($gid) = $packet->args;
             //$signal = new signal_message('aochat', $gid, 'invite');
             //$dispatcher->post($signal, 'onGroupInvite');
@@ -849,7 +849,7 @@ class AOChat
             }
             break;
         case AOCP_PRIVGRP_CLIJOIN:
-            // Event is someone joining the privgroup
+            // Event is someone joining the privateGroup
             // Deprecated call. Should listen to the signal already sendt.
             list ($id, $name) = $packet->args;
 
@@ -868,7 +868,7 @@ class AOChat
             $bot->inc_pgjoin($packet->args);
             break;
         case AOCP_PRIVGRP_CLIPART:
-            // Event is someone leaveing the privgroup
+            // Event is someone leaveing the privateGroup
             list ($id, $name) = $packet->args;
 
             //$signal = new signal_message('aochat', $id, 'leave');
@@ -886,7 +886,7 @@ class AOChat
             break;
             // Messages
         case AOCP_MSG_PRIVATE:
-            // Event is a tell
+            // Event is a sendTell
             // Tells should always be commands
             list ($id, $message) = $packet->args;
 
@@ -905,7 +905,7 @@ class AOChat
             $bot->inc_tell($packet->args);
             break;
         case AOCP_PRIVGRP_MESSAGE:
-            // Event is a privgroup message
+            // Event is a privateGroup message
             list (, $id, $message) = $packet->args;
             //$signal = new signal_message('aochat', $id, $message);
             //$dispatcher->post($signal, 'onPgMessage');

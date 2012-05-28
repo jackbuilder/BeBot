@@ -46,7 +46,7 @@ class Trickle extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'trickle', 'GUEST');
+        $this->registerCommand('all', 'trickle', 'GUEST');
         $this->help['description'] = "This command calculates the triclke-down to skills that come from increasing base abillities.";
         $this->help['command']['trickle [sta <num>] [agi <num>] [int <num>] [sen <num>] [str <num>] [psy <num>]']
             = 'Will show the amount of skill you gain by increasing the base abilities.';
@@ -310,11 +310,11 @@ class Trickle extends BaseActiveModule
     }
 
 
-    function command_handler($source, $msg, $type)
+    function commandHandler($source, $msg, $type)
     {
         $this->error->reset();
         $msg = strtolower($msg);
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'stat1',
@@ -360,12 +360,12 @@ class Trickle extends BaseActiveModule
                 $stats[$com['stat' . $cnt]] = intval($com['val' . $cnt]);
             }
         }
-        $trickle = $this->Calc_trickle($stats);
+        $trickle = $this->CalcTrickle($stats);
         return ($this->CreateBlob($stats, $trickle));
     }
 
 
-    function Calc_trickle($upgrade)
+    function CalcTrickle($upgrade)
     {
         foreach ($this->skill as $group_name => $group) {
             foreach ($group as $item_name => $item) {

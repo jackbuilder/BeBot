@@ -44,7 +44,7 @@ class BanManager extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command(
+        $this->registerCommand(
             "all", "ban", "GUEST", array(
                 "add" => "ADMIN",
                 "del" => "ADMIN"
@@ -61,7 +61,7 @@ class BanManager extends BaseActiveModule
         $this->help['command']['ban rem <name>'] = "Unbans <name>.";
         $this->bot->core("command_alias")->register("ban list", "banlist");
         $this->bot->core("command_alias")->register("ban", "blacklist");
-        $this->register_event("cron", "5min");
+        $this->registerEvent("cron", "5min");
         $this->bot->core("settings")
             ->create("Ban", "ReqReason", FALSE, "is a Reason Required?");
     }
@@ -69,7 +69,7 @@ class BanManager extends BaseActiveModule
 
     function cron()
     {
-        $unbans = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level = -1 AND banned_until > 0 AND banned_until <= " . time());
+        $unbans = $this->bot->db->select("SELECT nickname FROM #___users WHERE userLevel = -1 AND banned_until > 0 AND banned_until <= " . time());
         if (!empty($unbans)) {
             foreach ($unbans as $unban) {
                 $this->bot->core("security")
@@ -79,36 +79,36 @@ class BanManager extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^ban$/i", $msg) || preg_match("/^ban list$/i", $msg)) {
-            return $this->show_ban_list();
+            return $this->showBanList();
         }
         elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?)$/i", $msg, $info)) {
-            return $this->add_ban($name, $info[1], $info[2], "");
+            return $this->addBan($name, $info[1], $info[2], "");
         }
         elseif (preg_match("/^ban add ([a-z0-9]+)$/i", $msg, $info)) {
-            return $this->add_ban($name, $info[1], "0", "");
+            return $this->addBan($name, $info[1], "0", "");
         }
         elseif (preg_match("/^ban add ([a-z0-9]+) ([0-9]+[mhd]?) (.+)$/i", $msg, $info)) {
-            return $this->add_ban($name, $info[1], $info[2], $info[3]);
+            return $this->addBan($name, $info[1], $info[2], $info[3]);
         }
         elseif (preg_match("/^ban add ([a-z0-9]+) (.+)$/i", $msg, $info)) {
-            return $this->add_ban($name, $info[1], "0", $info[2]);
+            return $this->addBan($name, $info[1], "0", $info[2]);
         }
         elseif (preg_match("/^ban del ([a-z0-9]+)$/i", $msg, $info)) {
-            return $this->del_ban($name, $info[1]);
+            return $this->delBan($name, $info[1]);
         }
         elseif (preg_match("/^ban rem ([a-z0-9]+)$/i", $msg, $info)) {
-            return $this->del_ban($name, $info[1]);
+            return $this->delBan($name, $info[1]);
         }
         return $this->bot->send_help($name, "ban");
     }
 
 
-    function show_ban_list()
+    function showBanList()
     {
-        $banned = $this->bot->db->select("SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE user_level = -1 ORDER BY nickname");
+        $banned = $this->bot->db->select("SELECT nickname, banned_by, banned_at, banned_for, banned_until FROM #___users WHERE userLevel = -1 ORDER BY nickname");
         if (empty($banned)) {
             return "Nobody is banned!";
         }
@@ -116,7 +116,7 @@ class BanManager extends BaseActiveModule
         $banlist = "##blob_title## ::: All banned characters for " . $this->bot->botname . " :::##end##\n";
         foreach ($banned as $ban) {
             $blob = "\n" . $ban[0] . " " . $this->bot->core("tools")
-                ->chatcmd("whois " . $ban[0], "[WHOIS]");
+                ->chatcmd("whoIs " . $ban[0], "[WHOIS]");
             $blob .= " " . $this->bot->core("tools")
                 ->chatcmd("ban del " . $ban[0], "[UNBAN]") . "\n";
             $blob .= $this->bot->core("colors")
@@ -151,7 +151,7 @@ class BanManager extends BaseActiveModule
     }
 
 
-    function add_ban($source, $user, $duration, $reason)
+    function addBan($source, $user, $duration, $reason)
     {
         $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));
@@ -192,7 +192,7 @@ class BanManager extends BaseActiveModule
     }
 
 
-    function del_ban($source, $user)
+    function delBan($source, $user)
     {
         $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));

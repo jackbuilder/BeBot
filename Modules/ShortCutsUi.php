@@ -38,14 +38,14 @@ class ShortCutGUI extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("all", "shortcuts", "SUPERADMIN");
+        $this->registerCommand("all", "shortcuts", "SUPERADMIN");
         $this->help['description'] = "Allows you view, add and delete entries in the shortcut database.";
         $this->help['command']['shortcuts'] = "Shows currently existing shortcuts with corresponding long entries and allows deleting selected entries.";
         $this->help['command']['shortcuts add "<short>" "<long>"'] = "Adds <short> as shortcut for <long> to the database. Neither <short> nor <long> can contain any \".";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^shortcuts$/i", $msg)) {
             return $this->show_shortcuts();
@@ -59,7 +59,7 @@ class ShortCutGUI extends BaseActiveModule
     }
 
 
-    function show_shortcuts()
+    function showShortcuts()
     {
         $shortcuts = $this->bot->db->select("SELECT shortcut, long_desc, id FROM #___shortcuts ORDER BY shortcut ASC");
         if (empty($shortcuts)) {

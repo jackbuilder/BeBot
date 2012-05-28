@@ -49,10 +49,10 @@ class LeadEcho extends BaseActiveModule
             ->create("Leader", "Echo", FALSE, "Is the chat echo for the leader activated or nor?");
         $this->bot->core("settings")
             ->create("Leader", "LeaderAccess", TRUE, "Does being leader give you at least LEADER access in the bot?");
-        $this->register_command("pgmsg", "leader", "LEADER");
-        $this->register_command("pgmsg", "repeat", "LEADER");
-        $this->register_event("privgroup");
-        $this->register_event("pgleave");
+        $this->registerCommand("sendToGroup", "leader", "LEADER");
+        $this->registerCommand("sendToGroup", "repeat", "LEADER");
+        $this->registerEvent("privateGroup");
+        $this->registerEvent("privateGroupLeave");
         $this->bot->core("colors")
             ->define_scheme("leader_echo", "spam", "yellow");
         $this->help['description'] = 'Gives some LEADER access and highlights his chat';
@@ -62,9 +62,9 @@ class LeadEcho extends BaseActiveModule
 
 
     /*
-    This gets called on a msg in the privgroup with a command
+    This gets called on a msg in the privateGroup with a command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $highlight = $this->bot->core("colors")->get("highlight");
         $repeatstring = "<br>Repeat is ";
@@ -77,14 +77,14 @@ class LeadEcho extends BaseActiveModule
         $repeatstring .= " Use !repeat on|off to toggle it.";
         if (preg_match("/^leader$/i", $msg)) {
             if ($this->bot->core("settings")->get("Leader", "Name") != $name) {
-                return $this->set_leader($name, $name, $repeatstring);
+                return $this->setLeader($name, $name, $repeatstring);
             }
             else {
-                return $this->set_leader($name, "", $repeatstring);
+                return $this->setLeader($name, "", $repeatstring);
             }
         }
         elseif (preg_match("/^leader ?(.*)/i", $msg, $info)) {
-            return $this->set_leader($name, ucfirst(strtolower($info[1])), $repeatstring);
+            return $this->setLeader($name, ucfirst(strtolower($info[1])), $repeatstring);
         }
         elseif (preg_match("/^repeat on$/i", $msg)) {
             $this->bot->core("settings")->save("leader", "echo", TRUE);
@@ -97,7 +97,7 @@ class LeadEcho extends BaseActiveModule
     }
 
 
-    function set_leader($caller, $leadername, $repeatstring)
+    function setLeader($caller, $leadername, $repeatstring)
     {
         // Check if lead is just cleared, can only happen as current leader due to regexp:
         if ($leadername == "") {
@@ -134,9 +134,9 @@ class LeadEcho extends BaseActiveModule
 
 
     /*
-    This gets called on a msg in the privgroup without a command
+    This gets called on a msg in the privateGroup without a command
     */
-    function privgroup($name, $msg)
+    function privateGroup($name, $msg)
     {
         if ($name == $this->bot->core("settings")
             ->get("Leader", "Name")
@@ -150,9 +150,9 @@ class LeadEcho extends BaseActiveModule
 
 
     /*
-     This gets called if someone leaves the privgroup
+     This gets called if someone leaves the privateGroup
     */
-    function pgleave($name)
+    function privateGroupLeave($name)
     {
         // clear leader if leader leaves the channel:
         if ($name == $this->bot->core("settings")->get("Leader", "Name")) {

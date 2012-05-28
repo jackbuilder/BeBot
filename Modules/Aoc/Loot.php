@@ -47,24 +47,24 @@ class Rolls extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->count = 0;
-        $this->register_command(
-            "gc", "loot", "ANONYMOUS", array(
+        $this->registerCommand(
+            "sendToGuildChat", "loot", "ANONYMOUS", array(
                 "add" => "ANONYMOUS",
                 "rem" => "ANONYMOUS",
                 "list" => "ANONYMOUS",
                 "clear" => "ADMIN",
                 "result" => "ADMIN",
-                "reroll" => "ADMIN"
+                "reRoll" => "ADMIN"
             )
         );
-        $this->register_command(
-            "tell", "loot", "ANONYMOUS", array(
+        $this->registerCommand(
+            "sendTell", "loot", "ANONYMOUS", array(
                 "add" => "ANONYMOUS",
                 "rem" => "ANONYMOUS",
                 "list" => "ANONYMOUS",
                 "clear" => "ADMIN",
                 "result" => "ADMIN",
-                "reroll" => "ADMIN"
+                "reRoll" => "ADMIN"
             )
         );
         $this->bot->core("settings")
@@ -78,19 +78,19 @@ class Rolls extends BaseActiveModule
         $this->help['command']['loot list'] = "Lists all items and who is rolling for them.";
         $this->help['command']['loot clear'] = "Clears all rolls.";
         $this->help['command']['loot result'] = "Rolls for all the items and announces winners.";
-        $this->help['command']['loot reroll'] = "Adds any unwon items from the last roll to a new roll.";
+        $this->help['command']['loot reRoll'] = "Adds any unwon items from the last roll to a new roll.";
     }
 
 
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
-    sutible for output via send_tell, send_gc, and send_pgroup.
+    sutible for output via sendTell, sendGuildChat, and sendPrivateGroup.
     */
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     { // Start function handler()
         $this->error->reset(); //Reset the error message so we don't trigger the handler by old error messages.
-        $com = $this->parse_com(
+        $com = $this->parseCommand(
             $msg, array(
                 'com',
                 'sub',
@@ -113,7 +113,7 @@ class Rolls extends BaseActiveModule
         case 'add':
             $this->add($name, $com['args'], FALSE);
             break;
-        case 'reroll':
+        case 'reRoll':
             $this->reroll($name);
             break;
         case 'rem':
@@ -259,7 +259,7 @@ class Rolls extends BaseActiveModule
     }
 
 
-    function reroll($name)
+    function reRoll($name)
     {
         $lcount = count($this->leftovers);
         if ($lcount == 0) {
@@ -294,7 +294,7 @@ class Rolls extends BaseActiveModule
     }
 
 
-    function rlist()
+    function rList()
     {
         $num = 0;
         unset($msg);

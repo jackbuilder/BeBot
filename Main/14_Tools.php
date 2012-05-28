@@ -41,9 +41,9 @@ class tools extends BasePassiveModule
     {
 
         parent::__construct($bot, get_class($this));
-        $this->register_module("tools");
+        $this->registerModule("tools");
         $this->bot->core("settings")
-            ->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in get_site() even if Curl is available?");
+            ->create("tools", "force_sockets", FALSE, "Should we force the usage of Sockets in getSite() even if Curl is available?");
         $this->bot->core("settings")
             ->create("tools", "connect_timeout", 25, "How long in seconds should we wait for data to be returned from the webserver when making get_data calls?");
         // Please do not change this string.
@@ -52,11 +52,12 @@ class tools extends BasePassiveModule
     }
 
 
-    function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
+    function chatCommand($link, $title, $origin = FALSE, $strip = FALSE)
     {
         $origin = strtolower($origin);
         $msgstrip = "";
         switch ($origin) {
+        case 'sendToGuildChat':
         case 'gc':
         case 'o':
         case 'gu':
@@ -68,7 +69,8 @@ class tools extends BasePassiveModule
                 $chatcmd = "o <pre>";
             }
             Break;
-        case 'pgmsg':
+        case 'sendToGroup':
+        case 'pgrp':
         case 'pg':
         case '2':
             $chatcmd = "group " . $this->bot->botname . " <pre>";
@@ -76,11 +78,12 @@ class tools extends BasePassiveModule
         case 'start':
             $chatcmd = "start ";
             Break;
+        case 'sendTell':
         case 'tell':
         case '0':
         case '1':
         case FALSE:
-            $chatcmd = "tell " . $this->bot->botname . " <pre>";
+            $chatcmd = "sendTell " . $this->bot->botname . " <pre>";
             Break;
         case '/':
             $chatcmd = "";
@@ -91,32 +94,32 @@ class tools extends BasePassiveModule
         if ($strip) {
             $msgstrip = "style=text-decoration:none ";
         }
-        Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
+        Return ('<a ' . $msgstrip . 'href=\'chatCommand:///' . $chatcmd . $link . '\'>' . $title . '</a>');
     }
 
 
-    function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
+    function getSite($url, $strip_headers = FALSE, $read_timeout = FALSE)
     {
         if (!function_exists('curl_init')
             || ($this->bot->core("settings")
                 ->get("tools", "force_sockets") == TRUE)
         ) {
-            Return $this->get_site_sock($url, $strip_headers, $read_timeout);
+            Return $this->getSiteSock($url, $strip_headers, $read_timeout);
         }
         else {
-            Return $this->get_site_curl($url, $strip_headers, $read_timeout);
+            Return $this->getSiteCurl($url, $strip_headers, $read_timeout);
         }
     }
 
 
-    function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
+    function getSiteSock($url, $strip_headers = FALSE, $read_timeout = FALSE)
     {
-        $return = $this->get_site_data($url, $strip_headers, $read_timeout);
+        $return = $this->getSiteData($url, $strip_headers, $read_timeout);
         if (($return instanceof BotError) && $this->use_proxy_server && !empty($this->proxy_server_address)) {
             echo "We're using a proxy\n";
             foreach ($this->proxy_server_address as $proxy) {
                 echo "Trying proxy: " . $proxy . "\n";
-                $return = $this->get_site_data($url, $strip_headers, $read_timeout, $proxy);
+                $return = $this->getSiteData($url, $strip_headers, $read_timeout, $proxy);
                 if (!($return instanceof BotError)) {
                     break;
                 }
@@ -134,7 +137,7 @@ class tools extends BasePassiveModule
     /*
     Gets the data from a URL
     */
-    function get_site_data(
+    function getSiteData(
         $url, $strip_headers = FALSE, $read_timeout = FALSE,
         $proxy = ''
     )
@@ -220,7 +223,7 @@ class tools extends BasePassiveModule
     }
 
 
-    function get_site_curl(
+    function getSiteCurl(
         $url, $strip_headers = FALSE, $timeout = FALSE,
         $post = NULL,
         $login = NULL
@@ -275,7 +278,7 @@ class tools extends BasePassiveModule
     /*
     Parse XML crap
     */
-    function xmlparse($xml, $tag)
+    function XmlParse($xml, $tag)
     {
         $tmp = explode("<" . $tag . ">", $xml);
         if (!isset($tmp[1])) {
@@ -286,15 +289,15 @@ class tools extends BasePassiveModule
     }
 
 
-    function make_blob($title, $content, $header = TRUE)
+    function makeBlob($title, $content, $header = TRUE)
     {
         $inside = "";
         if ($header) {
             // Generic header for all info windows, shamelessly borrowed from VhaBot
             $inside .= "##blob_title##:::::::::::##end## ##blob_text##BeBot Client Terminal##end## ##blob_title##::::::::::::##end##\n";
-            $inside .= $this->chatcmd('about', '##blob_title##�##end## ##blob_text##About##end## ##blob_title##�##end##', FALSE, TRUE) . "     ";
-            $inside .= $this->chatcmd('help', '##blob_title##�##end## ##blob_text##Help##end## ##blob_title##�##end##', FALSE, TRUE) . "     ";
-            $inside .= $this->chatcmd('close InfoView', '##blob_title##�##end## ##blob_text##Close Terminal##end## ##blob_title##�##end##', '/', TRUE);
+            $inside .= $this->chatCommand('about', '##blob_title##�##end## ##blob_text##About##end## ##blob_title##�##end##', FALSE, TRUE) . "     ";
+            $inside .= $this->chatCommand('help', '##blob_title##�##end## ##blob_text##Help##end## ##blob_title##�##end##', FALSE, TRUE) . "     ";
+            $inside .= $this->chatCommand('close InfoView', '##blob_title##�##end## ##blob_text##Close Terminal##end## ##blob_title##�##end##', '/', TRUE);
             $inside .= "\n##blob_title##������������������������������������##end##\n";
         }
         // Using " inside a blob will end the blob.
@@ -311,7 +314,7 @@ class tools extends BasePassiveModule
     /*
     Creates a text blob.
     */
-    function make_item(
+    function makeItem(
         $lowid, $highid, $ql, $name, $alt = FALSE,
         $strip = FALSE
     )
@@ -333,7 +336,7 @@ class tools extends BasePassiveModule
     Takes an item string and returns an array with lowid, highid, ql and name.
     If $item is unparsable it returns a BotError
     */
-    function parse_item($item)
+    function parseItem($item)
     {
         $pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         preg_match($pattern, $item, $parts);
@@ -350,7 +353,7 @@ class tools extends BasePassiveModule
 
 
     //Returns true if $item is an itemref, false otherwise.
-    function is_item($item)
+    function isItem($item)
     {
         $pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         preg_match($pattern, $item, $parts);
@@ -365,7 +368,7 @@ class tools extends BasePassiveModule
     Used to convert an overflowed (unsigned) integer to a string with the correct positive unsigned integer value
     If the passed integer is not negative, the integer is merely passed back in string form with no modifications.
     */
-    function int_to_string($int)
+    function intToString($int)
     {
         if ($int <= -1) {
             $int += (float)"4294967296";
@@ -378,7 +381,7 @@ class tools extends BasePassiveModule
     Used to convert an unsigned interger in string form to an overflowed (negative) integere
     If the passed string is not an integer large enough to overflow, the string is merely passed back in integer form with no modifications.
     */
-    function string_to_int($string)
+    function stringToInt($string)
     {
         $int = (float)$string;
         if ($int > (float)2147483647) {
@@ -393,7 +396,7 @@ class tools extends BasePassiveModule
     Returns BotError on failure
     Returns ucfirst(strtolower($name)) if the player exists.
     */
-    function validate_player($name, $check_exists = TRUE)
+    function validatePlayer($name, $check_exists = TRUE)
     {
         $name = trim(ucfirst(strtolower($name)));
         if (strlen($name) < 3 || strlen($name) > 14) {
@@ -415,7 +418,7 @@ class tools extends BasePassiveModule
     }
 
 
-    function my_rand($min = FALSE, $max = FALSE)
+    function myRand($min = FALSE, $max = FALSE)
     {
         // For now we only support Mersienne Twister, but this can be changed.
         $this->randomsource = "Mersenne Twister";
@@ -428,7 +431,7 @@ class tools extends BasePassiveModule
     }
 
 
-    function best_match($find, $in, $perc = 0)
+    function bestMatch($find, $in, $perc = 0)
     {
         $use = array(0);
         $percentage = 0;

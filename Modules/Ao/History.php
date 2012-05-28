@@ -45,17 +45,17 @@ class History extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'history', 'GUEST');
+        $this->registerCommand('all', 'history', 'GUEST');
         $this->help['description'] = "Plugin to display the history of a player.";
         $this->help['command']['history <name>'] = "Shows the history of the player <name>";
         $this->help['notes'] = "No notes";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (preg_match("/^history (.+)$/i", $msg, $info)) {
-            return $this->player_history($info[1]);
+            return $this->playerHistory($info[1]);
         }
         else {
             if (preg_match("/^history$/i", $msg, $info)) {
@@ -69,7 +69,7 @@ class History extends BaseActiveModule
     /*
       Get info on player
     */
-    function player_history($name)
+    function playerHistory($name)
     {
         $name = ucfirst(strtolower($name));
         $id = $this->bot->core('player')->id($name);

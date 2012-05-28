@@ -52,16 +52,16 @@ class Raid extends BaseActiveModule
         $this->user = array();
         $this->announce = 0;
         $this->locked = FALSE;
-        $this->register_command("all", "c", "LEADER");
-        $this->register_command("all", "raid", "GUEST");
+        $this->registerCommand("all", "c", "LEADER");
+        $this->registerCommand("all", "raid", "GUEST");
         if ($this->bot->game == "ao") {
-            $this->register_event("pgleave");
-            $this->register_event("pgjoin");
-            $this->register_event("buddy");
+            $this->registerEvent("privateGroupLeave");
+            $this->registerEvent("privateGroupJoin");
+            $this->registerEvent("buddy");
         }
-        //$this -> register_event("connect");
-        $this->register_event("logon_notify");
-        $this->register_module("raid");
+        //$this -> registerEvent("connect");
+        $this->registerEvent("logon_notify");
+        $this->registerModule("raid");
         if ($this->bot->game == "ao") {
             $this->bot->core("settings")
                 ->create("Raid", "Remonleave", TRUE, "Automatically remove players from the raid if they leave <botname>'s channel?", "On;Off", FALSE, 15);
@@ -111,8 +111,8 @@ class Raid extends BaseActiveModule
         $this->help['command']['raid check'] = "Generates a list of active raiders with assist links in a window for attendance checking.";
         $this->help['command']['raid check <text>']
             = "put a copy and paste of the results of a raid check in <text> to have bot output a missing notice and to get a short list with kick links.";
-        $this->help['command']['raid notin'] = "Sent tells to all user in privgroup saying they arnt in raid if they arnt.";
-        $this->help['command']['raid notinkick'] = "Kicks all user in privgroup who arnt in raid.";
+        $this->help['command']['raid notIn'] = "Sent tells to all user in privateGroup saying they arnt in raid if they arnt.";
+        $this->help['command']['raid notInKick'] = "Kicks all user in privateGroup who arnt in raid.";
         $this->help['command']['raid list'] = "list all user who are or where in the raid and there status.";
         $this->help['command']['c <message>'] = "Raid command. Display <message> in a highly visiable manner.";
         $this->help['notes'] = "All commands except join and leave are restricted to users with " . $this->bot
@@ -126,35 +126,35 @@ class Raid extends BaseActiveModule
 				end INT default '0',
 				UNIQUE (name, time))"
         );
-        $this->restart_raid();
+        $this->restartRaid();
     }
 
 
-    function command_handler($name, $msg, $type)
+    function commandHandler($name, $msg, $type)
     {
         $var = explode(" ", $msg, 2);
         switch (strtolower($var[0])) {
         case 'c':
-            $this->raid_command($name, $var[1]);
+            $this->raidCommand($name, $var[1]);
             Break;
         case 'raid':
             $var = explode(" ", $msg, 4);
             switch (strtolower($var[1])) {
             case 'start':
-                Return $this->start_raid($name, $var[2], $var[3]);
+                Return $this->startRaid($name, $var[2], $var[3]);
             case 'stop':
             case 'end':
-                Return $this->end_raid($name);
+                Return $this->endRaid($name);
             case 'join':
-                return $this->join_raid($name);
+                return $this->joinRaid($name);
             case 'leave':
-                $return = $this->leave_raid($name);
-                if ($type == "tell") {
+                $return = $this->leaveRaid($name);
+                if ($type == "sendTell") {
                     Return $return;
                 }
                 Break;
             case 'kick':
-                Return $this->kick_raid($name, $var[2], $var[3], $origin);
+                Return $this->kickRaid($name, $var[2], $var[3], $origin);
             case 'check':
                 if (!empty($var[3])) {
                     $desc = $var[2] . " " . $var[3];
@@ -162,30 +162,30 @@ class Raid extends BaseActiveModule
                 else {
                     $desc = $var[2];
                 }
-                Return $this->check_raid($name, $desc);
+                Return $this->checkRaid($name, $desc);
             case 'lock':
             case 'unlock':
-                $return = $this->lock_raid($name, $var[1]);
-                if ($type == "tell") {
+                $return = $this->lockRaid($name, $var[1]);
+                if ($type == "sendTell") {
                     Return $return;
                 }
                 Break;
             case 'add':
-                return $this->addto_raid($name, $var[2], $type);
+                return $this->addToRaid($name, $var[2], $type);
             case 'reward':
             case 'give':
-                $this->add_point($name, $var[2], $var[3]);
+                $this->addPoint($name, $var[2], $var[3]);
                 Break;
             case 'punish':
             case 'take':
-                $this->rem_point($name, $var[2], $var[3]);
+                $this->remPoint($name, $var[2], $var[3]);
                 Break;
             case 'pause':
                 Return $this->pause(TRUE);
             case 'unpause':
                 Return $this->pause(FALSE);
             case 'announce':
-                Return $this->set_announce($name, $var[2]);
+                Return $this->setAnnounce($name, $var[2]);
             case 'description':
                 if (!empty($var[3])) {
                     $desc = $var[2] . " " . $var[3];
@@ -193,17 +193,17 @@ class Raid extends BaseActiveModule
                 else {
                     $desc = $var[2];
                 }
-                Return $this->set_description($name, $desc);
+                Return $this->setDescription($name, $desc);
             case 'level':
             case 'minlevel':
-                Return $this->change_level($name, $var[2]);
+                Return $this->changeLevel($name, $var[2]);
             case 'list':
-                Return $this->list_users($name);
-            case 'tell':
-            case 'notin':
-                Return $this->notin($name);
-            case 'notinkick':
-                Return $this->notinkick($name);
+                Return $this->listUsers($name);
+            case 'sendTell':
+            case 'notIn':
+                Return $this->notIn($name);
+            case 'notInKick':
+                Return $this->notInKick($name);
             case 'move':
                 Return $this->move($name, $var[2]);
             case 'tank':
@@ -213,11 +213,11 @@ class Raid extends BaseActiveModule
                 else {
                     $tank = $var[2];
                 }
-                Return $this->set_tank($name, $tank);
+                Return $this->setTank($name, $tank);
             case 'showtank':
-                Return $this->show_tank($name, $var[2]);
+                Return $this->showTank($name, $var[2]);
             case 'showcallers':
-                Return $this->show_callers($name, $var[2]);
+                Return $this->showCallers($name, $var[2]);
             case 'note':
                 if (!empty($var[3])) {
                     $this->note = $var[2] . " " . $var[3];
@@ -246,7 +246,7 @@ class Raid extends BaseActiveModule
                                 ->core("time")
                                 ->format_seconds($move) . " ##end##";
                         }
-                        return ucfirst($this->type) . " Raid is running: ##highlight##" . $this->description . "##end##" . $move . " :: " . $this->clickjoin();
+                        return ucfirst($this->type) . " Raid is running: ##highlight##" . $this->description . "##end##" . $move . " :: " . $this->clickJoin();
                     }
                 }
             }
@@ -266,7 +266,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function restart_raid()
+    function restartRaid()
     {
         $raiding = $this->bot->db->select("SELECT nickname, raidingas FROM #___raid_points WHERE raiding = 1");
         if (!empty($raiding)) {
@@ -283,7 +283,7 @@ class Raid extends BaseActiveModule
             $this->locked = (bool)$info[3];
             $this->paused = TRUE;
             $this->start = $info[1];
-            $this->register_event("cron", "1min");
+            $this->registerEvent("cron", "1min");
             echo "Raid Restarted for " . $info[0] . "\n";
             foreach ($raiding as $raider) {
                 $this->user2[$raider[1]] = "Bot Restart";
@@ -293,23 +293,23 @@ class Raid extends BaseActiveModule
 
 
     /*
-    This gets called if someone leaves the privgroup
+    This gets called if someone leaves the privateGroup
     */
-    function pgleave($name)
+    function privateGroupLeave($name)
     {
         if ($this->bot->core("settings")->get("Raid", "Remonleave")) {
             if (isset($this->user[$name])) {
                 unset($this->user[$name]);
                 $this->user2[$name] = "Left PrivGroup";
                 $this->pgleave[$name] = time();
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($name));
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->pointsTo($name));
                 $this->bot->send_output("", "##highlight##$name##end## was removed from the raid.", "both");
             }
         }
     }
 
 
-    function pgjoin($name)
+    function privateGroupJoin($name)
     {
         if ($this->bot->core("settings")
             ->get("Raid", "Remonleave")
@@ -321,7 +321,7 @@ class Raid extends BaseActiveModule
                     $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 }
                 $this->user[$name] = $this->bot->core('player')->id($name);
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 1, raidingas = '" . $name . "' WHERE id = " . $this->points_to($name));
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 1, raidingas = '" . $name . "' WHERE id = " . $this->pointsTo($name));
                 $this->bot->send_output("", "##highlight##$name##end## has Rejoined the raid.", "both");
             }
         }
@@ -336,11 +336,11 @@ class Raid extends BaseActiveModule
                 $move = ", Move in ##highlight##" . $this->bot->core("time")
                     ->format_seconds($move) . " ##end##";
             }
-            $who = $this->bot->core("whois")->lookup($name);
+            $who = $this->bot->core("whoIs")->lookup($name);
             if ($who['level'] < $this->minlevel) {
                 Return;
             }
-            $this->bot->send_tell($name, "Raid is running: ##highlight##" . $this->description . "##end##" . $move . " :: " . $this->clickjoin(TRUE));
+            $this->bot->send_tell($name, "Raid is running: ##highlight##" . $this->description . "##end##" . $move . " :: " . $this->clickJoin(TRUE));
         }
     }
 
@@ -358,7 +358,7 @@ class Raid extends BaseActiveModule
     /*
     Starts a Raid
     */
-    function start_raid($name, $desc)
+    function startRaid($name, $desc)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -384,12 +384,12 @@ class Raid extends BaseActiveModule
                     ->get("Raid", "showcallers");
                 $this->pgleave = array();
                 $this->start = time();
-                $this->bot->send_output($name, "##highlight##$name##end## has started the raid :: " . $this->clickjoin(), "both");
+                $this->bot->send_output($name, "##highlight##$name##end## has started the raid :: " . $this->clickJoin(), "both");
                 $this->pause(TRUE);
                 $this->save();
-                $this->register_event("cron", "1min");
+                $this->registerEvent("cron", "1min");
                 return "Raid started. :: " . $this->control();
-                if (isset($this->bot->commands["tell"]["raidhistory"])) {
+                if (isset($this->bot->commands["sendTell"]["raidhistory"])) {
                     $this->bot->db->query("INSERT INTO #___raid_details (name, description, start) VALUES ('$name', '" . mysql_real_escape_string($desc) . "', " . time() . ")");
                 }
             }
@@ -407,7 +407,7 @@ class Raid extends BaseActiveModule
     /*
     Ends a Raid
     */
-    function end_raid($name)
+    function endRaid($name)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -421,12 +421,12 @@ class Raid extends BaseActiveModule
                 $this->move = FALSE;
                 $this->announce = FALSE;
                 $this->user2 = array();
-                $this->unregister_event("cron", "1min");
+                $this->unregisterEvent("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has stopped the raid.", "both");
                 $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 $this->locked = FALSE;
                 $this->bot->core("settings")->save("Raid", "raidinfo", "false");
-                if (isset($this->bot->commands["tell"]["raidhistory"])) {
+                if (isset($this->bot->commands["sendTell"]["raidhistory"])) {
                     $this->bot->db->query(
                         "UPDATE #___raid_details SET end = " . time() . ", description = '" . $this->description . "', note = '" . $this->note . "' WHERE start = " . $this->start
                     );
@@ -447,7 +447,7 @@ class Raid extends BaseActiveModule
     /*
     Issues a raid command
     */
-    function raid_command($name, $command)
+    function raidCommand($name, $command)
     {
         $msg = $this->bot->core("settings")->get('Raid', 'Cformat');
         $msg = str_replace("##name##", $name, $msg);
@@ -460,8 +460,8 @@ class Raid extends BaseActiveModule
     /*
     Adds a point to all raiders
     */
-    function add_point($name, $points)
-    { //fix me! - fixed addto_raid so that raiders are added correctly
+    function addPoint($name, $points)
+    { //fix me! - fixed addToRaid so that raiders are added correctly
         if (!$this->raid) {
             $this->bot->send_tell($name, "No raid in progress");
         }
@@ -482,7 +482,7 @@ class Raid extends BaseActiveModule
                     $this->points[$user] += $points;
                     $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                     $inside .= "##highlight##" . $user . "##end##: ##highlight##" . $userp . "##end## points\n";
-                    if (isset($this->bot->commands["tell"]["raidhistory"])) {
+                    if (isset($this->bot->commands["sendTell"]["raidhistory"])) {
                         $this->bot->db->query(
                             "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points + "
                                 . $points
@@ -507,8 +507,8 @@ class Raid extends BaseActiveModule
     }
 
 
-    function rem_point($name, $points, $type = FALSE)
-    { //fix me! - fixed addto_raid so that raiders are added correctly
+    function remPoint($name, $points, $type = FALSE)
+    { //fix me! - fixed addToRaid so that raiders are added correctly
         if (!$this->raid) {
             $this->bot->send_tell($name, "No raid in progress");
         }
@@ -544,7 +544,7 @@ class Raid extends BaseActiveModule
                     $this->points[$user] -= $points;
                     $userp = isset($this->points[$user]) ? $this->points[$user] : 0;
                     $inside .= "##highlight##" . $user . "##end##: ##highlight##" . $userp . "##end## points\n";
-                    if (isset($this->bot->commands["tell"]["raidhistory"])) {
+                    if (isset($this->bot->commands["sendTell"]["raidhistory"])) {
                         $this->bot->db->query(
                             "INSERT INTO #___raid_log (name, points, time) VALUES ('" . $user . "', $userp, " . $this->start . ") ON DUPLICATE KEY UPDATE points = points - "
                                 . $points
@@ -569,7 +569,7 @@ class Raid extends BaseActiveModule
     /*
     Adds a player to Raid
     */
-    function addto_raid($name, $player, $source)
+    function addToRaid($name, $player, $source)
     {
         $player = ucfirst(strtolower($player));
         if ($this->bot->core("security")->check_access(
@@ -597,7 +597,7 @@ class Raid extends BaseActiveModule
                     $this->bot->send_tell($name, "##error##Warning: ##highlight##$player##end## is not in the PrivGroup of ##highlight##<botname>##end####end##");
                 }
                 $this->bot->db->query(
-                    "INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->points_to($player) . ", '" . $this->points_to_name($player)
+                    "INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->pointsTo($player) . ", '" . $this->pointsToName($player)
                         . "', 0, 1, '" . $player . "') ON DUPLICATE KEY UPDATE raiding = 1, raidingas = '" . $player . "'"
                 );
                 $this->bot->db->query(
@@ -610,16 +610,16 @@ class Raid extends BaseActiveModule
                 $this->user2[$player] = "Joined";
                 $this->bot->send_tell($player, "##highlight##$name##end## added you to the raid.");
                 if (!$this->locked) {
-                    $ctj = " :: " . $this->clickjoin();
+                    $ctj = " :: " . $this->clickJoin();
                 }
                 $this->bot->send_output("", "##highlight##$player##end## was ##highlight##added##end## to the raid by ##highlight##$name##end##" . $ctj, "both");
-                if ($source == "tell") {
+                if ($source == "sendTell") {
                     return "##highlight##$player##end## has been ##highlight##added##end## to the raid";
                 }
             }
         }
         elseif ($name == $player) {
-            Return $this->join_raid($name);
+            Return $this->joinRaid($name);
         }
         else {
             return "You must be a " . $this->bot->core("settings")
@@ -631,13 +631,13 @@ class Raid extends BaseActiveModule
     /*
     Joins a Raid
     */
-    function join_raid($name)
+    function joinRaid($name)
     {
         if (empty($this->user)) {
             $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
         }
         $minlevel = $this->minlevel;
-        $who = $this->bot->core("whois")->lookup($name, TRUE);
+        $who = $this->bot->core("whoIs")->lookup($name, TRUE);
         if (isset($this->user[$name])) {
             return "You are already in the raid";
         }
@@ -657,7 +657,7 @@ class Raid extends BaseActiveModule
         else {
             if ($this->raid) {
                 $this->bot->db->query(
-                    "INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->points_to($name) . ", '" . $this->points_to_name($name)
+                    "INSERT INTO #___raid_points (id, nickname, points, raiding, raidingas) VALUES (" . $this->pointsTo($name) . ", '" . $this->pointsToName($name)
                         . "', 0, 1, '"
                         . $name . "') ON DUPLICATE KEY UPDATE raiding = 1, raidingas = '" . $name . "'"
                 );
@@ -669,7 +669,7 @@ class Raid extends BaseActiveModule
                 $this->bot->db->query($query);
                 $this->user[$name] = $this->bot->core('player')->id($name);
                 $this->user2[$name] = "Joined";
-                $this->bot->send_output("", "##highlight##$name##end## has ##highlight##joined##end## the raid :: " . $this->clickjoin(), "both");
+                $this->bot->send_output("", "##highlight##$name##end## has ##highlight##joined##end## the raid :: " . $this->clickJoin(), "both");
                 $this->bot->send_tell($name, "you have joined the Raid");
                 return FALSE;
             }
@@ -683,7 +683,7 @@ class Raid extends BaseActiveModule
     /*
     Leaves a Raid
     */
-    function leave_raid($name)
+    function leaveRaid($name)
     {
         if (!isset($this->user[$name])) {
             return "You are not in the raid.";
@@ -702,11 +702,11 @@ class Raid extends BaseActiveModule
                 }
             }
             if (!$altinraid) {
-                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($name));
+                $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->pointsTo($name));
             }
 
             if (!$this->locked) {
-                $ctj = " :: " . $this->clickjoin();
+                $ctj = " :: " . $this->clickJoin();
             }
             $this->bot->send_output("", "##highlight##$name##end## has ##highlight##left##end## the raid" . $ctj, "both");
             return "You have ##highlight##left##end## the raid.";
@@ -717,7 +717,7 @@ class Raid extends BaseActiveModule
     /*
     Kicks someone from the raid
     */
-    function kick_raid($name, $who, $why, $origin)
+    function kickRaid($name, $who, $why, $origin)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -757,11 +757,11 @@ class Raid extends BaseActiveModule
                     }
                 }
                 if (!$altinraid) {
-                    $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->points_to($who));
+                    $this->bot->db->query("UPDATE #___raid_points SET raiding = 0 WHERE id = " . $this->pointsTo($who));
                 }
                 $this->bot->send_output("", "##highlight##$who##end## has been ##highlight##Kicked##end## from the raid by ##highlight##$name##end##$why", "both");
                 $this->bot->send_tell($who, "##highlight##$name##end## kicked you from the raid.");
-                if ($origin == "tell") {
+                if ($origin == "sendTell") {
                     Return "##highlight##$who##end## was kicked from the raid.";
                 }
                 else {
@@ -770,7 +770,7 @@ class Raid extends BaseActiveModule
             }
         }
         elseif ($name == $player) {
-            Return $this->leave_raid($name);
+            Return $this->leaveRaid($name);
         }
         else {
             return "You must be a " . $this->bot->core("settings")
@@ -782,7 +782,7 @@ class Raid extends BaseActiveModule
     /*
     Checks memebers on a raid
     */
-    function check_raid($name, $names)
+    function checkRaid($name, $names)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -799,7 +799,7 @@ class Raid extends BaseActiveModule
                         $count++;
                     }
                     $list = substr($list, 0, -2);
-                    $this->raid_command($name, $list);
+                    $this->raidCommand($name, $list);
                     Return ("##highlight##" . $count . "##end## Players Missing :: " . $this->bot
                         ->core("tools")->make_blob("click to view", $inside));
                 }
@@ -813,10 +813,10 @@ class Raid extends BaseActiveModule
                 $inside = "##blob_title##:::: People in the raid ::::##end##\n\n";
 
                 $inside .= "Send not-joined warnings: " . $this->bot
-                    ->core("tools")->chatcmd("raid notin", "raid notin") . "\n";
+                    ->core("tools")->chatcmd("raid notIn", "raid notIn") . "\n";
                 $inside .= "Kick not-joined from bot: " . $this->bot
                     ->core("tools")
-                    ->chatcmd("raid notinkick", "raid notinkick") . "\n\n";
+                    ->chatcmd("raid notInKick", "raid notInKick") . "\n\n";
 
                 if (!empty($players)) {
                     if ($this->bot->game == "ao") {
@@ -828,11 +828,11 @@ class Raid extends BaseActiveModule
                                 $assist = "/assist $player";
                             }
                         }
-                        $inside .= "<a href='chatcmd://$assist'>Check all raid members</a>\n\n";
+                        $inside .= "<a href='chatCommand://$assist'>Check all raid members</a>\n\n";
                     }
                     $inside .= "Example use: <pre>raid check Can't assist yourself. Target is not in a fight. Can't find target &gt;Chris05&lt;.\n\n";
                     foreach ($players as $player) {
-                        $who = $this->bot->core("whois")
+                        $who = $this->bot->core("whoIs")
                             ->lookup($player, TRUE); //All info about raiders are expected to be correct as already beeing member and all.
 
                         if ($who['faction'] == "Omni") {
@@ -876,7 +876,7 @@ class Raid extends BaseActiveModule
     /*
     Locks/unlocks a Raid
     */
-    function lock_raid($name, $lock)
+    function lockRaid($name, $lock)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -918,7 +918,7 @@ class Raid extends BaseActiveModule
     /*
     Make click to join blob
     */
-    function clickjoin($join = FALSE)
+    function clickJoin($join = FALSE)
     {
         if ($this->locked) {
             return "<font color=#FF6D4C>raid is locked</font>.";
@@ -949,13 +949,13 @@ class Raid extends BaseActiveModule
     /*
     Get correct char for points
     */
-    function points_to($name)
+    function pointsTo($name)
     {
         return $this->bot->core("points")->points_to($name);
     }
 
 
-    function points_to_name($name)
+    function pointsToName($name)
     {
         return $this->bot->core("points")->points_to_name($name);
     }
@@ -1005,16 +1005,16 @@ class Raid extends BaseActiveModule
                 $nl = TRUE;
                 $tank = "\nTank is ##highlight##" . $this->tank . "##end##";
             }
-            if ($this->showcallers && isset($this->bot->commands['tell']['caller']) && !empty($this->bot->commands['tell']['caller']->callers)) {
+            if ($this->showcallers && isset($this->bot->commands['sendTell']['caller']) && !empty($this->bot->commands['sendTell']['caller']->callers)) {
                 if ($nl) {
                     $callers = ", ";
                 }
                 else {
                     $callers = "\n";
                 }
-                $callers .= $this->bot->commands['tell']['caller']->show_callers();
+                $callers .= $this->bot->commands['sendTell']['caller']->show_callers();
             }
-            $this->bot->send_output("", "Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickjoin(), "both");
+            $this->bot->send_output("", "Raid is running: ##highlight##" . $this->description . "##end##" . $tank . $callers . $move . " :: " . $this->clickJoin(), "both");
             $this->announcel = time();
         }
     }
@@ -1033,7 +1033,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function change_level($name, $level)
+    function changeLevel($name, $level)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -1067,7 +1067,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function notin($name)
+    function notIn($name)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -1080,7 +1080,7 @@ class Raid extends BaseActiveModule
                 if (!empty($online)) {
                     foreach ($online as $notin) {
                         if (!isset($this->user[ucfirst(strtolower($notin[0]))])) {
-                            $this->bot->send_tell($notin[0], "##error##Warning##end##: you are not in the current raid :: " . $this->clickjoin());
+                            $this->bot->send_tell($notin[0], "##error##Warning##end##: you are not in the current raid :: " . $this->clickJoin());
                             $count++;
                         }
                     }
@@ -1098,7 +1098,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function notinkick($name)
+    function notInKick($name)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -1122,7 +1122,7 @@ class Raid extends BaseActiveModule
                     }
                 }
                 if ($count > 0) {
-                    $this->bot->send_output($name, $name . " kicked ##highlight##" . implode(", ", $inside) . "##end## from privategroup.", "pgmsg");
+                    $this->bot->send_output($name, $name . " kicked ##highlight##" . implode(", ", $inside) . "##end## from privategroup.", "sendToGroup");
                 }
                 Return ("##highlight##$count##end## Users Kicked for not in raid");
             }
@@ -1161,7 +1161,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function set_tank($name, $tank)
+    function setTank($name, $tank)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -1183,7 +1183,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function set_announce($name, $set)
+    function setAnnounce($name, $set)
     {
         $set = strtolower($set);
         if ($this->bot->core("security")->check_access(
@@ -1224,7 +1224,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function show_tank($name, $set)
+    function showTank($name, $set)
     {
         $set = strtolower($set);
         if ($this->bot->core("security")->check_access(
@@ -1265,7 +1265,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function show_callers($name, $set)
+    function showCallers($name, $set)
     {
         $set = strtolower($set);
         if ($this->bot->core("security")->check_access(
@@ -1306,7 +1306,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function set_description($name, $desc)
+    function setDescription($name, $desc)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -1414,14 +1414,14 @@ class Raid extends BaseActiveModule
         $inside .= "\nThere are ##highlight##$active##end## active, and ##highlight##$inactive##end## inactive participants in raid   [$link]";
         $inside .= "\n\nLinks\n\n";
         $inside .= $this->bot->core("tools")
-            ->chatcmd("raid notin", "Send not in Raid Warnings") . "\n";
+            ->chatcmd("raid notIn", "Send not in Raid Warnings") . "\n";
         $inside .= $this->bot->core("tools")
-            ->chatcmd("raid notinkick", "Kick toons not in Raid") . "\n";
+            ->chatcmd("raid notInKick", "Kick toons not in Raid") . "\n";
         return ($this->bot->core("tools")->make_blob("Raid Control", $inside));
     }
 
 
-    function list_users($name)
+    function listUsers($name)
     {
         if ($this->bot->core("security")->check_access(
             $name, $this->bot
@@ -1478,7 +1478,7 @@ class Raid extends BaseActiveModule
     }
 
 
-    function movein()
+    function moveIn()
     {
         if ($this->move > time()) {
             $move = $this->move - time();

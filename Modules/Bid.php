@@ -55,7 +55,7 @@ class Bid extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bid = "";
-        $this->register_command('all', 'bid', 'MEMBER');
+        $this->registerCommand('all', 'bid', 'MEMBER');
         $this->help['description'] = "Handles auctions using raid points";
         $this->help['command']['bid start <item>'] = "Starts an auction for <item>. <item> can be text or an item ref.";
         $this->help['command']['bid <points>'] = "Bid <points> raid points for the item currently on auction.";
@@ -71,16 +71,16 @@ class Bid extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $msg = explode(" ", $msg, 3);
         Switch ($msg[1]) {
         case 'start':
-            return $this->start_bid($name, $msg[2]);
+            return $this->startBid($name, $msg[2]);
         case 'info':
-            $this->info_bid($name);
+            $this->infoBid($name);
             Break;
         case 'cancel':
             Return $this->cancel($name);
@@ -93,11 +93,11 @@ class Bid extends BaseActiveModule
             Return $this->history();
         Default:
             if (is_numeric($msg[1]) || strtolower($msg[1]) == "all") {
-                if ($origin == "tell") {
-                    $this->place_bid($name, $msg[1]);
+                if ($origin == "sendTell") {
+                    $this->placeBid($name, $msg[1]);
                 }
                 else {
-                    Return ("Bids in /tell Only");
+                    Return ("Bids in /sendTell Only");
                 }
             }
             else {
@@ -110,7 +110,7 @@ class Bid extends BaseActiveModule
     /*
     Starts the bidding
     */
-    function start_bid($name, $item)
+    function startBid($name, $item)
     {
         if ($this->bot->core("security")->check_access($name, "leader")) {
             if ($this->bid && $this->bid != "") {
@@ -133,7 +133,7 @@ class Bid extends BaseActiveModule
             $timer = $this->bot->core("settings")
                 ->get("Bid", "timer");
             $this->end = time() + $timer;
-            $this->register_event("cron", "2sec");
+            $this->registerEvent("cron", "2sec");
             $msg = "\n##highlight##-------------------------------------##end##\n";
             $msg .= "##highlight##$name##end## started auction ";
             $msg .= "on ##highlight##$item##end##! \nYou have ";
@@ -154,7 +154,7 @@ class Bid extends BaseActiveModule
                 $this->bot->send_output("", "Auction for item ##highlight##" . $this->bid . "##end## Canceled", "both");
                 $this->bid = "";
                 $this->type = FALSE;
-                $this->unregister_event("cron", "2sec");
+                $this->unregisterEvent("cron", "2sec");
             }
             else {
                 Return ("##error##Error: No Auction in Progress##end##");
@@ -169,11 +169,11 @@ class Bid extends BaseActiveModule
     /*
     Place a bid
     */
-    function place_bid($name, $ammount)
+    function placeBid($name, $ammount)
     {
         $update = TRUE;
         if (strtolower($ammount) == "all") {
-            $ammount = $this->bot->db->select("SELECT " . $this->type . "_points FROM #___raid_points WHERE id = " . $this->points_to($name));
+            $ammount = $this->bot->db->select("SELECT " . $this->type . "_points FROM #___raid_points WHERE id = " . $this->pointsTo($name));
             if (!empty($ammount)) {
                 $ammount = $ammount[0][0];
             }
@@ -197,7 +197,7 @@ class Bid extends BaseActiveModule
                 return FALSE;
             }
         }
-        $result = $this->bot->db->select("SELECT points FROM #___raid_points WHERE id = " . $this->points_to($name));
+        $result = $this->bot->db->select("SELECT points FROM #___raid_points WHERE id = " . $this->pointsTo($name));
         if (empty($result)) {
             $this->bot->send_tell($name, "You appear to not have any points yet. No points table entry found.");
             return FALSE;
@@ -260,7 +260,7 @@ class Bid extends BaseActiveModule
 
 
     /*
-    Gets called on a cronjob...
+    Gets called on a cronJob...
     */
     function cron()
     {
@@ -290,7 +290,7 @@ class Bid extends BaseActiveModule
                 $this->bot->core("points")
                     ->rem_points($this->name, $this->highestbidder, $highest, "Auction: " . $this->bid, TRUE);
                 //	$this -> bot -> db -> query("UPDATE #___raid_points SET points = points - " . $highest .
-                //	" WHERE id = " . $this -> points_to($this -> highestbidder));
+                //	" WHERE id = " . $this -> pointsTo($this -> highestbidder));
                 $this->history[] = array(
                     time(),
                     $this->bid,
@@ -299,7 +299,7 @@ class Bid extends BaseActiveModule
                 );
             }
             $this->bid = "";
-            $this->unregister_event("cron", "2sec");
+            $this->unregisterEvent("cron", "2sec");
         }
     }
 
@@ -307,11 +307,11 @@ class Bid extends BaseActiveModule
     /*
     Show info about bidding
     */
-    function info_bid($name)
+    function infoBid($name)
     {
         $inside = "##blob_title##::::: Bidding Help :::::##end##\n\n";
         $inside .= "To place a bid write:\n";
-        $inside .= "##blob_text##/tell <botname> <pre>bid &lt;points&gt;##end##\n";
+        $inside .= "##blob_text##/sendTell <botname> <pre>bid &lt;points&gt;##end##\n";
         $inside .= "(Replace &lt;points&gt; with the number of points you would like to bid)\n\n";
         $inside .= "First you may place your bids as stated above.\n";
         $inside .= "The auction ends after 60 seconds or 10 seconds after the last bid was placed. So you always have some time to outbid ";
@@ -374,7 +374,7 @@ class Bid extends BaseActiveModule
         $inside .= $this->bot->core("tools")
             ->chatcmd("points", ":: <font color=#99CC00>Check your points##end## ::") . "\n\n";
         $inside .= "To place a bid write:\n";
-        $inside .= "##highlight##/tell <botname> <pre>bid &lt;points&gt;##end##\n";
+        $inside .= "##highlight##/sendTell <botname> <pre>bid &lt;points&gt;##end##\n";
         $inside .= "(Replace &lt;points&gt; with the number of points you would like to bid)\n";
         Return $this->bot->core("tools")
             ->make_blob(":: Enter Auction ::", $inside);
@@ -448,9 +448,9 @@ class Bid extends BaseActiveModule
     /*
     Get correct char for points
     */
-    function points_to($name)
+    function pointsTo($name)
     {
-        return $this->bot->commands["tell"]["points"]->points_to($name);
+        return $this->bot->commands["sendTell"]["points"]->points_to($name);
     }
 }
 

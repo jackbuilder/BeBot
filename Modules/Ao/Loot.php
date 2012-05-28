@@ -47,20 +47,20 @@ class Rolls extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->count = 0;
-        $this->register_command("pgmsg", "loot", "ANONYMOUS");
-        $this->register_command("pgmsg", "add", "ANONYMOUS");
-        $this->register_command("pgmsg", "rem", "ANONYMOUS");
-        $this->register_command("pgmsg", "list", "ANONYMOUS");
-        $this->register_command("pgmsg", "result", "ADMIN");
-        $this->register_command("pgmsg", "clear", "ADMIN");
-        $this->register_command("pgmsg", "reroll", "ADMIN");
-        $this->register_command("tell", "add", "ANONYMOUS");
-        $this->register_command("tell", "rem", "ANONYMOUS");
-        $this->register_command("tell", "loot", "ANONYMOUS");
-        $this->register_command("tell", "list", "ANONYMOUS");
-        $this->register_command("tell", "clear", "ADMIN");
-        $this->register_command("tell", "reroll", "ADMIN");
-        $this->register_event("pgleave");
+        $this->registerCommand("sendToGroup", "loot", "ANONYMOUS");
+        $this->registerCommand("sendToGroup", "add", "ANONYMOUS");
+        $this->registerCommand("sendToGroup", "rem", "ANONYMOUS");
+        $this->registerCommand("sendToGroup", "list", "ANONYMOUS");
+        $this->registerCommand("sendToGroup", "result", "ADMIN");
+        $this->registerCommand("sendToGroup", "clear", "ADMIN");
+        $this->registerCommand("sendToGroup", "reRoll", "ADMIN");
+        $this->registerCommand("sendTell", "add", "ANONYMOUS");
+        $this->registerCommand("sendTell", "rem", "ANONYMOUS");
+        $this->registerCommand("sendTell", "loot", "ANONYMOUS");
+        $this->registerCommand("sendTell", "list", "ANONYMOUS");
+        $this->registerCommand("sendTell", "clear", "ADMIN");
+        $this->registerCommand("sendTell", "reRoll", "ADMIN");
+        $this->registerEvent("privateGroupLeave");
         $this->bot->core("settings")
             ->create("Loot", "Roll", "SINGLE", "Should you be allowed to be added to the roll of more than one slot?", "SINGLE;MULTI");
         $this->bot->core("colors")
@@ -72,22 +72,22 @@ class Rolls extends BaseActiveModule
         $this->help['command']['list'] = "Lists all items and who is rolling for them.";
         $this->help['command']['clear'] = "Clears all rolls.";
         $this->help['command']['result'] = "Rolls for all the items and announces winners.";
-        $this->help['command']['reroll'] = "Adds any unwon items from the last roll to a new roll.";
+        $this->help['command']['reRoll'] = "Adds any unwon items from the last roll to a new roll.";
     }
 
 
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
-    sutible for output via send_tell, send_pgroup, and send_gc.
+    sutible for output via sendTell, sendPrivateGroup, and sendGuildChat.
     */
-    function command_handler($name, $msg, $source)
+    function commandHandler($name, $msg, $source)
     { // Start function handler()
         if (preg_match("/^loot (.*)/i", $msg, $info)) {
             $this->loot($info[1], $name);
         }
         else {
-            if (preg_match("/^reroll/i", $msg, $info)) {
+            if (preg_match("/^reRoll/i", $msg, $info)) {
                 $this->reroll($name);
             }
             else {
@@ -128,9 +128,9 @@ class Rolls extends BaseActiveModule
     } // End function handler()
 
     /*
-    This gets called if someone leaves the privgroup
+    This gets called if someone leaves the privateGroup
     */
-    function pgleave($name)
+    function privateGroupLeave($name)
     {
         if (isset($this->loot[$info[1]][$name])) {
             unset($this->loot[$info[1]][$name]);
@@ -263,7 +263,7 @@ class Rolls extends BaseActiveModule
     }
 
 
-    function reroll($name)
+    function reRoll($name)
     {
         $lcount = count($this->leftovers);
         if ($lcount == 0) {
@@ -298,7 +298,7 @@ class Rolls extends BaseActiveModule
     }
 
 
-    function rlist()
+    function rList()
     {
         $num = 0;
         unset($msg);

@@ -79,7 +79,7 @@ class BotError
     }
 
 
-    function set_description($description)
+    function setDescription($description)
     {
         $this->description = $description;
     }

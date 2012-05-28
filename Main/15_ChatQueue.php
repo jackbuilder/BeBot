@@ -50,7 +50,7 @@ class Chat_Queue_Core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module("chat_queue");
+        $this->registerModule("chat_queue");
 
         $this->bot->core("queue")
             ->register($this, "chat", ($this->bot->telldelay / 1000), 4);
@@ -64,7 +64,7 @@ class Chat_Queue_Core extends BasePassiveModule
     {
         $to = $info[0];
         $msg = $info[1];
-        if ($info[2] == "tell") {
+        if ($info[2] == "sendTell") {
             $this->bot->log(
                 "TELL", "OUT", "-> " . $this->bot->core("chat")
                 ->get_uname($to) . ": " . $msg
@@ -80,9 +80,9 @@ class Chat_Queue_Core extends BasePassiveModule
 
 
     /*
-    Checks if tell can be sent. true if yes, false it has to be put to queue
+    Checks if sendTell can be sent. true if yes, false it has to be put to queue
     */
-    function check_queue()
+    function checkQueue()
     {
         return $this->bot->core("queue")->check_queue("chat");
     }
@@ -91,7 +91,7 @@ class Chat_Queue_Core extends BasePassiveModule
     /*
     Puts a msg into queue
     */
-    function into_queue($to, $msg, $type, $priority)
+    function intoQueue($to, $msg, $type, $priority)
     {
         $info = array(
             $to,

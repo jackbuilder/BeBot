@@ -52,14 +52,14 @@ class ShortCuts_Core extends BasePassiveModule
                 . "('Exec', 'Executive'), ('Mem', 'Member'), ('Adv', 'Advisor'), ('Vet', 'Veteran'), ('Mon', 'Monarch'), "
                 . "('Coun', 'Counsel'), ('Fol', 'Follower'), ('Anar', 'Anarchist'), ('Lord', 'Lord'), ('Knght', 'Knight'), " . "('Vas', 'Vassal '), ('Peas', 'Peasant')"
         );
-        $this->register_module("shortcuts");
-        $this->register_event("cron", "1hour");
-        $this->create_caches();
+        $this->registerModule("shortcuts");
+        $this->registerEvent("cron", "1hour");
+        $this->createCaches();
     }
 
 
     // Creates the caches, both indexes are transformed to lower case
-    function create_caches()
+    function createCaches()
     {
         $this->short = array();
         $this->long = array();
@@ -77,12 +77,12 @@ class ShortCuts_Core extends BasePassiveModule
 
     function cron()
     {
-        $this->create_caches();
+        $this->createCaches();
     }
 
 
     // Returns the shortcut for the argument if it exists, the unmodified argument otherwise
-    function get_short($long)
+    function getShort($long)
     {
         if (isset($this->short[strtolower($long)])) {
             return $this->short[strtolower($long)];
@@ -92,7 +92,7 @@ class ShortCuts_Core extends BasePassiveModule
 
 
     // Returns the long description of a shortcut if the shortcut is defined, the unmodified argument otherwise
-    function get_long($short)
+    function getLong($short)
     {
         if (isset($this->long[strtolower($short)])) {
             return $this->long[strtolower($short)];
@@ -120,7 +120,7 @@ class ShortCuts_Core extends BasePassiveModule
 
 
     // Removes an entry based on the shortcut
-    function delete_shortcut($short)
+    function deleteShortcut($short)
     {
         if (!isset($this->long[strtolower($short)])) {
             $this->error->set('The shortcut "' . $short . '" does not exist in the database!');
@@ -134,7 +134,7 @@ class ShortCuts_Core extends BasePassiveModule
 
 
     // Removes an entry based on the long description
-    function delete_description($long)
+    function deleteDescription($long)
     {
         if (!isset($this->short[strtolower($long)])) {
             $this->error->set('The description "' . $long . '" does not exist in the database!');
@@ -148,7 +148,7 @@ class ShortCuts_Core extends BasePassiveModule
 
 
     // Removes an entry based on it's ID
-    function delete_id($id)
+    function deleteId($id)
     {
         $ret = $this->bot->db->select("SELECT shortcut, long_desc FROM #___shortcuts WHERE id = " . $id);
         if (empty($ret)) {

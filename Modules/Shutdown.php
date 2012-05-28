@@ -41,8 +41,8 @@ class Shutdown extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command("tell", "shutdown", "SUPERADMIN");
-        $this->register_command("tell", "restart", "SUPERADMIN");
+        $this->registerCommand("sendTell", "shutdown", "SUPERADMIN");
+        $this->registerCommand("sendTell", "restart", "SUPERADMIN");
         $this->help['description'] = 'Handles bot shut down and restart..';
         $this->help['command']['shutdown'] = "Shuts down the bot.";
         $this->help['command']['restart'] = "Restarts the bot.";
@@ -53,9 +53,9 @@ class Shutdown extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         if (time() < $this->bot->connected_time + 10) {
             //ignore commands for 1st 10 secs to prevent unwanted restart command while offline
@@ -91,7 +91,7 @@ class Shutdown extends BaseActiveModule
             time() + 2,
             "The bot " . $text
         );
-        $this->register_event("cron", "1sec");
+        $this->registerEvent("cron", "1sec");
     }
 
 

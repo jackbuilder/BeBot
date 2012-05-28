@@ -57,15 +57,15 @@ class Nroll extends BaseActiveModule
         $this->verifyresult = array();
         $this->verifytime = array();
         $this->verifyname = array();
-        $this->register_command("all", "nroll", "GUEST");
-        $this->register_command("all", "nverify", "GUEST");
+        $this->registerCommand("all", "nroll", "GUEST");
+        $this->registerCommand("all", "nverify", "GUEST");
         $this->help['description'] = 'Randomly choose one of several options.';
         $this->help['command']['nroll keywords'] = "Randomly choose one of several keywords, seperated by commas or if no commas are present, by spaces.";
         $this->help['command']['nverify #'] = "Verify a previous nroll.";
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $output = "";
         if (preg_match("/^nroll (.+)$/i", $msg, $info)) {
@@ -82,8 +82,8 @@ class Nroll extends BaseActiveModule
             $this->verifytime[] = time();
             $this->verifyname[] = $name;
             end($this->verifyresult);
-            $output = "I choose <font color=yellow>$result</font>.  To verify, /tell <botname> <pre>nverify " . key($this->verifyresult);
-            //$this -> bot -> send_output($name, $output, $origin);
+            $output = "I choose <font color=yellow>$result</font>.  To verify, /sendTell <botname> <pre>nverify " . key($this->verifyresult);
+            //$this -> bot -> sendOutput($name, $output, $origin);
         }
         elseif (preg_match("/^nverify (.+)$/i", $msg, $info)) {
             if (isset($this->verifyresult[$info[1]])) {
@@ -94,7 +94,7 @@ class Nroll extends BaseActiveModule
             else {
                 $output = "Results not found.  Please check your query and try again.  If that doesn't work, give up, it ain't worth it.";
             }
-            //$this -> bot -> send_output($name, $output, $origin);
+            //$this -> bot -> sendOutput($name, $output, $origin);
         }
         return $output;
     }

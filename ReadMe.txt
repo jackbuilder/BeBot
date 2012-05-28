@@ -99,7 +99,7 @@ hard-code as few super admins here as possible. Instead of putting the names
 in here we recommend using the !adduser <username> SUPERADMIN in-game to add 
 superadmins. 
 
-The next section works just like the superadmins. You can tell the bot what 
+The next section works just like the superadmins. You can sendTell the bot what
 other bots it may encounter in the guild. This is so that the bot just 
 ignores tells and messages from the other bot and doesn't end up in a spam
 war with it. 
@@ -193,8 +193,8 @@ IN-GAME SETUP
 
 There is a settings module to handle configuration of most aspects and many 
 modules for BeBot. Most notable is the Security module. To start configuring 
-it send a tell to your bot with "!settings security". For a list of modules 
-whose settings are configurable by the new interface send a tell to your bot 
+it send a sendTell to your bot with "!settings security". For a list of modules
+whose settings are configurable by the new interface send a sendTell to your bot
 with "!settings". 
 
 

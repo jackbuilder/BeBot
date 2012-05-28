@@ -39,28 +39,28 @@ class PlayerList extends BasePassiveModule
     public function __construct($bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_module('player');
+        $this->registerModule('player');
         //$dispatcher = Event_Dispatcher2::getInstance();
-        //$dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
+        //$dispatcher->addObserver(array($this , 'signalHandle'), 'onPlayerName');
         $this->bot->dispatcher->connect(
             'core.on_player_name', array(
                 $this,
-                'signal_handle'
+                'signalHandle'
             )
         );
         $this->bot->dispatcher->connect(
             'core.on_player_id', array(
                 $this,
-                'signal_handle'
+                'signalHandle'
             )
         );
     }
 
 
-    public function signal_handle($data)
+    public function signalHandle($data)
     {
         //$data = $signal->getNotificationObject();
-        //list ($uid, $uname) = $data->message;
+        //list ($userId, $userName) = $data->message;
 
         /*
         echo "Debug core.on_player_name and on_player_id ";
@@ -110,7 +110,7 @@ class PlayerList extends BasePassiveModule
         }
 
         if (empty($uname)) {
-            // This is normal and can happen, if the user just types "!whois" etc.
+            // This is normal and can happen, if the user just types "!whoIs" etc.
             $this->error->set("Tried to get user id for an empty user name.");
             $this->bit->log("DEBUG", "PlayerList", "Tried to get user id for an empty user name.");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
@@ -118,7 +118,7 @@ class PlayerList extends BasePassiveModule
         }
         $uname = ucfirst(strtolower($uname));
         if (is_numeric($uname)) {
-            $this->debug_output("Attempting to look up an id for an id ($uname)");
+            $this->debugOutput("Attempting to look up an id for an id ($uname)");
             return $uname;
         }
         // Check if we have not the player in cache.
@@ -130,11 +130,11 @@ class PlayerList extends BasePassiveModule
                 return $this->namecache[$uname]['id'];
             }
             else {
-                // If we we didn't get a response from funcom, it's possible it was just a fluke, so try to get userid from whois
+                // If we we didn't get a response from funcom, it's possible it was just a fluke, so try to get userid from whoIs
                 // table if the information there isn't stale.
                 $query = "SELECT ID,UPDATED FROM #___whois WHERE nickname = '$uname' LIMIT 1";
                 $result = $this->bot->db->select($query, MYSQL_ASSOC);
-                // If we have a whois result, and its under 48 hours old,
+                // If we have a whoIs result, and its under 48 hours old,
                 if (!empty($result) && isset($result[0]['UPDATED'])) {
                     if (($result[0]['UPDATED'] + 172800 >= time()) && ($result[0]['ID'] >= 1)) {
                         $age = time() - $result[0]['UPDATED'];
@@ -164,7 +164,7 @@ class PlayerList extends BasePassiveModule
     */
     public function name($uid)
     {
-        //echo "Looking up uname for $uid!\n";
+        //echo "Looking up userName for $userId!\n";
         if (!is_numeric($uid)) {
             $this->bot->log("DEBUG", "PlayerList", "Attempting to look up a username for a username (" . $uid . ")");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
@@ -185,16 +185,16 @@ class PlayerList extends BasePassiveModule
                 return $return;
             }
             else {
-                // If we we didn't get a responce from funcom, it's possible it was just a fluke, so try to get nickname from whois
+                // If we we didn't get a responce from funcom, it's possible it was just a fluke, so try to get nickname from whoIs
                 // table if the information there isn't stale.
                 $query = "SELECT NICKNAME,UPDATED FROM #___whois WHERE id = '$uid' LIMIT 1";
                 $result = $this->bot->db->select($query, MYSQL_ASSOC);
-                // If we have a whois result, and its under 48 hours old,
+                // If we have a whoIs result, and its under 48 hours old,
                 if (!empty($result) && isset($result[0]['UPDATED'])) {
                     if ($result[0]['updated'] + 172800 >= time()) {
                         $age = time() - $result[1];
                         $age = $age / 60 / 60;
-                        $this->bot->log("PLAYERLIST", "WARN", "Username lookup for $uid failed, but using whois info that is $age hours old.");
+                        $this->bot->log("PLAYERLIST", "WARN", "Username lookup for $uid failed, but using whoIs info that is $age hours old.");
                         //cache in memory for future reference.
                         $this->add($uid, $result[0]['NICKNAME']);
                         return $result[0]['NICKNAME'];
@@ -235,13 +235,13 @@ class PlayerList extends BasePassiveModule
     }
 
 
-    public function get_namecache()
+    public function getNameCache()
     {
         return $this->namecache;
     }
 
 
-    public function get_uidcache()
+    public function getUserIdCache()
     {
         return $this->uidcache;
     }

@@ -39,10 +39,10 @@ class Whois_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         /*
-        Create tables for our whois cache if it does not already exist.
+        Create tables for our whoIs cache if it does not already exist.
         */
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whois", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whoIs", "false") . " (
 					ID bigint NOT NULL default '0',
 					nickname varchar(15) NOT NULL default '',
 					level tinyint(3) unsigned NOT NULL default '1',
@@ -53,8 +53,8 @@ class Whois_Core extends BasePassiveModule
 					location int(15) NOT NULL default '0',
 					online tinyint(1) NOT NULL default '0',
 					used bigint(25) NOT NULL default '0',
-					org_rank_id int(15) NOT NULL default '0',
-					org_rank int(15) NOT NULL default '0',
+					orgRankId int(15) NOT NULL default '0',
+					orgRank int(15) NOT NULL default '0',
 					org_name varchar(15) NULL default '',
 					updated int(10) NOT NULL default '0',
 					PRIMARY KEY  (nickname),
@@ -64,16 +64,16 @@ class Whois_Core extends BasePassiveModule
 					KEY used (used)
 				)"
         );
-        $this->register_module("whois");
-        $this->register_event("cron", "1hour");
+        $this->registerModule("whoIs");
+        $this->registerEvent("cron", "1hour");
         $this->cache = array();
         $this->class_name = array();
-        $this->create_name_cache();
-        $this->register_event("buddy");
+        $this->createNameCache();
+        $this->registerEvent("buddy");
         $this->bot->core("settings")
             ->create(
             "Whois", "MaxCacheSize", 100,
-            "What is the maximum number of whois entries that should be cached internally in the bot at the same time to reduce load on the SQL server?",
+            "What is the maximum number of whoIs entries that should be cached internally in the bot at the same time to reduce load on the SQL server?",
             "10;25;50;75;100;200;300;500;1000"
         );
         $this->bot->core("settings")
@@ -85,41 +85,41 @@ class Whois_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create(
             "Whois", "TimeValid", 1,
-            "After how many days should the whois information in a database entry be considered outdated and looked for an update? NOTICE: Only use values higher then one day if you have trouble connecting to the FC website or are running the external updating script.",
+            "After how many days should the whoIs information in a database entry be considered outdated and looked for an update? NOTICE: Only use values higher then one day if you have trouble connecting to the FC website or are running the external updating script.",
             "1;2;3;4;5"
         );
         $this->bot->core("settings")
             ->create('Whois', "Debug", FALSE, "Show debug information (such as Character ID, Org ID, etc)");
-        $this->update_table();
+        $this->updateTable();
     }
 
 
-    function update_table()
+    function updateTable()
     {
-        if ($this->bot->db->get_version("whois") == 5) {
+        if ($this->bot->db->get_version("whoIs") == 5) {
             return;
         }
-        switch ($this->bot->db->get_version("whois")) {
+        switch ($this->bot->db->get_version("whoIs")) {
         case 1: // Update Table version to prevent repeat update calls
             //was an update for a setting which isnt used in AoC
         case 2:
             $this->bot->db->update_table(
-                "whois", "class1", "modify",
+                "whoIs", "class1", "modify",
                 "ALTER IGNORE TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
             $this->bot->db->update_table(
-                "whois", "class2", "modify",
+                "whoIs", "class2", "modify",
                 "ALTER IGNORE TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
         case 3:
-            $this->bot->db->update_table("whois", "id", "alter", "ALTER TABLE #___whois CHANGE `id` BIGINT NOT NULL");
-            $this->bot->db->set_version("whois", 4);
-            $this->update_table();
+            $this->bot->db->update_table("whoIs", "id", "alter", "ALTER TABLE #___whois CHANGE `id` BIGINT NOT NULL");
+            $this->bot->db->set_version("whoIs", 4);
+            $this->updateTable();
             return;
         case 4:
-            $this->bot->db->update_table("whois", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
-            $this->bot->db->set_version("whois", 5);
-            $this->update_table();
+            $this->bot->db->update_table("whoIs", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
+            $this->bot->db->set_version("whoIs", 5);
+            $this->updateTable();
             break;
         default:
         }
@@ -172,7 +172,7 @@ class Whois_Core extends BasePassiveModule
     }
 
 
-    function create_name_cache()
+    function createNameCache()
     {
         $this->class_name[0] = "Commoner";
         $this->class_name[18] = "Barbarian";
@@ -194,14 +194,14 @@ class Whois_Core extends BasePassiveModule
 
     function cron()
     {
-        $this->cleanup_cache();
+        $this->cleanupCache();
     }
 
 
     // Removes old entries from cache to make room for new ones
     // All entries older then MaxTimeInCache get removed
     // If none meets this requirement the oldest entry gets removed to free one spot
-    function cleanup_cache()
+    function cleanupCache()
     {
         $oldesttime = -1;
         $oldestname = "";
@@ -234,7 +234,7 @@ class Whois_Core extends BasePassiveModule
 
 
     // Remove $who from cache
-    function remove_from_cache($who)
+    function removeFromCache($who)
     {
         if (isset($this->cache[$who])) {
             unset($this->cache[$who]);
@@ -243,13 +243,13 @@ class Whois_Core extends BasePassiveModule
 
 
     // Add $who to cache, make sure cache doesn't grow too large
-    function add_to_cache($who)
+    function addToCache($who)
     {
         // If cache has grown to maximum size clean it up
         if (count($this->cache) >= $this->bot->core("settings")
             ->get("Whois", "MaxCacheSize")
         ) {
-            $this->cleanup_cache();
+            $this->cleanupCache();
         }
         // We got room now, just add the new entry to cache
         $who["timestamp"] = time();
@@ -258,13 +258,13 @@ class Whois_Core extends BasePassiveModule
 
 
     /**
-     * Internal whois function with caching. Heavily modified to work with AoC.
+     * Internal whoIs function with caching. Heavily modified to work with AoC.
      *
-     * @param $name      User name of the player to lookup whois information
-     * @param $noupdate  If no stale data is cached, get whois information by adding the user as a buddy temporarily.
+     * @param $name      User name of the player to lookup whoIs information
+     * @param $noupdate  If no stale data is cached, get whoIs information by adding the user as a buddy temporarily.
      *                   You should set $noupdate to true, if you are sure the user is already a buddy.
-     * @param $nowait    If buddy added, wait until server sends whois information. Process other packets meanwhile.
-     *                   You should set $nowait to true, if you are about to update whois information for many users.
+     * @param $nowait    If buddy added, wait until server sends whoIs information. Process other packets meanwhile.
+     *                   You should set $nowait to true, if you are about to update whoIs information for many users.
      *
      * @return The WHO array, or false, or BotError
      */
@@ -318,10 +318,10 @@ class Whois_Core extends BasePassiveModule
             If the result isn't stale yet and the userid's match, use it.
             */
             if ($lookup[0]['updated'] >= (time() - ($this->bot->core("settings")
-                ->get("whois", "timevalid") * 24 * 3600))
+                ->get("whoIs", "timevalid") * 24 * 3600))
                 && $lookup[0]['ID'] == $uid
             ) {
-                $this->add_to_cache($who);
+                $this->addToCache($who);
                 return $who;
             }
         }
@@ -355,7 +355,7 @@ class Whois_Core extends BasePassiveModule
     /*
     Performs a quick check to make sure XML data is parsable.
     */
-    function check_xml($xml)
+    function checkXml($xml)
     {
         if ($xml instanceof BotError) {
             $this->bot->log("WHOIS", "CHECK_XML", "For some reason I was passed a BotError. This shouldn't happen!");
@@ -377,7 +377,7 @@ class Whois_Core extends BasePassiveModule
 
 
     /*
-    Updates whois cache info with passed array.
+    Updates whoIs cache info with passed array.
     */
     function update($who)
     {
@@ -397,7 +397,7 @@ class Whois_Core extends BasePassiveModule
                     . " updated = VALUES(updated) "
             );
             // Clear from memory cache
-            $this->remove_from_cache($who["nickname"]);
+            $this->removeFromCache($who["nickname"]);
             return TRUE;
         }
         else {
@@ -406,7 +406,7 @@ class Whois_Core extends BasePassiveModule
     }
 
 
-    function whois_details($source, $whois)
+    function whoisDetails($source, $whois)
     {
         $seen = "";
         $alts = "";
@@ -470,7 +470,7 @@ class Whois_Core extends BasePassiveModule
         if ($this->bot->core("settings")->get('Whois', 'Debug')) {
             $whois_debug = $this->bot->db->select("SELECT updated FROM #___whois WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC);
             $user_debug = $this->bot->db->select(
-                "SELECT id,notify,user_level,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC
+                "SELECT id,notify,userLevel,added_by,added_at,deleted_by,deleted_at,updated_at FROM #___users WHERE nickname = '" . $whois['nickname'] . "'", MYSQL_ASSOC
             );
             $window .= "\n##red## Debug Information:##end##\n";
             if (!empty($whois_debug[0]['updated'])) {
@@ -510,21 +510,21 @@ class Whois_Core extends BasePassiveModule
                     $flag .= "Notify";
                     $flag_count++;
                 }
-                if ($user_debug[0]['user_level'] == 2) {
+                if ($user_debug[0]['userLevel'] == 2) {
                     if ($flag_count >= 1) {
                         $flag .= ", ";
                     }
                     $flag .= "Member";
                     $flag_count++;
                 }
-                if ($user_debug[0]['user_level'] == 1) {
+                if ($user_debug[0]['userLevel'] == 1) {
                     if ($flag_count >= 1) {
                         $flag .= ", ";
                     }
                     $flag .= "Guest";
                     $flag_count++;
                 }
-                if ($user_debug[0]['user_level'] == 0) {
+                if ($user_debug[0]['userLevel'] == 0) {
                     if ($flag_count >= 1) {
                         $flag .= ", ";
                     }
@@ -549,7 +549,7 @@ class Whois_Core extends BasePassiveModule
                 ->chatcmd('addbuddy ' . $whois['nickname'], 'Add to buddylist', 'cc') . "\n";
             $window .= $this->bot->core("tools")
                 ->chatcmd('rembuddy ' . $whois['nickname'], 'Remove from buddylist', 'cc') . "\n";
-            //$window .= $this -> bot -> core("tools") -> chatcmd('history ' . $whois['nickname'], 'Character history') . "\n";
+            //$window .= $this -> bot -> core("tools") -> chatCommand('history ' . $whoIs['nickname'], 'Character history') . "\n";
         }
         return ($this->bot->core("tools")->make_blob("Details", $window));
     }

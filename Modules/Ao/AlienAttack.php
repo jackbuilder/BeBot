@@ -52,14 +52,14 @@ class AlienAttack extends BaseActiveModule
         		action VARCHAR(10),
         		player VARCHAR(15))"
         );
-        $this->register_command('all', 'city', 'GUEST');
-        $this->register_alias("city", "cloak");
-        $this->register_event("gmsg", "org");
+        $this->registerCommand('all', 'city', 'GUEST');
+        $this->registerAlias("city", "cloak");
+        $this->registerEvent("groupMessage", "org");
         $this->help['description'] = "Shows information and history pertaining to the city and city controller.";
         $this->help['command']['city'] = "- See description";
         $this->help['command']['cloak'] = "- See description";
-        $this->register_event("logon_notify");
-        $this->register_event("timer", "city");
+        $this->registerEvent("logon_notify");
+        $this->registerEvent("timer", "city");
         $classid = $this->bot->core("timer")
             ->create_timer_class("CityWarning", "Notify class used by the AlienAttack module.");
         $nextid = $this->bot->core("timer")
@@ -102,18 +102,18 @@ class AlienAttack extends BaseActiveModule
             ->create_timer_class_entry($classid, -2, 0, "", "");
         $nextid = $this->bot->core("timer")
             ->create_timer_class_entry($classid, $nextid, 60 * 15, "", "");
-        $this->delete_cloak_reminder();
+        $this->deleteCloakReminder();
         $this->bot->core("settings")
-            ->create("AlienAttack", "Spam", "none", "Should the bot spam to gc or tells (on logon) or both?", "none;gc;tell;both");
+            ->create("AlienAttack", "Spam", "none", "Should the bot spam to sendToGuildChat or tells (on logon) or both?", "none;sendToGuildChat;sendTell;both");
         $this->bot->core("settings")
-            ->create("AlienAttack", "Channel", "gc", "Into which channel should any output about alien attacks and city changes be send?", "gc;pgmsg;both");
+            ->create("AlienAttack", "Channel", "sendToGuildChat", "Into which channel should any output about alien attacks and city changes be send?", "sendToGuildChat;sendToGroup;both");
         $this->bot->core("settings")
             ->create("AlienAttack", "PublicTimer", FALSE, "Should a public timer in addition to the periodic spam be created on cloak up and down?");
         $this->bot->core("settings")
             ->create("AlienAttack", "CloakReminder", TRUE, "Should the bot send a reminder every 15mins if the cloak is still disabled?");
         $this->spam = FALSE;
         $setting = $this->bot->core("settings")->get('AlienAttack', 'Spam');
-        if ($setting == "tell" || $setting == "both") {
+        if ($setting == "sendTell" || $setting == "both") {
             $result = $this->bot->db->select("SELECT time FROM #___org_city WHERE action = 'off' ORDER BY time DESC LIMIT 0, 1");
             if (!empty($result)) {
                 if ($result[0][0] > time() - 1800) {
@@ -167,18 +167,18 @@ class AlienAttack extends BaseActiveModule
 
 
     /*
-    This gets called on a tell with the command
+    This gets called on a sendTell with the command
     */
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
-        return $this->city_blob();
+        return $this->cityBlob();
     }
 
 
     /*
     Makes the battle results
     */
-    function city_blob()
+    function cityBlob()
     {
         $result = $this->bot->db->select("SELECT time, action, player FROM #___org_city ORDER BY time DESC LIMIT 0, 12");
         if (!$result) {
@@ -262,7 +262,7 @@ class AlienAttack extends BaseActiveModule
     /*
     This gets called on a msg in the group
     */
-    function gmsg($name, $group, $msg)
+    function groupMessage($name, $group, $msg)
     {
         if ($name == "0") {
             $channel = $this->bot->core("settings")
@@ -284,14 +284,14 @@ class AlienAttack extends BaseActiveModule
                         $player = $info[1];
                         $setting = $this->bot->core("settings")
                             ->get('AlienAttack', 'Spam');
-                        if ($setting == "gc" || $setting == "both") {
+                        if ($setting == "sendToGuildChat" || $setting == "both") {
                             $this->bot->core("timer")
                                 ->add_timer(FALSE, "city", 1860, $player . " spam", "internal", 0, "CityWarningSpam");
                         }
                         $this->spam = TRUE;
                         $this->bot->core("timer")
                             ->add_timer(FALSE, "city", 60 * 60 + 1, $player . " cloak", "internal", 0, "CityWarning");
-                        $this->delete_cloak_reminder();
+                        $this->deleteCloakReminder();
                         if ($this->bot->core("settings")
                             ->get("AlienAttack", "PublicTimer")
                         ) {
@@ -299,7 +299,7 @@ class AlienAttack extends BaseActiveModule
                                 ->add_timer(
                                 FALSE, $player, 60 * 60 + 1, $this->bot
                                 ->core("shortcuts")
-                                ->get_short($this->bot->guildname) . "'s cloak can be enabled again", "gc", 0, "CityWarning"
+                                ->get_short($this->bot->guildname) . "'s cloak can be enabled again", "sendToGuildChat", 0, "CityWarning"
                             );
                         }
                         $this->bot->send_output("", "##highlight##" . $player . "##end## turned the cloaking device in our city ##highlight##off##end##!", $channel);
@@ -308,7 +308,7 @@ class AlienAttack extends BaseActiveModule
                         if (preg_match("/(.+) turned the cloaking device in your city on./i", $msg, $info)) {
                             $action = "on";
                             $player = $info[1];
-                            $this->delete_cloak_reminder();
+                            $this->deleteCloakReminder();
                             $this->bot->core("timer")
                                 ->add_timer(FALSE, "city", 60 * 60 + 1, $player . " cloakready", "internal", 0, "CityCloakReady");
                             if ($this->bot->core("settings")
@@ -318,7 +318,7 @@ class AlienAttack extends BaseActiveModule
                                     ->add_timer(
                                     FALSE, $player, 60 * 60 + 1, $this->bot
                                     ->core("shortcuts")
-                                    ->get_short($this->bot->guildname) . "'s cloak can be disabled again", "gc", 0, "CityWarning"
+                                    ->get_short($this->bot->guildname) . "'s cloak can be disabled again", "sendToGuildChat", 0, "CityWarning"
                                 );
                             }
                             $this->bot->send_output("", "##highlight##" . $player . "##end## turned the cloaking device in our city back ##highlight##on##end##!", $channel);
@@ -373,7 +373,7 @@ class AlienAttack extends BaseActiveModule
                                             else {
                                                 $action = "unknown";
                                                 $player = $msg;
-                                                //$this -> bot -> send_output("", "Something wierd is going on, and I don't know what it is!", $channel);
+                                                //$this -> bot -> sendOutput("", "Something wierd is going on, and I don't know what it is!", $channel);
                                             }
                                         }
                                     }
@@ -393,7 +393,7 @@ class AlienAttack extends BaseActiveModule
     }
 
 
-    function delete_cloak_reminder()
+    function deleteCloakReminder()
     {
         $reg_timer = $this->bot->core("timer")->list_timed_events("city");
         if (!empty($reg_timer)) {
@@ -409,7 +409,7 @@ class AlienAttack extends BaseActiveModule
     function notify($name)
     {
         $setting = $this->bot->core("settings")->get('AlienAttack', 'Spam');
-        if ($this->spam && ($setting == "tell" || $setting == "both")) {
+        if ($this->spam && ($setting == "sendTell" || $setting == "both")) {
             $this->bot->send_tell($name, "##red##Warning##end##: Alien Raid in City is in Progress. Please dont enter the city");
         }
     }

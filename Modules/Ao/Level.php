@@ -39,21 +39,21 @@ class Level extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->register_command('all', 'level', 'GUEST');
-        $this->register_command('all', 'mission', 'GUEST');
+        $this->registerCommand('all', 'level', 'GUEST');
+        $this->registerCommand('all', 'mission', 'GUEST');
         $this->help['description'] = 'Displayes teaming, pvp and mission levels.';
         $this->help['command']['level <level>'] = "Shows team and pvp ranges for a given <level> and which QL missions that level can roll";
         $this->help['command']['mission <level>'] = "Shows Levels that can Roll the given Mission <level>";
         $this->help['notes'] = "<pre>lvl is a synonym for <pre>level.<br>";
         $this->help['notes'] = "<pre>mish is a synonym for <pre>mission.<br>";
         $this->help['notes'] .= "Team and pvp levels has been known to be off especially for low levels.";
-        $this->register_alias("level", "lvl");
-        $this->register_alias("mission", "mish");
-        $this->make_cache();
+        $this->registerAlias("level", "lvl");
+        $this->registerAlias("mission", "mish");
+        $this->createCache();
     }
 
 
-    function make_cache()
+    function createCache()
     {
         $this->xplevel = array(
             1 => 1450,
@@ -532,15 +532,15 @@ class Level extends BaseActiveModule
     }
 
 
-    function command_handler($name, $msg, $origin)
+    function commandHandler($name, $msg, $origin)
     {
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
         switch ($command) {
         case 'level':
-            return $this->get_level($vars[1]);
+            return $this->getLevel($vars[1]);
         case 'mission':
-            return $this->get_mish($vars[1]);
+            return $this->getMish($vars[1]);
         default:
             return "Broken plugin, received unhandled command: $command";
         }
@@ -548,7 +548,7 @@ class Level extends BaseActiveModule
     }
 
 
-    function get_level($lvl)
+    function getLevel($lvl)
     {
         if (($lvl > 220) || ($lvl < 1)) {
             Return "Please choose a number between 1 and 220";
@@ -611,7 +611,7 @@ class Level extends BaseActiveModule
     }
 
 
-    function get_mish($mish)
+    function getMish($mish)
     {
         if (($mish > 250) || ($mish < 1)) {
             Return "Please choose a number between 1 and 250";
