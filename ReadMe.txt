@@ -109,7 +109,7 @@ For setting up the guild bot section please see bottom of this section.
 To switch logging off set "$log" to "off". You can also set it to "chat" 
 which will only log incoming and outgoing messages. If set to "all" 
 everything displayed on the console will be put into the log. The default is 
-"chat". Set "$log_path" to the place where you want logs to be saved. 
+"chat". Set "$logPath" to the place where you want logs to be saved.
 
 With "$command_prefix" you can determine what symbol commands start with. 
 The default here is "!". Note that you need to use the regex string here. 
@@ -122,7 +122,7 @@ The last 4 values are probably best left at default.
 Guild bot
 ---------
 
-To make a guild bot set "$guildbot" to true. Change "$guild_name" to the 
+To make a guild bot set "$guildBot" to true. Change "$guild_name" to the
 exact name of your guild. 
 
 AO only: Set "$guild_id" to the id of your guild. The easiest way to find 
@@ -145,7 +145,7 @@ your bot will attempt to relay to the player named "False")
 Raid bot
 --------
 
-To make a raid bot set "$guildbot" to false and leave "$guild_name" blank. 
+To make a raid bot set "$guildBot" to false and leave "$guild_name" blank.
 Set "$guild_id" to 0. For a raid bot you most likely want to set 
 $guild_relay_target = false; (note: false, not "false") 
 

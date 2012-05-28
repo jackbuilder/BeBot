@@ -463,7 +463,7 @@ class Raffle extends BaseActiveModule
             $this->announce = 0;
         }
         if ($this->end < time()) {
-            $this->unregisterEvent("cron", "2sec");
+            $this->unRegisterEvent("cron", "2sec");
             if (!empty($this->users)) {
                 $this->raffleResult($this->admin);
             }

@@ -121,7 +121,7 @@ class BotStatistics_Core extends BasePassiveModule
     }
 
 
-    function checkBots($name, $origin, $bot = FALSE, $dim = FALSE)
+    function checkBots($origin, $bot = FALSE, $dim = FALSE)
     {
         if (!$dim) {
             $dim = $this->bot->dimension;

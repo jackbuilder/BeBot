@@ -60,7 +60,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     }
 
 
-    function settings($user, $module, $setting, $new, $old)
+    function settings($new)
     {
         $rate = 1 / $new;
         $max = $new * 2;
@@ -117,7 +117,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     /*
     This gets called on cron
     */
-    function queue($module, $info)
+    function queue($info)
     {
         if ($info[1]) {
             $this->doAdd($info[0]);

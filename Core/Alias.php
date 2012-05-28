@@ -92,7 +92,6 @@ class Alias extends BaseActiveModule
 
     function commandHandler($name, $msg, $origin)
     {
-        $security = FALSE;
         $vars = explode(' ', $msg);
         $vars[0] = strtolower($vars[0]);
         $vars[1] = strtolower($vars[1]);

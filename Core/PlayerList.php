@@ -137,8 +137,9 @@ class PlayerList extends BasePassiveModule
                 // If we have a whoIs result, and its under 48 hours old,
                 if (!empty($result) && isset($result[0]['UPDATED'])) {
                     if (($result[0]['UPDATED'] + 172800 >= time()) && ($result[0]['ID'] >= 1)) {
-                        $age = time() - $result[0]['UPDATED'];
-                        $age = $age / 60 / 60;
+                        // FIXME: Unused
+                        //$age = time() - $result[0]['UPDATED'];
+                        //$age = $age / 60 / 60;
                         // cache in memory for future reference.
                         $this->add($result[0]['ID'], $uname);
                         return $result[0]['ID'];
@@ -216,7 +217,6 @@ class PlayerList extends BasePassiveModule
 
     public function exists($user)
     {
-        $return = FALSE;
         if (empty($user)) {
             $this->error->set("exist() called with empty string.");
             $this->bot->log("DEBUG", "PlayerList", "exist() called with empty string.");

@@ -52,7 +52,7 @@ class Items_Core extends BasePassiveModule
     function parseItems($itemText)
     {
         $items = array();
-        $count = preg_match_all('/' . $this->itemPattern . '/i', $itemText, $matches, PREG_SET_ORDER);
+        preg_match_all('/' . $this->itemPattern . '/i', $itemText, $matches, PREG_SET_ORDER);
         foreach ($matches as $match) {
             $item['lowid'] = $match[2];
             $item['highid'] = $match[3];

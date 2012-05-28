@@ -34,18 +34,6 @@ class Player
     //Game spesific variables
     private $userId = FALSE;
     private $userName = FALSE; //aka nickname
-    private $firstname = FALSE;
-    private $lastname = FALSE;
-    private $breed = FALSE;
-    private $gender = FALSE;
-    private $level = FALSE;
-    private $profession = FALSE;
-    private $aiLevel = FALSE;
-    private $organization = FALSE;
-    private $orgRank = FALSE;
-    //Bot spesific variables
-    private $accessLevel = FALSE;
-    private $userLevel = FALSE;
     private $preferences = array();
 
 

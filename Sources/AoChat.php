@@ -1189,7 +1189,7 @@ class AOChat
     }
 
 
-    function privategroup_leave($group)
+    function privategroup_leave()
     {
         $uid = $this->bot->core('player')->id($user);
         if ($uid instanceof BotError) {

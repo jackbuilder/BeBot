@@ -41,8 +41,6 @@ The Class itself...
 */
 class Queue_Core extends BasePassiveModule
 {
-    private $que;
-    private $que_low;
     private $queue_left;
     private $last_call;
 

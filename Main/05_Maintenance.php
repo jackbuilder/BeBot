@@ -139,7 +139,7 @@ class Maintenance extends BaseActiveModule
                 }
             }
         Default:
-            $this->unregisterEvent("cron", "5sec");
+            $this->unRegisterEvent("cron", "5sec");
             break;
         }
     }
@@ -290,7 +290,7 @@ class Maintenance extends BaseActiveModule
     }
 
 
-    function dontdo($name, $msg, $origin)
+    function dontdo($msg)
     {
         $msg = explode(" ", $msg, 4);
         Switch ($msg[0]) {

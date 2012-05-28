@@ -205,7 +205,7 @@ class Roster_Core extends BasePassiveModule
     }
 
 
-    function gmsg($name, $group, $msg)
+    function gmsg($name, $msg)
     {
         if ($name == "0") {
             if (preg_match("/(.+) kicked (.+) from the organization./i", $msg, $info)) {

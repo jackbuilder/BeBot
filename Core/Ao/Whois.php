@@ -275,7 +275,8 @@ class Whois_Core extends BasePassiveModule
      *
      * @return The WHO array, or false, or BotError
      */
-    function lookup($name, $noupdate = FALSE, $nowait = FALSE)
+    function lookup($name, $noupdate = FALSE, /** @noinspection PhpUnusedParameterInspection */
+        $nowait = FALSE)
     {
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $this->bot->core("statistics")
@@ -582,7 +583,6 @@ class Whois_Core extends BasePassiveModule
     function whoisDetails($source, $whois)
     {
         $seen = "";
-        $alts = "";
         $window = "\n##normal## Name:##end## ##highlight##";
         if ($whois['firstname'] != '') {
             $window .= $whois['firstname'] . " ";

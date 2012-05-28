@@ -132,7 +132,6 @@ class Time_Core extends BaseActiveModule
 
     function parseTime($timestr)
     {
-        $duration = 0;
         $timesize = 1;
         $timeunit = 1;
         if (stristr($timestr, 'm')) {

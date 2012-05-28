@@ -446,9 +446,7 @@ function getSiteData(
 
 
 function getSiteCurl(
-    $url, $strip_headers = FALSE, $timeout = FALSE,
-    $post = NULL,
-    $login = NULL
+    $url, $timeout = FALSE,
 ) // login should be username:password
 {
     $ch = curl_init();

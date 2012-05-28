@@ -121,7 +121,8 @@ class PBParser
      * @param String $string
      * @param String $classname - classname
      */
-    private function _create_class_body($classfile, &$string, $classname)
+    private function _create_class_body($classfile, &$string, /** @noinspection PhpUnusedParameterInspection */
+        $classname)
     {
         foreach ($classfile as $field) {
             $type = $this->_get_type($field);
@@ -215,7 +216,8 @@ class PBParser
      * @param String $string
      * @param String $classname - classname
      */
-    private function _create_class_constructor($classfile, &$string, $classname)
+    private function _create_class_constructor($classfile, &$string, /** @noinspection PhpUnusedParameterInspection */
+        $classname)
     {
         $string .= '  var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;' . "\n";
         $string .= "  public function __construct(" . '$reader=null' . ")\n  {\n";
@@ -270,7 +272,8 @@ class PBParser
      *
      * @param String $string the proton file as string
      */
-    private function _parse_message_type(&$string, $m_name, $path = '')
+    private function _parse_message_type(&$string, /** @noinspection PhpUnusedParameterInspection */
+        $m_name, $path = '')
     {
         $myarray = array();
         $string = trim($string);
@@ -401,7 +404,8 @@ class PBParser
      *
      * @param String $type - the type
      */
-    private function _check_type($type, $array, $path)
+    private function _check_type($type, /** @noinspection PhpUnusedParameterInspection */
+        $array, $path)
     {
         if (isset($this->scalar_types[strtolower($type)])) {
             return array(

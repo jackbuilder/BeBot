@@ -49,16 +49,16 @@ class BasePassiveModule
 
     protected function registerEvent($event, $target = FALSE)
     {
-        $ret = $this->bot->register_event($event, $target, $this);
+        $ret = $this->bot->registerEvent($event, $target, $this);
         if ($ret) {
             $this->error->set($ret);
         }
     }
 
 
-    protected function unregisterEvent($event, $target = FALSE)
+    protected function unRegisterEvent($event, $target = FALSE)
     {
-        $ret = $this->bot->unregister_event($event, $target, $this);
+        $ret = $this->bot->unRegisterEvent($event, $target, $this);
         if ($ret) {
             $this->error->set($ret);
         }
@@ -69,15 +69,15 @@ class BasePassiveModule
     {
         if ($this->linkName == NULL) {
             $this->linkName = strtolower($name);
-            $this->bot->register_module($this, strtolower($name));
+            $this->bot->registerModule($this, strtolower($name));
         }
     }
 
 
-    protected function unregisterModule()
+    protected function unRegisterModule()
     {
         if ($this->linkName != NULL) {
-            $this->bot->unregister_module($this->linkName);
+            $this->bot->unRegisterModule($this->linkName);
         }
     }
 

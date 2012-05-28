@@ -46,63 +46,6 @@ class PB extends BaseActiveModule
             'thigh' => 'legs',
             'left hand' => 'lhand'
         );
-    private $profs
-        = array(
-            'adventurer' => 'adv',
-            'agent' => 'agent',
-            'bureaucrat' => 'crat',
-            'doctor' => 'doc',
-            'enforcer' => 'enf',
-            'engineer' => 'eng',
-            'fixer' => 'fixer',
-            'keeper' => 'keeper',
-            'martial artist' => 'ma',
-            'meta-physicist' => 'mp',
-            'nano-technician' => 'nt',
-            'soldier' => 'sol',
-            'trader' => 'trader'
-        );
-    private $units
-        = array(
-            'adv' => array(
-                'infantry',
-                'artillery',
-                'support'
-            ),
-            'agent' => array('artillery'),
-            'crat' => array(
-                'control',
-                'extermination'
-            ),
-            'doc' => array('support'),
-            'enf' => array('infantry'),
-            'eng' => array('control'),
-            'fixer' => array(
-                'artillery',
-                'support'
-            ),
-            'keeper' => array(
-                'infantry',
-                'support'
-            ),
-            'ma' => array(
-                'infantry',
-                'support'
-            ),
-            'mp' => array(
-                'control',
-                'extermination',
-                'support'
-            ),
-            'nt' => array('extermination'),
-            'sol' => array('artillery'),
-            'trader' => array(
-                'artillery',
-                'control',
-                'support'
-            )
-        );
-
 
     function __construct(&$bot)
     {

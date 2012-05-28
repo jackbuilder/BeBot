@@ -129,7 +129,7 @@ class Whois_Core extends BasePassiveModule
     /*
     This gets called if a buddy logs on/off
     */
-    function buddy($name, $online, $level, $location, $class)
+    function buddy($name, $level, $location, $class)
     {
         $user = $this->bot->core("player")->id($name);
         $who = array();
@@ -409,7 +409,6 @@ class Whois_Core extends BasePassiveModule
     function whoisDetails($source, $whois)
     {
         $seen = "";
-        $alts = "";
         $window = "\n##normal##Name:##end## ##highlight##{$whois['nickname']}##end##\n";
         $window .= " ##normal##Level:##end## ##highlight##{$whois['level']}##end##\n";
         $window .= " ##normal##Class:##end## ##highlight##{$whois['class']}##end##\n";

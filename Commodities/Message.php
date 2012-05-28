@@ -45,7 +45,7 @@ class message
     }
 
 
-    function setDestination($destination, $overwrite = FALSE)
+    function setDestination($destination)
     {
         if (empty($this->destination)) {
             $this->destination[] = $destination;

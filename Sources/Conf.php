@@ -35,7 +35,8 @@ $conf = new Conf($argv, $confc);
 class Conf
 {
     private $conf;
-    private $login;
+    private /** @noinspection PhpUnusedPrivateFieldInspection */
+        $login;
 
 
     function __construct($argv, $confc)
@@ -48,7 +49,7 @@ class Conf
     }
 
 
-    function load($argv = FALSE)
+    function load()
     {
         if (file_exists("./conf/" . $this->cf)) {
             require "./conf/" . $this->cf;
@@ -139,17 +140,17 @@ class Conf
         echo "Superadmins enter nothing when done.\n";
         $sa[0]
             = '
-	// $super_admin["Superadmin1"] = true;';
+	// $superAdmin["Superadmin1"] = true;';
         $sa[1]
             = '
-	// $super_admin["Superadmin2"] = true;';
+	// $superAdmin["Superadmin2"] = true;';
         $san = 0;
         while (!$sac) {
             $saask = $this->ask("SuperAdmin:");
             if ($saask != "") {
                 $sa[$san]
                     = '
-	$super_admin["' . $saask . '"] = true;';
+	$superAdmin["' . $saask . '"] = true;';
                 $san++;
             }
             else {
@@ -169,7 +170,7 @@ class Conf
 	$guild = "' . $guild . '";				// Name of the guild running the bot (AOC only)
 
 	/*
-	Suggested values for owner and super_admin:
+	Suggested values for owner and superAdmin:
 	We suggest that the owner should be the main characer on the
 	account for $ao_username.
 	super_admis should be alts on the same account.
@@ -181,17 +182,17 @@ class Conf
 	$owner = "' . $owner . '";				 // Owner of the bot.' . $sa . '
 
 
-	// $other_bots["Bot1"] = true;	 // All other bots that are guildmembers/raidbotmembers
-	// $other_bots["Bot2"] = true;
+	// $otherBots["Bot1"] = true;	 // All other bots that are guildmembers/raidbotmembers
+	// $otherBots["Bot2"] = true;
 
 
-	$guildbot = ' . $guildbot . ';				// false if its a raidbot.
-	$guild_id = 00000001;			// only if its a guildbot.
+	$guildBot = ' . $guildbot . ';				// false if its a raidbot.
+	$guild_id = 00000001;			// only if its a guildBot.
 
 
 	$log = "chat";					 // logging all/chat/off
-	$log_path = "./log";			 // relative/absolute path of logfiles
-	$log_timestamp = "none";	//Valid options are: datetime, date, time, none.  Always defaults to datetime if missing or invalid.
+	$logPath = "./log";			 // relative/absolute path of logfiles
+	$logTimestamp = "none";	//Valid options are: datetime, date, time, none.  Always defaults to datetime if missing or invalid.
 
 
 	/*
@@ -220,11 +221,11 @@ class Conf
 	WARNING!  Enabling proxies will allow you to pull information from web servers if you have been blocked.
 	The more proxy addresses you have, the slower each lookup will be.  It is recommended that no more than
 	one proxy be added at any given time.  Proxies will only be used as a fallback (if the first lookup fails).
-	Format for $proxy_server_address: IP:PORT (The list is parsed as a comma-seperated list)
-	Example: $proxy_server_address = "4.2.2.2:80,4.2.2.3:80,4.2.2.4:80";
+	Format for $proxyServerAddress: IP:PORT (The list is parsed as a comma-seperated list)
+	Example: $proxyServerAddress = "4.2.2.2:80,4.2.2.3:80,4.2.2.4:80";
 	*/
-	$use_proxy_server = false;				// Enable simple web proxy server for HTTP lookups?
-	$proxy_server_address = "";				// Proxy server to use address to use
+	$useProxyServer = false;				// Enable simple web proxy server for HTTP lookups?
+	$proxyServerAddress = "";				// Proxy server to use address to use
 
 ?>';
         $fp = fopen('./conf/' . $this->cf, 'w');

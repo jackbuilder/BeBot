@@ -19,10 +19,14 @@ class ServerConnection
     private $m_ServerAddress;
     private $m_ServerPort;
 
-    private $m_ClientEndpointName;
-    private $m_ClientEndpointID;
-    private $m_ServerEndpointID;
-    private $m_ServerEndpointName;
+    private /** @noinspection PhpUnusedPrivateFieldInspection */
+        $m_ClientEndpointName;
+    private /** @noinspection PhpUnusedPrivateFieldInspection */
+        $m_ClientEndpointID;
+    private /** @noinspection PhpUnusedPrivateFieldInspection */
+        $m_ServerEndpointID;
+    private /** @noinspection PhpUnusedPrivateFieldInspection */
+        $m_ServerEndpointName;
 
     private $m_Socket;
 
@@ -207,7 +211,7 @@ class ServerConnection
     }
 
 
-    protected function EncryptAndSend($data, $rpcID)
+    protected function EncryptAndSend($data)
     {
         $stream = new BinaryStream();
 

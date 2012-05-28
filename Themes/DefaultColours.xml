@@ -1,8 +1,8 @@
-<theme name="Default theme for BeBot" version="1.0" author="Alreadythere"
-       link="">
-    <color name="normal" color="lightyellow"/>
-    <color name="highlight" color="aqua"/>
-    <color name="error" color="red"/>
-    <color name="blob_title" color="tan"/>
-    <color name="blob_text" color="forestgreen"/>
-</theme>
+<bebot:theme name="Default theme for BeBot" version="1.0" author="Alreadythere"
+       link="" xmlns:bebot="theme">
+    <bebot:color name="normal" color="lightyellow"/>
+    <bebot:color name="highlight" color="aqua"/>
+    <bebot:color name="error" color="red"/>
+    <bebot:color name="blob_title" color="tan"/>
+    <bebot:color name="blob_text" color="forestgreen"/>
+</bebot:theme>

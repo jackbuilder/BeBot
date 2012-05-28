@@ -421,7 +421,7 @@ class Raid extends BaseActiveModule
                 $this->move = FALSE;
                 $this->announce = FALSE;
                 $this->user2 = array();
-                $this->unregisterEvent("cron", "1min");
+                $this->unRegisterEvent("cron", "1min");
                 $this->bot->send_output($name, "##highlight##$name##end## has stopped the raid.", "both");
                 $this->bot->db->query("UPDATE #___raid_points SET raiding = 0");
                 $this->locked = FALSE;

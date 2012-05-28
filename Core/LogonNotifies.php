@@ -47,7 +47,7 @@
  * of some things on bot restarts, useful for modules that only should do something if a
  * character logs in for real, instead of the possibly false logons on bot startup.
  */
-$logon_notifies_core = new Logon_Notifies_Core($bot);
+new Logon_Notifies_Core($bot);
 class Logon_Notifies_Core extends BasePassiveModule
 {
     var $bot;
@@ -130,15 +130,15 @@ class Logon_Notifies_Core extends BasePassiveModule
         else {
             return;
         }
-        $thistime = time();
-        if ($thistime >= $this->startup) {
+        $thisTime = time();
+        if ($thisTime >= $this->startup) {
             $starting = FALSE;
         }
         else {
             $starting = TRUE;
         }
         foreach ($this->notifies as $user => $time) {
-            if ($time <= $thistime) {
+            if ($time <= $thisTime) {
                 foreach ($this->modules as $module) {
                     if ($module != NULL) {
                         $module->notify($user, $starting);

@@ -99,7 +99,6 @@ class BuddyList extends BasePassiveModule
                 }
             }
         }
-        $end = "";
         if (!$member) {
             $end = " (not on notify)";
             // Using aoc -> buddyRemove() here is an exception, all the checks in chat -> buddyRemove() aren't needed!

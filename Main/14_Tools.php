@@ -223,11 +223,7 @@ class tools extends BasePassiveModule
     }
 
 
-    function getSiteCurl(
-        $url, $strip_headers = FALSE, $timeout = FALSE,
-        $post = NULL,
-        $login = NULL
-    ) // login should be username:password
+    function getSiteCurl($url, $timeout = FALSE) // login should be username:password
     {
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $url);

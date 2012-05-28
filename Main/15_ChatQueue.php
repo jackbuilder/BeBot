@@ -37,12 +37,6 @@ The Class itself...
 */
 class Chat_Queue_Core extends BasePassiveModule
 {
-    private $que;
-    private $que_low;
-    private $msgs_left;
-    private $last_call;
-
-
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
@@ -60,7 +54,7 @@ class Chat_Queue_Core extends BasePassiveModule
     /*
     This gets called on cron
     */
-    function queue($name, $info)
+    function queue($info)
     {
         $to = $info[0];
         $msg = $info[1];

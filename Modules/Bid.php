@@ -154,7 +154,7 @@ class Bid extends BaseActiveModule
                 $this->bot->send_output("", "Auction for item ##highlight##" . $this->bid . "##end## Canceled", "both");
                 $this->bid = "";
                 $this->type = FALSE;
-                $this->unregisterEvent("cron", "2sec");
+                $this->unRegisterEvent("cron", "2sec");
             }
             else {
                 Return ("##error##Error: No Auction in Progress##end##");
@@ -299,7 +299,7 @@ class Bid extends BaseActiveModule
                 );
             }
             $this->bid = "";
-            $this->unregisterEvent("cron", "2sec");
+            $this->unRegisterEvent("cron", "2sec");
         }
     }
 

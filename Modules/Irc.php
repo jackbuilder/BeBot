@@ -709,9 +709,9 @@ class IRC extends BaseActiveModule
         $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'level (.*)', $this->bot->commands["sendTell"]["irc"], 'ircLevel');
         $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'lvl (.*)', $this->bot->commands["sendTell"]["irc"], 'ircLevel');
         $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'pvp (.*)', $this->bot->commands["sendTell"]["irc"], 'ircLevel');
-        //$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'command', $this -> bot -> commands["sendTell"]["irc"], 'command');
+        //$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commPre . 'command', $this -> bot -> commands["sendTell"]["irc"], 'command');
         $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'is (.*)', $this->bot->commands["sendTell"]["irc"], 'ircIs');
-        //$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commpre . 'sendTell (.*)', $this -> bot -> commands["sendTell"]["irc"], 'ao_msg');
+        //$this -> irc -> registerActionhandler(SMARTIRC_TYPE_QUERY, $this -> bot -> commPre . 'sendTell (.*)', $this -> bot -> commands["sendTell"]["irc"], 'ao_msg');
         $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'online', $this->bot->commands["sendTell"]["irc"], 'ircOnline');
         $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'whoIs', $this->bot->commands["sendTell"]["irc"], 'ircWhois');
         $this->irc->registerActionhandler(SMARTIRC_TYPE_QUERY, $this->bot->commpre . 'userId (.*)', $this->bot->commands["sendTell"]["irc"], 'ircUserId');
@@ -759,7 +759,7 @@ class IRC extends BaseActiveModule
         if ($this->irc != NULL) {
             $this->irc->disconnect();
             $this->irc = NULL;
-            $this->unregisterEvent("cron", "1sec");
+            $this->unRegisterEvent("cron", "1sec");
             $this->bot->core("settings")->save("irc", "connected", FALSE);
             $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . " - IRC'");
             return "Disconnected from IRC server.";

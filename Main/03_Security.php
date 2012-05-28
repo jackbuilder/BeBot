@@ -826,7 +826,7 @@ class Security_Core extends BaseActiveModule
             }
         }
 
-        if ($this->bot->guildbot) // If this is a guildbot, we can only add guests.
+        if ($this->bot->guildbot) // If this is a guildBot, we can only add guests.
         {
             $level = "GUEST";
             $lvlnum = GUEST;
@@ -981,7 +981,7 @@ class Security_Core extends BaseActiveModule
     } // End function getGroupId()
 
     // Shows the security commands.
-    function showSecurityMenu($source)
+    function showSecurityMenu()
     { // Start function showSecurityMenu
         $inside = "Security System Main Menu\n\n";
         $inside .= "[" . $this->bot->core("tools")
@@ -1990,7 +1990,7 @@ class Security_Core extends BaseActiveModule
         $this->cacheUsers(); // Cache users security.
         $this->cacheGroups(); // Admin groups and members.
         if ($this->bot->guildbot) {
-            $this->cacheOrgRanks(); // Cache org rank security if this is a guildbot.
+            $this->cacheOrgRanks(); // Cache org rank security if this is a guildBot.
         }
     } // End function cacheSecurity()
 
