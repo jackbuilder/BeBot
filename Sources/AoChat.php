@@ -174,11 +174,11 @@ class AOChat
         */
         if (PHP_INT_SIZE == 4) {
             $phpbit = "32 bit";
-            $this->sixtyfourbit = false;
+            $this->sixtyfourbit = FALSE;
         }
         else {
             $phpbit = "64 bit";
-            $this->sixtyfourbit = true;
+            $this->sixtyfourbit = TRUE;
         }
         $this->bot->log("MAIN", "START", "PHP install detected as being $phpbit");
     }
@@ -233,13 +233,13 @@ class AOChat
         }
         $this->socket = $s;
         $this->state = "auth";
-        if (@socket_connect($s, $server, $port) === false) {
+        if (@socket_connect($s, $server, $port) === FALSE) {
             trigger_error(
                 "Could not connect to the " . strtoupper(AOCHAT_GAME) . " Chat server ($server:$port): " .
                     socket_strerror(socket_last_error($s)), E_USER_WARNING
             );
             $this->disconnect();
-            return false;
+            return FALSE;
         }
         /* For AO we expect the login seed when we connect to the chatserver */
         if (strtolower(AOCHAT_GAME) == "ao") {
@@ -250,7 +250,7 @@ class AOChat
                     E_USER_WARNING
                 );
                 $this->disconnect();
-                return false;
+                return FALSE;
             }
         }
         return $s;
@@ -279,12 +279,12 @@ class AOChat
         $loginServer = new LoginServerConnection($this, $username, $password, $serverAddress, $serverPort, LOGIN_TYPE_PROTOBUF);
         if (!$loginServer->Connect()) {
             trigger_error("Could not connect to the Loginserver (" . $serverAddress . ":" . $serverPort . ")");
-            return false;
+            return FALSE;
         }
         if (!$loginServer->HandlePackets()) {
             $loginServer->Disconnect("Error while handling packets for loginserver");
             trigger_error("Error while handling packets for Loginserver (" . $serverAddress . ":" . $serverPort . ")");
-            return false;
+            return FALSE;
         }
         $loginServer->Disconnect("Done");
 
@@ -295,12 +295,12 @@ class AOChat
         ), $loginServer->GetCharacterServerPort(), $loginServer->GetEndpointType());
         if (!$characterServer->Connect()) {
             trigger_error("Could not connect to the Characterserver (" . $loginServer->GetCharacterServerAddress() . ":" . $loginServer->GetCharacterServerPort() . ")");
-            return false;
+            return FALSE;
         }
         if (!$characterServer->HandlePackets()) {
             $characterServer->Disconnect("Error while handling packets for characterserver");
             trigger_error("Error while handling packets for Characterserver (" . $loginServer->GetCharacterServerAddress() . ":" . $loginServer->GetCharacterServerPort() . ")");
-            return false;
+            return FALSE;
         }
         $characterServer->Disconnect("Done");
 
@@ -319,13 +319,13 @@ class AOChat
         if (!is_resource($this->socket)) /* this is fatal */ {
             die("Could not create socket.\n");
         }
-        if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
+        if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === FALSE) {
             trigger_error(
                 "Could not connect to the " . strtoupper(AOCHAT_GAME) . " Chatserver (" . $this->ServerAddress . ":"
                     . $this->ServerPort . ")" . socket_strerror(socket_last_error($this->socket)), E_USER_WARNING
             );
             $this->disconnect();
-            return false;
+            return FALSE;
         }
 
         // Prepare the login packet and send it
@@ -340,7 +340,7 @@ class AOChat
             ));
             $this->send_packet($loginCharacterPacket);
             $this->state = "connected";
-            return true;
+            return TRUE;
         }
 
         if ($this->serverseed != 0) {
@@ -355,7 +355,7 @@ class AOChat
                     . $this->ServerPort . ") Login cookie was missing.\n"
             );
         }
-        return false;
+        return FALSE;
     }
 
 
@@ -412,9 +412,9 @@ class AOChat
         // Prepare an array of all characters returned
         for ($i = 0; $i < sizeof($packet->args[0]); $i++) {
             $this->chars[] = array(
-                "id" => $packet->args[0][$i],
-                "name" => ucfirst(strtolower($packet->args[1][$i])),
-                "level" => $packet->args[2][$i],
+                "id"     => $packet->args[0][$i],
+                "name"   => ucfirst(strtolower($packet->args[1][$i])),
+                "level"  => $packet->args[2][$i],
                 "online" => $packet->args[3][$i]
             );
         }
@@ -456,7 +456,7 @@ class AOChat
         // Make sure we have a valid character to login
         if (!is_array($char)) {
             if (empty($field)) {
-                return false;
+                return FALSE;
             }
             else {
                 foreach ($this->chars as $e) {
@@ -478,13 +478,13 @@ class AOChat
 
         // Check if login was successfull.
         if ($pr->type != AOCP_LOGIN_OK) {
-            return false;
+            return FALSE;
         }
 
         $this->char = $char;
         // We are authenticated and logged in. Everything is ok.
         $this->state = "ok";
-        return true;
+        return TRUE;
     }
 
 
@@ -534,13 +534,13 @@ class AOChat
     function wait_for_certain_packet($type, $args = array(), $time = 5)
     {
         // Prevent this function from being called recursively
-        static $already_running = false;
+        static $already_running = FALSE;
         if ($already_running) {
             $this->bot->log("NETWORK", "ERROR", "AOChat::wait_for_certain_packet() called recursively! Don't do that!");
             $this->bot->log("DEBUG", "AOChat", $this->bot->debug_bt());
-            return false;
+            return FALSE;
         }
-        $already_running = true;
+        $already_running = TRUE;
 
         // Save start time
         $time_left = $time;
@@ -555,20 +555,20 @@ class AOChat
 
             // Check if connection was lost --> return
             if ($packet == "disconnected") {
-                $already_running = false;
+                $already_running = FALSE;
                 return "disconnected";
             }
 
             // Check if this packet is the one we are looking for --> return
             if (($packet instanceof AOChatPacket) && ($packet->type == $type)) {
-                $args_match = true;
+                $args_match = TRUE;
                 for ($i = 0; $i < count($packet->args); $i++) {
                     if ($args[$i] !== NULL && $packet->args[$i] != $args[$i]) {
-                        $args_match = false;
+                        $args_match = FALSE;
                     }
                 }
                 if ($args_match) {
-                    $already_running = false;
+                    $already_running = FALSE;
                     return $packet;
                 }
             }
@@ -578,8 +578,8 @@ class AOChat
             $current_time = (float)$usec + (float)$sec;
             $time_left = (float)$time - ($current_time - $start_time);
         }
-        $already_running = false;
-        return false;
+        $already_running = FALSE;
+        return FALSE;
     }
 
 
@@ -618,7 +618,7 @@ class AOChat
         $data = "";
         $rlen = $len;
         while ($rlen > 0) {
-            if (($tmp = socket_read($this->socket, $rlen)) === false) {
+            if (($tmp = socket_read($this->socket, $rlen)) === FALSE) {
                 if (!is_resource($this->socket)) {
                     $this->disconnect();
                     die("Read error: $last_error\n");
@@ -685,9 +685,9 @@ class AOChat
             //$dispatcher->post($signal, 'onGroupAnnounce');
             //unset($signal);
             $event = new sfEvent($this, 'Core.on_group_announce', array(
-                'source' => $gid,
+                'source'  => $gid,
                 'message' => $name,
-                'status' => $status
+                'status'  => $status
             ));
             $this->bot->dispatcher->notify($event);
 
@@ -706,7 +706,7 @@ class AOChat
             //$dispatcher->post($signal, 'onGroupInvite');
 
             $event = new sfEvent($this, 'Core.on_group_invite', array(
-                'source' => $gid,
+                'source'  => $gid,
                 'message' => 'invite'
             ));
             $this->bot->dispatcher->notify($event);
@@ -730,7 +730,7 @@ class AOChat
             //unset($signal);
 
             $event = new sfEvent($this, 'Core.on_player_name', array(
-                'id' => $id,
+                'id'   => $id,
                 'name' => $name
             ));
             $this->bot->dispatcher->notify($event);
@@ -752,7 +752,7 @@ class AOChat
             echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
 
             $event = new sfEvent($this, 'Core.on_player_id', array(
-                'id' => $id,
+                'id'   => $id,
                 'name' => $name
             ));
             $this->bot->dispatcher->notify($event);
@@ -766,20 +766,20 @@ class AOChat
                 list ($bid, $bonline, $blevel, $blocation, $bclass) = $packet->args;
                 $this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | AOC_BUDDY_KNOWN;
                 $event = new sfEvent($this, 'Core.on_buddy_onoff', array(
-                    'id' => $bid,
-                    'online' => $bonline,
-                    'level' => $blevel,
+                    'id'       => $bid,
+                    'online'   => $bonline,
+                    'level'    => $blevel,
                     'location' => $blocation,
-                    'class' => $bclass
+                    'class'    => $bclass
                 ));
             }
             else {
                 list ($bid, $bonline, $btype) = $packet->args;
                 $this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | (ord($btype) ? AOC_BUDDY_KNOWN : 0);
                 $event = new sfEvent($this, 'Core.on_buddy_onoff', array(
-                    'id' => $bid,
+                    'id'     => $bid,
                     'online' => $bonline,
-                    'type' => $btype
+                    'type'   => $btype
                 ));
             }
 
@@ -806,7 +806,7 @@ class AOChat
 //				unset($signal);
 
             $event = new sfEvent($this, 'Core.on_buddy_remove', array(
-                'source' => 'system',
+                'source'  => 'system',
                 'message' => $pakcte->args[0]
             ));
             $this->bot->dispatcher->notify($event);
@@ -829,13 +829,13 @@ class AOChat
                 if (!is_resource($this->socket)) /* this is fatal */ {
                     die("Could not create socket.\n");
                 }
-                if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === false) {
+                if (@socket_connect($this->socket, $this->ServerAddress, $this->ServerPort) === FALSE) {
                     trigger_error(
                         "Could not connect to the " . strtoupper(AOCHAT_GAME) . " Chatserver (" .
                             $this->ServerAddress . ":" . $this->ServerPort . ")" . socket_strerror(socket_last_error($s)), E_USER_WARNING
                     );
                     $this->disconnect();
-                    return false;
+                    return FALSE;
                 }
                 // echo "Resending auth to chatserver [Character:" . $this->char["name"] . ", id:" . $this->char["id"] . "]\n";
                 $this->state = "connected";
@@ -858,7 +858,7 @@ class AOChat
             //unset($signal);
 
             $event = new sfEvent($this, 'Core.on_privgroup_join', array(
-                'source' => $id,
+                'source'  => $id,
                 'message' => 'join'
             ));
             $this->bot->dispatcher->notify($event);
@@ -876,7 +876,7 @@ class AOChat
             //unset($signal);
 
             $event = new sfEvent($this, 'Core.on_privgroup_leave', array(
-                'source' => $id,
+                'source'  => $id,
                 'message' => 'leave'
             ));
             $this->bot->dispatcher->notify($event);
@@ -895,7 +895,7 @@ class AOChat
             //unset($signal);
 
             $event = new sfEvent($this, 'Core.on_tell', array(
-                'source' => $id,
+                'source'  => $id,
                 'message' => $message
             ));
             $this->bot->dispatcher->notify($event);
@@ -911,7 +911,7 @@ class AOChat
             //$dispatcher->post($signal, 'onPgMessage');
 
             $event = new sfEvent($this, 'Core.on_privgroup_message', array(
-                'source' => $id,
+                'source'  => $id,
                 'message' => $message
             ));
             $this->bot->dispatcher->notify($event);
@@ -978,7 +978,7 @@ class AOChat
             fwrite($this->debug, "\n=====\n");
         }
         socket_write($this->socket, $data, strlen($data));
-        return true;
+        return TRUE;
     }
 
 
@@ -1031,14 +1031,14 @@ class AOChat
         */
 
         if (!$this->bot->core('player')->exists($u)) {
-            return false;
+            return FALSE;
         }
     }
 
 
     function lookup_group($arg, $type = 0)
     {
-        $is_gid = false;
+        $is_gid = FALSE;
         // This should probably be moved out of AOChat and into Core/PlayerList.php
         if ($type && ($is_gid = (strlen($arg) === 5 && (ord($arg[0]) & ~0x80) < 0x10))) {
             return $arg;
@@ -1046,7 +1046,7 @@ class AOChat
         if (!$is_gid) {
             $arg = strtolower($arg);
         }
-        return isset($this->gid[$arg]) ? $this->gid[$arg] : false;
+        return isset($this->gid[$arg]) ? $this->gid[$arg] : FALSE;
     }
 
 
@@ -1060,8 +1060,8 @@ class AOChat
     function get_gname($g)
     {
         // This should probably be moved out of AOChat and into Core/GroupList.php
-        if (($gid = $this->lookup_group($g, 1)) === false) {
-            return false;
+        if (($gid = $this->lookup_group($g, 1)) === FALSE) {
+            return FALSE;
         }
         return $this->gid[$gid];
     }
@@ -1084,7 +1084,7 @@ class AOChat
             $uid = $user;
         }
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         return $this->send_packet(
             new AOChatPacket("out", AOCP_MSG_PRIVATE, array(
@@ -1099,8 +1099,8 @@ class AOChat
     /* General chat groups */
     function send_group($group, $msg, $blob = "\0")
     {
-        if (($gid = $this->get_gid($group)) === false) {
-            return false;
+        if (($gid = $this->get_gid($group)) === FALSE) {
+            return FALSE;
         }
         return $this->send_packet(
             new AOChatPacket("out", AOCP_GROUP_MESSAGE, array(
@@ -1114,8 +1114,8 @@ class AOChat
 
     function group_join($group)
     {
-        if (($gid = $this->get_gid($group)) === false) {
-            return false;
+        if (($gid = $this->get_gid($group)) === FALSE) {
+            return FALSE;
         }
         return $this->send_packet(
             new AOChatPacket("out", AOCP_GROUP_DATA_SET, array(
@@ -1129,8 +1129,8 @@ class AOChat
 
     function group_leave($group)
     {
-        if (($gid = $this->get_gid($group)) === false) {
-            return false;
+        if (($gid = $this->get_gid($group)) === FALSE) {
+            return FALSE;
         }
         return $this->send_packet(
             new AOChatPacket("out", AOCP_GROUP_DATA_SET, array(
@@ -1144,8 +1144,8 @@ class AOChat
 
     function group_status($group)
     {
-        if (($gid = $this->get_gid($group)) === false) {
-            return false;
+        if (($gid = $this->get_gid($group)) === FALSE) {
+            return FALSE;
         }
         return $this->grp[$gid];
     }
@@ -1161,7 +1161,7 @@ class AOChat
             $gid = $group;
         }
         if ($gid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         return $this->send_packet(
             new AOChatPacket("out", AOCP_PRIVGRP_MESSAGE, array(
@@ -1177,7 +1177,7 @@ class AOChat
     {
         $gid = $this->bot->core('player')->id($group);
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_JOIN, $gid));
     }
@@ -1193,7 +1193,7 @@ class AOChat
     {
         $uid = $this->bot->core('player')->id($user);
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_PART, $gid));
     }
@@ -1203,7 +1203,7 @@ class AOChat
     {
         $uid = $this->bot->core('player')->id($user);
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_INVITE, $uid));
     }
@@ -1213,7 +1213,7 @@ class AOChat
     {
         $uid = $this->bot->core('player')->id($user);
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_KICK, $uid));
     }
@@ -1235,10 +1235,10 @@ class AOChat
             $uid = $this->bot->core('player')->id($user);
         }
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         if ($uid === $this->char['id']) {
-            return false;
+            return FALSE;
         }
         if (strtolower(AOCHAT_GAME) == "ao") {
             $uid = array(
@@ -1254,7 +1254,7 @@ class AOChat
     {
         $uid = $this->bot->core('player')->id($user);
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         return $this->send_packet(new AOChatPacket("out", AOCP_BUDDY_REMOVE, $uid));
     }
@@ -1288,7 +1288,7 @@ class AOChat
             $uid = $who;
         }
         if ($uid instanceof BotError) {
-            return false;
+            return FALSE;
         }
         if (!isset($this->buddies[$uid])) {
             return 0;
@@ -1299,7 +1299,7 @@ class AOChat
 
     function buddy_online($who)
     {
-        return ($this->buddy_exists($who) & AOC_BUDDY_ONLINE) ? true : false;
+        return ($this->buddy_exists($who) & AOC_BUDDY_ONLINE) ? TRUE : FALSE;
     }
 
 
@@ -1353,7 +1353,7 @@ class AOChat
         }
         $r = 1;
         $p = $base;
-        while (true) {
+        while (TRUE) {
             if (bcmod($exp, 2)) {
                 $r = bcmod(bcmul($p, $r), $mod);
                 $exp = bcsub($exp, "1");
@@ -1529,10 +1529,10 @@ class AOChat
     function aochat_crypt($key, $str)
     {
         if (strlen($key) != 32) {
-            return false;
+            return FALSE;
         }
         if (strlen($str) % 8 != 0) {
-            return false;
+            return FALSE;
         }
         $now = array(
             0,

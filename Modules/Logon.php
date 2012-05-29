@@ -45,7 +45,7 @@ class Logon extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("logon", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("logon", "true") . "
 				(id BIGINT NOT NULL PRIMARY KEY,
 				message VARCHAR(255))"
         );
@@ -59,15 +59,15 @@ class Logon extends BaseActiveModule
         $this->registerEvent("connect");
         $this->updateTable();
         $this->bot->core("colors")
-            ->define_scheme("logon", "logon_spam", "darkaqua");
+            ->defineScheme("logon", "logon_spam", "darkaqua");
         $this->bot->core("colors")
-            ->define_scheme("logon", "level", "lightteal");
+            ->defineScheme("logon", "level", "lightteal");
         $this->bot->core("colors")
-            ->define_scheme("logon", "ailevel", "lightgreen");
+            ->defineScheme("logon", "ailevel", "lightgreen");
         $this->bot->core("colors")
-            ->define_scheme("logon", "organization", "darkaqua");
+            ->defineScheme("logon", "organization", "darkaqua");
         $this->bot->core("colors")
-            ->define_scheme("logon", "logoff_spam", "yellow");
+            ->defineScheme("logon", "logoff_spam", "yellow");
         $this->bot->core("settings")
             ->create("Logon", "Enable", TRUE, "Should logon spam be enabled at all?");
         $this->bot->core("settings")
@@ -100,13 +100,13 @@ class Logon extends BaseActiveModule
 
     function updateTable()
     {
-        if ($this->bot->db->get_version("logon") == 2) {
+        if ($this->bot->db->getVersion("logon") == 2) {
             return;
         }
-        switch ($this->bot->db->get_version("logon")) {
+        switch ($this->bot->db->getVersion("logon")) {
         case 1:
-            $this->bot->db->update_table("logon", "id", "alter", "ALTER TABLE #___logon MODIFY id BIGINT NOT NULL");
-            $this->bot->db->set_version("logon", 2);
+            $this->bot->db->updateTable("logon", "id", "alter", "ALTER TABLE #___logon MODIFY id BIGINT NOT NULL");
+            $this->bot->db->setVersion("logon", 2);
             $this->updateTable();
         default:
         }

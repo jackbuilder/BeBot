@@ -67,7 +67,7 @@ class Raffle extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Raffle", "timer", 0, "How Long shold a Raffle Last? 0 = disabled");
         $this->bot->core("colors")
-            ->define_scheme("raffle", "highlight", "yellow");
+            ->defineScheme("raffle", "highlight", "yellow");
     }
 
 

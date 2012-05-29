@@ -98,7 +98,7 @@ class Settings_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("settings", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("settings", "true") . "
 		              (module varchar(25) NOT NULL,
 		               setting varchar(50) NOT NULL,
 		               value varchar(255) NOT NULL,
@@ -583,14 +583,14 @@ class Settings_Core extends BasePassiveModule
     */
     function updateSettingsTable()
     {
-        $schemaversion = $this->bot->db->get_version("settings");
+        $schemaversion = $this->bot->db->getVersion("settings");
         Switch ($schemaversion) {
         case 1:
             $sql = "ALTER IGNORE TABLE #___settings ADD COLUMN disporder INT UNSIGNED NOT NULL DEFAULT 1";
             $this->bot->log("SETTINGS", "UPDATE", "Settings Table updated to schema version 2");
-            $this->bot->db->update_table("settings", "disporder", "add", $sql);
+            $this->bot->db->updateTable("settings", "disporder", "add", $sql);
         }
-        $this->bot->db->set_version("settings", 2);
+        $this->bot->db->setVersion("settings", 2);
         /*$done = FALSE;
        while ($done == FALSE):
            // Upgrade from Schema 1.0 to 1.5.

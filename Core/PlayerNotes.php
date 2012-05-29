@@ -48,7 +48,7 @@ class PlayerNotes_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("player_notes", "false") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("player_notes", "false") . "
 			(pnid INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				player VARCHAR(30) NOT NULL,
 				author VARCHAR(30) NOT NULL,
@@ -179,16 +179,16 @@ class PlayerNotes_Core extends BasePassiveModule
         if ($this->bot->core("settings")
             ->exists('Playernotes', 'Schema_version')
         ) {
-            $this->bot->db->set_version(
+            $this->bot->db->setVersion(
                 "player_notes", $this->bot
                     ->core("settings")->get('Playernotes', 'Schema_version')
             );
             $this->bot->core("settings")->del('Playernotes', 'Schema_version');
         }
-        switch ($this->bot->db->get_version('player_notes')) {
+        switch ($this->bot->db->getVersion('player_notes')) {
         case 1:
             // Rename timestmp column to timestamp.
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "player_notes", array(
                     "timestmp",
                     "timestamp"
@@ -196,9 +196,9 @@ class PlayerNotes_Core extends BasePassiveModule
             );
         case 2:
             // Change player column to VARCHAR(30) NOT NULL
-            $this->bot->db->update_table("player_notes", "player", "alter", "ALTER TABLE #___player_notes CHANGE player player VARCHAR(30) NOT NULL");
+            $this->bot->db->updateTable("player_notes", "player", "alter", "ALTER TABLE #___player_notes CHANGE player player VARCHAR(30) NOT NULL");
         }
-        $this->bot->db->set_version('player_notes', 3);
+        $this->bot->db->setVersion('player_notes', 3);
     }
 } // End of Class
 ?>

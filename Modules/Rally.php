@@ -60,7 +60,7 @@ class Rally extends BaseActiveModule
 
 
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("rally", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("rally", "true") . "
 		            (name varchar(50) NOT NULL,
 		             rally VARCHAR(200) NOT NULL,
 		             PRIMARY KEY (name))"

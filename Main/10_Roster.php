@@ -39,13 +39,13 @@ class Roster_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("users", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("users", "true") . "
 					(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 					char_id BIGINT NOT NULL UNIQUE,
 					nickname VARCHAR(25) UNIQUE,
 					password VARCHAR(64),
 					password_salt VARCHAR(5),
-					lastSeen INT(11) DEFAULT '0',
+					last_seen INT(11) DEFAULT '0',
 					last_raid INT(11) DEFAULT '0',
 					added_by VARCHAR(25),
 					added_at INT(11) DEFAULT '0',
@@ -86,47 +86,47 @@ class Roster_Core extends BasePassiveModule
 
     function updateTable()
     {
-        if ($this->bot->db->get_version("users") == 7) {
+        if ($this->bot->db->getVersion("users") == 7) {
             return;
         }
         if ($this->bot->core("settings")->exists("members", "schemaversion")) {
-            $this->bot->db->set_version(
+            $this->bot->db->setVersion(
                 "users", $this->bot->core("settings")
                     ->get("members", "schemaversion")
             );
             $this->bot->core("settings")->del("members", "schemaversion");
         }
-        switch ($this->bot->db->get_version("users")) {
+        switch ($this->bot->db->getVersion("users")) {
         case 1:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "users", array(
                     "banned_for",
                     "banned_until"
                 ), "add", "ALTER TABLE #___users ADD banned_for VARCHAR(100) AFTER banned_at, ADD banned_until INT(11) DEFAULT '0' AFTER banned_for"
             );
-            $this->bot->db->set_version("users", 2);
+            $this->bot->db->setVersion("users", 2);
             $this->updateTable();
             return;
         case 2:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "users", array(
                     "userLevel",
                     "banned_until",
                     "notify"
                 ), "alter", "ALTER TABLE #___users ADD INDEX (userLevel), ADD INDEX (banned_until), ADD INDEX (notify)"
             );
-            $this->bot->db->set_version("users", 3);
+            $this->bot->db->setVersion("users", 3);
             $this->updateTable();
             return;
         case 3:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 'users', array(
                     'receive_announce',
                     'receive_invite',
                     'admin_level'
                 ), 'drop', "ALTER TABLE #___users DROP receive_announce, DROP receive_invite, DROP admin_level"
             );
-            $this->bot->db->set_version("users", 4);
+            $this->bot->db->setVersion("users", 4);
             $this->updateTable();
             return;
         case 4:
@@ -147,15 +147,15 @@ class Roster_Core extends BasePassiveModule
                                 ->change($invited_user['char_id'], 'AutoInv', 'receive_auto_invite', 'On');
                         }
                     }
-                    $this->bot->db->update_table('users', array('auto_invite'), 'drop', "ALTER TABLE #___users DROP auto_invite");
+                    $this->bot->db->updateTable('users', array('auto_invite'), 'drop', "ALTER TABLE #___users DROP auto_invite");
                 }
-                $this->bot->db->set_version("users", 5);
+                $this->bot->db->setVersion("users", 5);
             }
             else {
                 // We have to delay any further updates until we can correctly update the autoinvite fields!
                 return;
             }
-            $this->bot->db->set_version("users", 5);
+            $this->bot->db->setVersion("users", 5);
             $this->updateTable();
             return;
         case 5:
@@ -192,12 +192,12 @@ class Roster_Core extends BasePassiveModule
                 $this->bot->core("settings")
                     ->del("members", "Receiveinvite");
             }
-            $this->bot->db->set_version("users", 6);
+            $this->bot->db->setVersion("users", 6);
             $this->updateTable();
             return;
         case 6:
-            $this->bot->db->update_table("users", "char_id", "alter", "ALTER TABLE #___users MODIFY char_id BIGINT NOT NULL");
-            $this->bot->db->set_version("users", 7);
+            $this->bot->db->updateTable("users", "char_id", "alter", "ALTER TABLE #___users MODIFY char_id BIGINT NOT NULL");
+            $this->bot->db->setVersion("users", 7);
             $this->updateTable();
             return;
         default:

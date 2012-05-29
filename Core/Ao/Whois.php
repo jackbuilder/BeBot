@@ -64,7 +64,7 @@ class Whois_Core extends BasePassiveModule
         Create tables for our whoIs cache if it does not already exsist.
         */
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whoIs", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("whoIs", "false") . " (
 					ID BIGINT NOT NULL default '0',
 					nickname varchar(15) NOT NULL default '',
 					firstname varchar(20) NOT NULL default '',
@@ -134,26 +134,26 @@ class Whois_Core extends BasePassiveModule
 
     function updateTable()
     {
-        if ($this->bot->db->get_version("whoIs") == 5) {
+        if ($this->bot->db->getVersion("whoIs") == 5) {
             return;
         }
-        switch ($this->bot->db->get_version("whoIs")) {
+        switch ($this->bot->db->getVersion("whoIs")) {
         case 1: // Update Table version to prevent repeat update calls
             //was an update for a setting
-            $this->bot->db->set_version("whoIs", 2);
+            $this->bot->db->setVersion("whoIs", 2);
             $this->updateTable();
             return;
         case 2:
-            $this->bot->db->set_version("whoIs", 3);
+            $this->bot->db->setVersion("whoIs", 3);
             $this->updateTable();
             return;
         case 3:
-            $this->bot->db->set_version("whoIs", 4);
+            $this->bot->db->setVersion("whoIs", 4);
             $this->updateTable();
             return;
         case 4:
-            $this->bot->db->update_table("whoIs", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
-            $this->bot->db->set_version("whoIs", 5);
+            $this->bot->db->updateTable("whoIs", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
+            $this->bot->db->setVersion("whoIs", 5);
             $this->updateTable();
             return;
         default:
@@ -275,8 +275,10 @@ class Whois_Core extends BasePassiveModule
      *
      * @return The WHO array, or false, or BotError
      */
-    function lookup($name, $noupdate = FALSE, /** @noinspection PhpUnusedParameterInspection */
-        $nowait = FALSE)
+    function lookup(
+        $name, $noupdate = FALSE, /** @noinspection PhpUnusedParameterInspection */
+        $nowait = FALSE
+    )
     {
         if ($this->bot->core("settings")->get("Statistics", "Enabled")) {
             $this->bot->core("statistics")

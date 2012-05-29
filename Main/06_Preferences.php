@@ -41,7 +41,7 @@ class Preferences_core extends BasePassiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->bot->db->define_tablename('preferences_def', 'true');
+        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->bot->db->defineTableName('preferences_def', 'true');
         $query .= '(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ';
         $query .= 'module VARCHAR(30), ';
         $query .= 'name VARCHAR(30), ';
@@ -49,7 +49,7 @@ class Preferences_core extends BasePassiveModule
         $query .= 'default_value VARCHAR(25), ';
         $query .= 'possible_values VARCHAR(255))';
         $this->bot->db->query($query);
-        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->bot->db->define_tablename('preferences', 'true');
+        $query = 'CREATE TABLE IF NOT EXISTS ' . $this->bot->db->defineTableName('preferences', 'true');
         $query .= '(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, ';
         $query .= 'pref_id INT NOT NULL, ';
         $query .= 'owner BIGINT, ';
@@ -64,24 +64,24 @@ class Preferences_core extends BasePassiveModule
 
     function updateTable()
     {
-        if ($this->bot->db->get_version("preferences_def") == 2 and $this->bot->db->get_version("preferences") == 2) {
+        if ($this->bot->db->getVersion("preferences_def") == 2 and $this->bot->db->getVersion("preferences") == 2) {
             return;
         }
 
-        Switch ($this->bot->db->get_version("preferences_def")) {
+        Switch ($this->bot->db->getVersion("preferences_def")) {
         case 1:
-            $this->bot->db->update_table("preferences_def", "access", "drop", "ALTER TABLE #___preferences_def DROP access");
-            $this->bot->db->set_version("preferences_def", 2);
+            $this->bot->db->updateTable("preferences_def", "access", "drop", "ALTER TABLE #___preferences_def DROP access");
+            $this->bot->db->setVersion("preferences_def", 2);
             $this->updateTable();
             return;
         default:
             break;
         }
 
-        Switch ($this->bot->db->get_version("preferences")) {
+        Switch ($this->bot->db->getVersion("preferences")) {
         case 1:
-            $this->bot->db->update_table("preferences", "owner", "alter", "ALTER TABLE #___preferences MODIFY owner BIGINT NOT NULL");
-            $this->bot->db->set_version("preferences", 2);
+            $this->bot->db->updateTable("preferences", "owner", "alter", "ALTER TABLE #___preferences MODIFY owner BIGINT NOT NULL");
+            $this->bot->db->setVersion("preferences", 2);
             $this->updateTable();
             return;
         default:

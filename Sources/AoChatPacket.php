@@ -40,72 +40,72 @@ class AOChatPacket
             );
         }
         $GLOBALS["aochat-packetmap"] = array(
-            "in" => array(
-                AOCP_LOGIN_SEED => array(
+            "in"  => array(
+                AOCP_LOGIN_SEED      => array(
                     "name" => "Login Seed",
                     "args" => "S"
                 ),
-                AOCP_LOGIN_OK => array(
+                AOCP_LOGIN_OK        => array(
                     "name" => "Login Result OK",
                     "args" => ""
                 ),
-                AOCP_LOGIN_ERROR => array(
+                AOCP_LOGIN_ERROR     => array(
                     "name" => "Login Result Error",
                     "args" => "S"
                 ),
-                AOCP_LOGIN_CHARLIST => array(
+                AOCP_LOGIN_CHARLIST  => array(
                     "name" => "Login CharacterList",
                     "args" => "isii"
                 ),
-                AOCP_CLIENT_UNKNOWN => array(
+                AOCP_CLIENT_UNKNOWN  => array(
                     "name" => "Client Unknown",
                     "args" => "I"
                 ),
-                AOCP_CLIENT_NAME => array(
+                AOCP_CLIENT_NAME     => array(
                     "name" => "Client Name",
                     "args" => $aocpdifs[0]
                 ),
-                AOCP_CLIENT_LOOKUP => array(
+                AOCP_CLIENT_LOOKUP   => array(
                     "name" => "Lookup Result",
                     "args" => "IS"
                 ),
-                AOCP_MSG_PRIVATE => array(
+                AOCP_MSG_PRIVATE     => array(
                     "name" => "Message Private",
                     "args" => "ISS"
                 ),
-                AOCP_MSG_VICINITY => array(
+                AOCP_MSG_VICINITY    => array(
                     "name" => "Message Vicinity",
                     "args" => "ISS"
                 ),
-                AOCP_MSG_VICINITYA => array(
+                AOCP_MSG_VICINITYA   => array(
                     "name" => "Message Anon Vicinity",
                     "args" => "SSS"
                 ),
-                AOCP_MSG_SYSTEM => array(
+                AOCP_MSG_SYSTEM      => array(
                     "name" => "Message System",
                     "args" => "S"
                 ),
-                AOCP_CHAT_NOTICE => array(
+                AOCP_CHAT_NOTICE     => array(
                     "name" => "Chat Notice",
                     "args" => "IIIS"
                 ),
-                AOCP_BUDDY_ADD => array(
+                AOCP_BUDDY_ADD       => array(
                     "name" => "Buddy Added",
                     "args" => $aocpdifs[1]
                 ),
-                AOCP_BUDDY_REMOVE => array(
+                AOCP_BUDDY_REMOVE    => array(
                     "name" => "Buddy Removed",
                     "args" => "I"
                 ),
-                AOCP_PRIVGRP_INVITE => array(
+                AOCP_PRIVGRP_INVITE  => array(
                     "name" => "Privategroup Invited",
                     "args" => "I"
                 ),
-                AOCP_PRIVGRP_KICK => array(
+                AOCP_PRIVGRP_KICK    => array(
                     "name" => "Privategroup Kicked",
                     "args" => "I"
                 ),
-                AOCP_PRIVGRP_PART => array(
+                AOCP_PRIVGRP_PART    => array(
                     "name" => "Privategroup Part",
                     "args" => "I"
                 ),
@@ -121,81 +121,81 @@ class AOChatPacket
                     "name" => "Privategroup Message",
                     "args" => "IISS"
                 ),
-                AOCP_PRIVGRP_REFUSE => array(
+                AOCP_PRIVGRP_REFUSE  => array(
                     "name" => "Privategroup Refuse Invite",
                     "args" => "II"
                 ),
-                AOCP_GROUP_ANNOUNCE => array(
+                AOCP_GROUP_ANNOUNCE  => array(
                     "name" => "Group Announce",
                     "args" => "GSIS"
                 ),
-                AOCP_GROUP_PART => array(
+                AOCP_GROUP_PART      => array(
                     "name" => "Group Part",
                     "args" => "G"
                 ),
-                AOCP_GROUP_MESSAGE => array(
+                AOCP_GROUP_MESSAGE   => array(
                     "name" => "Group Message",
                     "args" => "GISS"
                 ),
-                AOCP_PING => array(
+                AOCP_PING            => array(
                     "name" => "Pong",
                     "args" => "S"
                 ),
-                AOCP_FORWARD => array(
+                AOCP_FORWARD         => array(
                     "name" => "Forward",
                     "args" => "IM"
                 ),
-                AOCP_ADM_MUX_INFO => array(
+                AOCP_ADM_MUX_INFO    => array(
                     "name" => "Adm Mux Info",
                     "args" => "iii"
                 )
             ),
             "out" => array(
-                AOCP_LOGIN_CHARID => array(
+                AOCP_LOGIN_CHARID    => array(
                     "name" => "Login CharacterID",
                     "args" => "IIIS"
                 ),
-                AOCP_LOGIN_REQUEST => array(
+                AOCP_LOGIN_REQUEST   => array(
                     "name" => "Login Response GetCharLst",
                     "args" => "ISS"
                 ),
-                AOCP_LOGIN_SELECT => array(
+                AOCP_LOGIN_SELECT    => array(
                     "name" => "Login Select Character",
                     "args" => "I"
                 ),
-                AOCP_CLIENT_LOOKUP => array(
+                AOCP_CLIENT_LOOKUP   => array(
                     "name" => "Name Lookup",
                     "args" => "S"
                 ),
-                AOCP_MSG_PRIVATE => array(
+                AOCP_MSG_PRIVATE     => array(
                     "name" => "Message Private",
                     "args" => "ISS"
                 ),
-                AOCP_BUDDY_ADD => array(
+                AOCP_BUDDY_ADD       => array(
                     "name" => "Buddy Add",
                     "args" => $aocpdifs[2]
                 ),
-                AOCP_BUDDY_REMOVE => array(
+                AOCP_BUDDY_REMOVE    => array(
                     "name" => "Buddy Remove",
                     "args" => "I"
                 ),
-                AOCP_ONLINE_SET => array(
+                AOCP_ONLINE_SET      => array(
                     "name" => "Onlinestatus Set",
                     "args" => "I"
                 ),
-                AOCP_PRIVGRP_INVITE => array(
+                AOCP_PRIVGRP_INVITE  => array(
                     "name" => "Privategroup Invite",
                     "args" => "I"
                 ),
-                AOCP_PRIVGRP_KICK => array(
+                AOCP_PRIVGRP_KICK    => array(
                     "name" => "Privategroup Kick",
                     "args" => "I"
                 ),
-                AOCP_PRIVGRP_JOIN => array(
+                AOCP_PRIVGRP_JOIN    => array(
                     "name" => "Privategroup Join",
                     "args" => "I"
                 ),
-                AOCP_PRIVGRP_PART => array(
+                AOCP_PRIVGRP_PART    => array(
                     "name" => "Privategroup Part",
                     "args" => "I"
                 ),
@@ -207,31 +207,31 @@ class AOChatPacket
                     "name" => "Privategroup Message",
                     "args" => "ISS"
                 ),
-                AOCP_GROUP_DATA_SET => array(
+                AOCP_GROUP_DATA_SET  => array(
                     "name" => "Group Data Set",
                     "args" => "GIS"
                 ),
-                AOCP_GROUP_MESSAGE => array(
+                AOCP_GROUP_MESSAGE   => array(
                     "name" => "Group Message",
                     "args" => "GSS"
                 ),
-                AOCP_GROUP_CM_SET => array(
+                AOCP_GROUP_CM_SET    => array(
                     "name" => "Group Clientmode Set",
                     "args" => "GIIII"
                 ),
-                AOCP_CLIENTMODE_GET => array(
+                AOCP_CLIENTMODE_GET  => array(
                     "name" => "Clientmode Get",
                     "args" => "IG"
                 ),
-                AOCP_CLIENTMODE_SET => array(
+                AOCP_CLIENTMODE_SET  => array(
                     "name" => "Clientmode Set",
                     "args" => "IIII"
                 ),
-                AOCP_PING => array(
+                AOCP_PING            => array(
                     "name" => "Ping",
                     "args" => "S"
                 ),
-                AOCP_CC => array(
+                AOCP_CC              => array(
                     "name" => "CC",
                     "args" => $aocpdifs[3]
                 )
@@ -243,12 +243,12 @@ class AOChatPacket
         $pmap = $GLOBALS["aochat-packetmap"][$dir][$type];
         if (!$pmap) {
             echo "Unsupported packet type (" . $dir . ", " . $type . ")\n";
-            return false;
+            return FALSE;
         }
         if ($dir == "in") {
             if (!is_string($data)) {
                 echo "Incorrect argument for incoming packet, expecting a string.\n";
-                return false;
+                return FALSE;
             }
             for ($i = 0; $i < strlen($pmap["args"]); $i++) {
                 $sa = $pmap["args"][$i];
@@ -348,7 +348,7 @@ class AOChatPacket
             }
             $this->data = $data;
         }
-        return true;
+        return TRUE;
     }
 }
 

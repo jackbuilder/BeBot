@@ -53,7 +53,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_flexible", "true") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("security_flexible", "true") . " (
 					id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 					gid INT(10) unsigned NOT NULL,
 					field ENUM('join', 'level', 'profession', 'faction', 'rank_id', 'org_id', 'at_id'),
@@ -65,12 +65,12 @@ class FlexibleSecurity_Core extends BasePassiveModule
         $this->registerEvent("cron", "6hour");
         $this->cache = array();
         $this->querynames = array(
-            'level' => 'level',
+            'level'      => 'level',
             'profession' => 'profession',
-            'faction' => 'faction',
-            'rank_id' => 'orgRankId',
-            'org_id' => 'org_id',
-            'at_id' => 'defender_rank_id'
+            'faction'    => 'faction',
+            'rank_id'    => 'orgRankId',
+            'org_id'     => 'org_id',
+            'at_id'      => 'defender_rank_id'
         );
         $this->updateTable();
         $this->enabled = FALSE;
@@ -83,27 +83,27 @@ class FlexibleSecurity_Core extends BasePassiveModule
         if ($this->bot->core("settings")
             ->exists("FlexibleSecurity", "SchemaVersion")
         ) {
-            $this->bot->db->set_version(
+            $this->bot->db->setVersion(
                 "security_flexible", $this->bot
                     ->core("settings")->get("FlexibleSecurity", "SchemaVersion")
             );
             $this->bot->core("settings")
                 ->del("FlexibleSecurity", "SchemaVersion");
         }
-        if ($this->bot->db->get_version("security_flexible" == 2)) {
+        if ($this->bot->db->getVersion("security_flexible" == 2)) {
             return;
         }
-        switch ($this->bot->db->get_version("security_flexible")) {
+        switch ($this->bot->db->getVersion("security_flexible")) {
         case 1:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "security_flexible", "id", "add", "ALTER IGNORE TABLE #___security_flexible ADD `id` INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY FIRST"
             );
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "security_flexible", "condition", "modify",
                 "ALTER IGNORE TABLE #___security_flexible CHANGE `condition` `op` ENUM( '=', '<', '<=', '>', '>=', '!=', '&&', '||' )"
             );
         }
-        $this->bot->db->set_version("security_flexible", 2);
+        $this->bot->db->setVersion("security_flexible", 2);
     }
 
 
@@ -121,7 +121,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
         $this->cache = array();
         $this->checkEnable();
         // Clear cached security infos for mains in security module:
-        $this->bot->core("security")->cache_mgr("del", "maincache", 0);
+        $this->bot->core("security")->cacheManager("del", "maincache", 0);
     }
 
 

@@ -47,7 +47,7 @@ class BotStatistics_Core extends BasePassiveModule
             $this->DB = "";
         }
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->DB . $this->bot->db->define_tablename("bots", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->DB . $this->bot->db->defineTableName("bots", "false") . " (
 				ID INT NOT NULL auto_increment PRIMARY KEY,
 				bot VARCHAR(20),
 				dim VARCHAR(20) NOT NULL default '',
@@ -59,7 +59,7 @@ class BotStatistics_Core extends BasePassiveModule
 				)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->DB . $this->bot->db->define_tablename("bots_log", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->DB . $this->bot->db->defineTableName("bots_log", "false") . " (
 				ID INT NOT NULL auto_increment PRIMARY KEY,
 				bot VARCHAR(20),
 				dim VARCHAR(20) NOT NULL default '',
@@ -78,20 +78,20 @@ class BotStatistics_Core extends BasePassiveModule
 
     function updateTable()
     {
-        Switch ($this->bot->db->get_version("bots")) {
+        Switch ($this->bot->db->getVersion("bots")) {
         case 1:
-            $this->bot->db->update_table("bots", "restarts", "add", "ALTER IGNORE TABLE " . $this->DB . "bots ADD restarts INT DEFAULT '0'");
+            $this->bot->db->updateTable("bots", "restarts", "add", "ALTER IGNORE TABLE " . $this->DB . "bots ADD restarts INT DEFAULT '0'");
         case 2:
-            $this->bot->db->update_table("bots", "dim", "alter", "ALTER TABLE " . $this->DB . "bots modify dim VARCHAR(20) NOT NULL default ''");
+            $this->bot->db->updateTable("bots", "dim", "alter", "ALTER TABLE " . $this->DB . "bots modify dim VARCHAR(20) NOT NULL default ''");
         Default:
         }
-        $this->bot->db->set_version("bots", 3);
-        Switch ($this->bot->db->get_version("bots_log")) {
+        $this->bot->db->setVersion("bots", 3);
+        Switch ($this->bot->db->getVersion("bots_log")) {
         case 1:
-            $this->bot->db->update_table("bots", "dim", "alter", "ALTER TABLE " . $this->DB . "bots_log modify dim VARCHAR(20) NOT NULL default ''");
+            $this->bot->db->updateTable("bots", "dim", "alter", "ALTER TABLE " . $this->DB . "bots_log modify dim VARCHAR(20) NOT NULL default ''");
         Default:
         }
-        $this->bot->db->set_version("bots", 2);
+        $this->bot->db->setVersion("bots", 2);
     }
 
 

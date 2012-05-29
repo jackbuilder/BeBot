@@ -47,7 +47,7 @@ class statistics extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("statistics", "true") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("statistics", "true") . " (
 					id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 					module VARCHAR(100) NOT NULL,
 					action VARCHAR(100) NOT NULL,

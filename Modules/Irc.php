@@ -34,7 +34,7 @@
 /*
 Add a "_" at the beginning of the file (_IRC.php) if you do not want it to be loaded.
 */
-include_once ('Sources/SmartIRC.php');
+include_once ('Sources/SmartIRC/SmartIRC.php');
 $irc = new IRC($bot);
 /*
 The Class itself...
@@ -123,12 +123,12 @@ class IRC extends BaseActiveModule
         $this->bot->core("settings")->del("Irc", "AnnounceTo");
         $this->bot->core("settings")->del("Irc", "AnnounceWhat");
 
-        $this->bot->core("colors")->define_scheme("Irc", "Text", "normal");
-        $this->bot->core("colors")->define_scheme("Irc", "User", "normal");
-        $this->bot->core("colors")->define_scheme("Irc", "Group", "normal");
+        $this->bot->core("colors")->defineScheme("Irc", "Text", "normal");
+        $this->bot->core("colors")->defineScheme("Irc", "User", "normal");
+        $this->bot->core("colors")->defineScheme("Irc", "Group", "normal");
         $this->irc = NULL;
         $this->last_log["st"] = time();
-        $this->bot->core("timer")->register_callback("IRC", $this);
+        $this->bot->core("timer")->registerCallback("IRC", $this);
         $this->spam[0] = array(
             0,
             0,

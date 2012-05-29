@@ -39,19 +39,19 @@ class Symb_sql extends BaseActiveModule
 {
     private $slots
         = array(
-            'ocular' => 'eye',
-            'brain' => 'head',
-            'ear' => 'ear',
-            'right arm' => 'rarm',
-            'chest' => 'chest',
-            'left arm' => 'larm',
+            'ocular'      => 'eye',
+            'brain'       => 'head',
+            'ear'         => 'ear',
+            'right arm'   => 'rarm',
+            'chest'       => 'chest',
+            'left arm'    => 'larm',
             'right wrist' => 'rwrist',
-            'waist' => 'waist',
-            'left wrist' => 'lwrist',
-            'right hand' => 'rhand',
-            'thigh' => 'legs',
-            'left hand' => 'lhand',
-            'feet' => 'feet'
+            'waist'       => 'waist',
+            'left wrist'  => 'lwrist',
+            'right hand'  => 'rhand',
+            'thigh'       => 'legs',
+            'left hand'   => 'lhand',
+            'feet'        => 'feet'
         );
 
 
@@ -82,8 +82,8 @@ class Symb_sql extends BaseActiveModule
 
     function tables()
     {
-        $this->bot->db->define_tablename("symbiants", "false");
-        Switch ($this->bot->db->get_version("symbiants")) {
+        $this->bot->db->defineTableName("symbiants", "false");
+        Switch ($this->bot->db->getVersion("symbiants")) {
         case 1:
         case 2:
             $filename = "./extra/symbiants/symbiants.sql";
@@ -97,7 +97,7 @@ class Symb_sql extends BaseActiveModule
                 }
             }
         }
-        $this->bot->db->set_version("symbiants", 3);
+        $this->bot->db->setVersion("symbiants", 3);
     }
 
 

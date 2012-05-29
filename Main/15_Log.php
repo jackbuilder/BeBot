@@ -46,7 +46,7 @@ class Log extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("log_message", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("log_message", "true") . "
 		        (id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 		        message VARCHAR(500) NOT NULL,
 		        first VARCHAR(45) NOT NULL,

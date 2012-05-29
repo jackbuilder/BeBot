@@ -117,12 +117,12 @@ class OnlineDisplay extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Online", "RaidStatus", TRUE, "Should Raid Status Be shown");
         $this->bot->core("colors")
-            ->define_scheme("online", "title", "blob_title");
+            ->defineScheme("online", "title", "blob_title");
         $this->bot->core("colors")
-            ->define_scheme("online", $this->cp, "seagreen");
+            ->defineScheme("online", $this->cp, "seagreen");
         $this->bot->core("colors")
-            ->define_scheme("online", "characters", "blob_text");
-        $this->bot->core("colors")->define_scheme("online", "afk", "white");
+            ->defineScheme("online", "characters", "blob_text");
+        $this->bot->core("colors")->defineScheme("online", "afk", "white");
     }
 
 

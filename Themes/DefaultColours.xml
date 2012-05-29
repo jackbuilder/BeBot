@@ -1,5 +1,5 @@
 <bebot:theme name="Default theme for BeBot" version="1.0" author="Alreadythere"
-       link="" xmlns:bebot="theme">
+             link="" xmlns:bebot="theme">
     <bebot:color name="normal" color="lightyellow"/>
     <bebot:color name="highlight" color="aqua"/>
     <bebot:color name="error" color="red"/>

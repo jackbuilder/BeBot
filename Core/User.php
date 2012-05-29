@@ -188,7 +188,7 @@ class User_Core extends BasePassiveModule
             else {
                 $cache = 'members';
             }
-            $this->bot->core("security")->cache_mgr("add", $cache, $name);
+            $this->bot->core("security")->cacheManager("add", $cache, $name);
         }
         return "Player ##highlight##" . $name . "##end## has been added to the bot as " . $this->accessName($user_level);
     }
@@ -270,7 +270,7 @@ class User_Core extends BasePassiveModule
                         else {
                             $cache = 'members';
                         }
-                        $this->bot->core("security")->cache_mgr("rem", $cache, $name);
+                        $this->bot->core("security")->cacheManager("rem", $cache, $name);
                     }
                     //Make sure the usr isnt left on the online list
                     $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . "' AND nickname = '" . $name . "'");
@@ -342,7 +342,7 @@ class User_Core extends BasePassiveModule
                     else {
                         $cache = 'members';
                     }
-                    $this->bot->core("security")->cache_mgr("rem", $cache, $name);
+                    $this->bot->core("security")->cacheManager("rem", $cache, $name);
                 }
                 $this->bot->core("online")->logoff($name);
                 $this->bot->core("notify")->update_cache();

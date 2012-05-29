@@ -46,7 +46,7 @@ class Points extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("raid_points", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("raid_points", "true") . "
 				(id INT NOT NULL PRIMARY KEY,
 				nickname VARCHAR(20),
 				points decimal(11,2) default '0.00',
@@ -54,7 +54,7 @@ class Points extends BaseActiveModule
 				raidingas VARCHAR(20))"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("raid_points_log", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("raid_points_log", "true") . "
 				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				name VARCHAR(20),
 				points decimal(11,2) default '0.00',
@@ -78,12 +78,12 @@ class Points extends BaseActiveModule
         $this->help['command']['points top'] = "Shows the 25 biggest point accounts.";
         $this->registerCommand(
             "all", "points", "GUEST", array(
-                "add" => "SUPERADMIN",
-                "del" => "SUPERADMIN",
-                "rem" => "SUPERADMIN",
+                "add"      => "SUPERADMIN",
+                "del"      => "SUPERADMIN",
+                "rem"      => "SUPERADMIN",
                 "transfer" => "SUPERADMIN",
-                "tomain" => "SUPERADMIN",
-                "all" => "SUPERADMIN"
+                "tomain"   => "SUPERADMIN",
+                "all"      => "SUPERADMIN"
             )
         );
         $this->registerModule("points");
@@ -92,10 +92,10 @@ class Points extends BaseActiveModule
 
     function updateTable()
     {
-        if ($this->bot->db->get_version("raid_points") == 4) {
+        if ($this->bot->db->getVersion("raid_points") == 4) {
             return;
         }
-        switch ($this->bot->db->get_version("raid_points")) {
+        switch ($this->bot->db->getVersion("raid_points")) {
         case 1:
             $fields = $this->bot->db->select("EXPLAIN #___raid_points", MYSQL_ASSOC);
             foreach ($fields as $field) {
@@ -105,12 +105,12 @@ class Points extends BaseActiveModule
                     }
                 }
             }
-            $this->bot->db->update_table("raid_points", "points", "modify", "ALTER IGNORE TABLE #___raid_points modify `points` decimal(11,2) default '0.00'");
+            $this->bot->db->updateTable("raid_points", "points", "modify", "ALTER IGNORE TABLE #___raid_points modify `points` decimal(11,2) default '0.00'");
             if ($updatepoints) {
                 $this->bot->db->query("UPDATE #___raid_points SET points = points / 10");
             }
         case 2:
-            $this->bot->db->update_table("raid_points", "nickname", "add", "ALTER IGNORE TABLE #___raid_points ADD nickname VARCHAR(20) DEFAULT '' after id");
+            $this->bot->db->updateTable("raid_points", "nickname", "add", "ALTER IGNORE TABLE #___raid_points ADD nickname VARCHAR(20) DEFAULT '' after id");
             $users = $this->bot->db->select("SELECT id from #___raid_points");
             if (!empty($users)) {
                 foreach ($users as $id) {
@@ -133,10 +133,10 @@ class Points extends BaseActiveModule
                 }
             }
         case 3:
-            $this->bot->db->update_table("raid_points", "raidingas", "add", "ALTER IGNORE TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding");
+            $this->bot->db->updateTable("raid_points", "raidingas", "add", "ALTER IGNORE TABLE #___raid_points ADD raidingas VARCHAR(20) DEFAULT '' after raiding");
         default:
         }
-        $this->bot->db->set_version("raid_points", 4);
+        $this->bot->db->setVersion("raid_points", 4);
     }
 
 

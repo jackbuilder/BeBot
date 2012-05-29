@@ -352,7 +352,7 @@ class Trickle extends BaseActiveModule
                 $this->error->set($this->error->get() . "'{$com[$statno]}' is not a recognized base stat.\n");
             }
         }
-        if ($this->error->status() == true) {
+        if ($this->error->status() == TRUE) {
             return $this->error;
         }
         for ($cnt = 1; $cnt < 7; $cnt++) {

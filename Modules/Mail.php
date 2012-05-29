@@ -50,7 +50,7 @@ class Mail extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         //$this -> registerEvent("cron", "12hour");
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("mail_message", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("mail_message", "true") . "
 						(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 						received TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 						expires TIMESTAMP,

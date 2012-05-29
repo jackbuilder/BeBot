@@ -139,7 +139,7 @@ class BotHelp_Core extends BaseActiveModule
         $channel = strtolower($channel);
         $this->help_cache[$channel] = array();
         foreach (
-            $this->bot->core("access_control")->get_access_levels() as
+            $this->bot->core("access_control")->getAccessLevels() as
             $lvl
         ) {
             $this->help_cache[$channel][$lvl] = "";
@@ -157,7 +157,7 @@ class BotHelp_Core extends BaseActiveModule
                 $cmdstr = $command . " ";
             }
             switch ($this->bot->core("access_control")
-                ->get_min_access_level($command, $channel)) {
+                ->getMinAccessLevel($command, $channel)) {
             case ANONYMOUS:
                 $this->help_cache[$channel]['ANONYMOUS'] .= $cmdstr;
             case GUEST:

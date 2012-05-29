@@ -55,7 +55,7 @@ class craftclasses extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("craftingclass", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("craftingclass", "false") . " (
 			id int(11) NOT NULL auto_increment,
 			name varchar(32) NOT NULL,
 			class1 enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL,
@@ -77,25 +77,25 @@ class craftclasses extends BaseActiveModule
         $this->help['command']['craft'] = "Shows the classes you currently have assigned to you.";
         $this->bot->core("settings")
             ->create("Craftclasses", "Remind", TRUE, "Should users level 40+ be reminded to set their craft classes?");
-        $this->update_table();
+        $this->updateTable();
     }
 
 
-    function update_table()
+    function updateTable()
     {
-        switch ($this->bot->db->get_version("craftingclass")) {
+        switch ($this->bot->db->getVersion("craftingclass")) {
         case 1:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "craftingclass", "class1", "modify",
                 "ALTER IGNORE TABLE #___craftingclass modify `class1` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "craftingclass", "class2", "modify",
                 "ALTER IGNORE TABLE #___craftingclass modify `class2` enum('Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
         default:
         }
-        $this->bot->db->set_version("craftingclass", 2);
+        $this->bot->db->setVersion("craftingclass", 2);
     }
 
 

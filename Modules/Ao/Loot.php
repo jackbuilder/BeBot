@@ -64,7 +64,7 @@ class Rolls extends BaseActiveModule
         $this->bot->core("settings")
             ->create("Loot", "Roll", "SINGLE", "Should you be allowed to be added to the roll of more than one slot?", "SINGLE;MULTI");
         $this->bot->core("colors")
-            ->define_scheme("loot", "highlight", "yellow");
+            ->defineScheme("loot", "highlight", "yellow");
         $this->help['description'] = 'Module to flat roll on items.';
         $this->help['command']['loot <item>'] = "Adds an item to the roll list.";
         $this->help['command']['add <slot>'] = "Adds your name to the slot number.  Add 0 removes you from all slots.";

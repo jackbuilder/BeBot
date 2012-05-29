@@ -57,7 +57,7 @@ class Alias extends BaseActiveModule
         $this->help['command']['alias'] = "Show Alias's associated with you and your Alts.";
         $this->help['command']['alias list'] = "Show all Alias's.";
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("alias", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("alias", "false") . " (
 										alias VARCHAR(30) PRIMARY KEY,
 										nickname VARCHAR(30),
 										main INT(1) Default '0'

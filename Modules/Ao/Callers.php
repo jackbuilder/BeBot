@@ -45,8 +45,8 @@ class Callers extends BaseActiveModule
         $this->registerCommand(
             'all', 'caller', 'GUEST', array(
                 "clear" => "LEADER",
-                "add" => "LEADER",
-                "del" => "LEADER"
+                "add"   => "LEADER",
+                "del"   => "LEADER"
             )
         );
         $this->registerAlias("caller", "callers");

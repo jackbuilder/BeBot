@@ -53,7 +53,7 @@ class News extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("news", "true") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("news", "true") . " (
 		           id INT NOT NULL auto_increment PRIMARY KEY,
 		           type INT default '1',
 		           time INT NOT NULL default '0',

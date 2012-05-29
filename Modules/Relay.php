@@ -60,7 +60,7 @@ class Relay extends BaseActiveModule
         $this->bot->core('prefs')
             ->create('AutoInv', 'receive_auto_invite', 'Automatic invites to private group should be?', 'Off', 'Off;On');
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("relay", "false") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("relay", "false") . "
                (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 						botname VARCHAR(20),
         	 			type VARCHAR(30),
@@ -113,11 +113,11 @@ class Relay extends BaseActiveModule
             ->create("Relay", 'ShowMain', FALSE, "Should we display the name of the characters main when relaying?");
         $this->bot->core("settings")
             ->create("Relay", 'TruncateMain', '6', "How many characters of the main's name to display?", '4;6;8;10;13');
-        $this->bot->core("colors")->define_scheme("relay", "channel", "normal");
-        $this->bot->core("colors")->define_scheme("relay", "name", "normal");
-        $this->bot->core("colors")->define_scheme("relay", "message", "normal");
+        $this->bot->core("colors")->defineScheme("relay", "channel", "normal");
+        $this->bot->core("colors")->defineScheme("relay", "name", "normal");
+        $this->bot->core("colors")->defineScheme("relay", "message", "normal");
         $this->bot->core("colors")
-            ->define_scheme("relay", "mainname", "normal");
+            ->defineScheme("relay", "mainname", "normal");
         $this->help['description'] = "Plugin to enable relay between guilds and private groups.";
         $this->help['command']['gcr <message>'] = "Has the bot say a message (useful for testing or other purposes).";
         $this->help['notes']
@@ -131,13 +131,13 @@ class Relay extends BaseActiveModule
 
     function update()
     {
-        switch ($this->bot->db->get_version("relay")) {
+        switch ($this->bot->db->getVersion("relay")) {
         case 1:
             $this->bot->core("settings")
                 ->update("Relay", "Type", "defaultoptions", "Pgroup;Tells;DB");
         Default:
         }
-        $this->bot->db->set_version("relay", 2);
+        $this->bot->db->setVersion("relay", 2);
     }
 
 
@@ -834,8 +834,8 @@ class Relay extends BaseActiveModule
         }
         $key = $this->bot->core("settings")->get("Relay", "Key");
         $return = array(
-            'hmac' => NULL,
-            'iv' => NULL,
+            'hmac'      => NULL,
+            'iv'        => NULL,
             'encrypted' => NULL
         );
         $decrypted_string = trim($string);

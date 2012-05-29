@@ -46,16 +46,16 @@ class AccessControlGUI extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->access_levels = $this->bot->core("access_control")
-            ->get_access_levels();
+            ->getAccessLevels();
         $this->access_shorts = array(
             'AN' => 'ANONYMOUS',
-            'G' => 'GUEST',
-            'M' => 'MEMBER',
-            'L' => 'LEADER',
-            'A' => 'ADMIN',
+            'G'  => 'GUEST',
+            'M'  => 'MEMBER',
+            'L'  => 'LEADER',
+            'A'  => 'ADMIN',
             'SA' => 'SUPERADMIN',
-            'O' => 'OWNER',
-            'D' => 'DISABLED'
+            'O'  => 'OWNER',
+            'D'  => 'DISABLED'
         );
         $this->shortcuts = array();
         foreach ($this->access_shorts as $short => $long) {
@@ -63,14 +63,14 @@ class AccessControlGUI extends BaseActiveModule
         }
         $this->channels = array(
             "sendToGuildChat" => "##green##",
-            "sendToGroup" => "##white##",
-            "sendTell" => "##seablue##"
+            "sendToGroup"     => "##white##",
+            "sendTell"        => "##seablue##"
         );
         /*
         Create default access right for "commands" by SUPERADMIN if it is not set or set to DISABLED. You always want to be able to change the rights!
         */
         if ($this->bot->core("access_control")
-            ->get_min_access_level("commands") == OWNER + 1
+            ->getMinAccessLevel("commands") == OWNER + 1
         ) {
             $this->bot->core("access_control")
                 ->update_access("commands", "sendTell", "OWNER");
@@ -253,7 +253,9 @@ class AccessControlGUI extends BaseActiveModule
                 }
             }
             else {
-                if (isset($this->bot->commands['sendToGuildChat'][$command]) || isset($this->bot->commands['sendToGroup'][$command]) || isset($this->bot->commands['sendTell'][$command])) {
+                if (isset($this->bot->commands['sendToGuildChat'][$command]) || isset($this->bot->commands['sendToGroup'][$command])
+                    || isset($this->bot->commands['sendTell'][$command])
+                ) {
                     $isset = TRUE;
                 }
             }

@@ -36,15 +36,15 @@ class PB extends BaseActiveModule
 {
     private $slots
         = array(
-            'ocullar' => 'eye',
-            'brain' => 'head',
-            'right arm' => 'rarm',
-            'left arm' => 'larm',
+            'ocullar'     => 'eye',
+            'brain'       => 'head',
+            'right arm'   => 'rarm',
+            'left arm'    => 'larm',
             'right wrist' => 'rwrist',
-            'left wrist' => 'lwrist',
-            'right hand' => 'rhand',
-            'thigh' => 'legs',
-            'left hand' => 'lhand'
+            'left wrist'  => 'lwrist',
+            'right hand'  => 'rhand',
+            'thigh'       => 'legs',
+            'left hand'   => 'lhand'
         );
 
     function __construct(&$bot)
@@ -84,8 +84,8 @@ foreach($query as $q)
 }
 }
 $this -> bot -> db -> setVersion("symbiants", 2); */
-        $this->bot->db->define_tablename("pocketbosses", "false");
-        Switch ($this->bot->db->get_version("pocketbosses")) {
+        $this->bot->db->defineTableName("pocketbosses", "false");
+        Switch ($this->bot->db->getVersion("pocketbosses")) {
         case 1:
         case 2:
             $filename = "./extra/symbiants/pocketbosses.sql";
@@ -99,7 +99,7 @@ $this -> bot -> db -> setVersion("symbiants", 2); */
                 }
             }
         }
-        $this->bot->db->set_version("pocketbosses", 3);
+        $this->bot->db->setVersion("pocketbosses", 3);
     }
 
 

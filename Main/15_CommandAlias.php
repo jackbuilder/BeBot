@@ -45,7 +45,7 @@ class CommandAlias_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->registerModule("command_alias");
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("command_alias", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("command_alias", "false") . " (
 						alias VARCHAR(100) NOT NULL,
 						command VARCHAR(30) NOT NULL
 					)"

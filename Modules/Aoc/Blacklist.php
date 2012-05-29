@@ -46,7 +46,7 @@ class Blacklist extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("blacklist", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("blacklist", "true") . "
 			  (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 			  name VARCHAR(30) NOT NULL,
 			  noteid INT NOT NULL,
@@ -228,8 +228,8 @@ class Blacklist extends BaseActiveModule
             ->create("Blacklist", "table_version", 0, "Table version for Blacklist database table", NULL, TRUE, 99);
         switch ($this->bot->core("settings")->get('Blacklist', 'Table_version')) {
         case 0: // Previous version of BeBot.
-            $this->bot->db->update_table("blacklist", "noteid", "add", "ALTER IGNORE TABLE #___blacklist ADD noteid INT NOT NULL");
-            $this->bot->db->update_table("blacklist", "expire", "add", "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0");
+            $this->bot->db->updateTable("blacklist", "noteid", "add", "ALTER IGNORE TABLE #___blacklist ADD noteid INT NOT NULL");
+            $this->bot->db->updateTable("blacklist", "expire", "add", "ALTER IGNORE TABLE #___blacklist ADD expire INT UNSIGNED DEFAULT 0");
             $this->bot->log("BLACKLIST", "UPDATE", "Updated blacklist table to version 1.");
             $this->bot->core("settings")
                 ->save("Blacklist", "table_version", 1);

@@ -46,7 +46,7 @@ class AlienAttack extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("org_city", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("org_city", "true") . "
         		(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
         		time INT,
         		action VARCHAR(10),
@@ -61,52 +61,54 @@ class AlienAttack extends BaseActiveModule
         $this->registerEvent("logon_notify");
         $this->registerEvent("timer", "city");
         $classid = $this->bot->core("timer")
-            ->create_timer_class("CityWarning", "Notify class used by the AlienAttack module.");
+            ->createTimerClass("CityWarning", "Notify class used by the AlienAttack module.");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, -2, 0, "", "");
+            ->createTimerClassEntry($classid, -2, 0, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 60, "", "in one minute");
+            ->createTimerClassEntry($classid, $nextid, 60, "", "in one minute");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 300, "", "in five minutes");
+            ->createTimerClassEntry($classid, $nextid, 300, "", "in five minutes");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 900, "", "in 15 minutes");
+            ->createTimerClassEntry($classid, $nextid, 900, "", "in 15 minutes");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 1800, "", "in 30 minutes");
+            ->createTimerClassEntry($classid, $nextid, 1800, "", "in 30 minutes");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 3600, "", "in one hour");
+            ->createTimerClassEntry($classid, $nextid, 3600, "", "in one hour");
         $classid = $this->bot->core("timer")
-            ->create_timer_class("CityWarningSpam", "Notify class used by the AlienAttack module.");
+            ->createTimerClass("CityWarningSpam", "Notify class used by the AlienAttack module.");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, -2, 0, "", "");
+            ->createTimerClassEntry($classid, -2, 0, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 300, "", "");
+            ->createTimerClassEntry($classid, $nextid, 300, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 600, "", "");
+            ->createTimerClassEntry($classid, $nextid, 600, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 900, "", "");
+            ->createTimerClassEntry($classid, $nextid, 900, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 1200, "", "");
+            ->createTimerClassEntry($classid, $nextid, 1200, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 1500, "", "");
+            ->createTimerClassEntry($classid, $nextid, 1500, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 1800, "", "");
+            ->createTimerClassEntry($classid, $nextid, 1800, "", "");
         $classid = $this->bot->core("timer")
-            ->create_timer_class("CityCloakReady", "Notify class used by the AlienAttack module.");
+            ->createTimerClass("CityCloakReady", "Notify class used by the AlienAttack module.");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, -2, 0, "", "");
+            ->createTimerClassEntry($classid, -2, 0, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 60 * 60, "", "");
+            ->createTimerClassEntry($classid, $nextid, 60 * 60, "", "");
         $classid = $this->bot->core("timer")
-            ->create_timer_class("CityCloakReminder", "Notify class used by the AlienAttack module.");
+            ->createTimerClass("CityCloakReminder", "Notify class used by the AlienAttack module.");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, -2, 0, "", "");
+            ->createTimerClassEntry($classid, -2, 0, "", "");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 60 * 15, "", "");
+            ->createTimerClassEntry($classid, $nextid, 60 * 15, "", "");
         $this->deleteCloakReminder();
         $this->bot->core("settings")
             ->create("AlienAttack", "Spam", "none", "Should the bot spam to sendToGuildChat or tells (on logon) or both?", "none;sendToGuildChat;sendTell;both");
         $this->bot->core("settings")
-            ->create("AlienAttack", "Channel", "sendToGuildChat", "Into which channel should any output about alien attacks and city changes be send?", "sendToGuildChat;sendToGroup;both");
+            ->create(
+            "AlienAttack", "Channel", "sendToGuildChat", "Into which channel should any output about alien attacks and city changes be send?", "sendToGuildChat;sendToGroup;both"
+        );
         $this->bot->core("settings")
             ->create("AlienAttack", "PublicTimer", FALSE, "Should a public timer in addition to the periodic spam be created on cloak up and down?");
         $this->bot->core("settings")

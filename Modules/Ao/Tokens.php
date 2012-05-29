@@ -57,8 +57,8 @@ class tokens extends BaseActiveModule
     */
     function commandHandler($source, $msg, $type)
     {
-        $return = false;
-        $clan = false;
+        $return = FALSE;
+        $clan = FALSE;
         /*
         This should really be moved to the bot core.. but until i get the time to modify every single module... :\
         */
@@ -77,7 +77,7 @@ class tokens extends BaseActiveModule
                     if (!($who instanceof BotError)) {
                         $level = $who["level"];
                         if ($who["faction"] == 'Clan') {
-                            $clan = true;
+                            $clan = TRUE;
                         }
                     }
                     $return = $this->ShowTokens($level, $vars[1], $vars[2], $clan);
@@ -93,7 +93,7 @@ class tokens extends BaseActiveModule
                         $who = $this->bot->core("whoIs")->lookup($source);
                         if (!($who instanceof BotError)) {
                             if ($who["faction"] == 'Clan') {
-                                $clan = true;
+                                $clan = TRUE;
                             }
                         }
                         $return = $this->ShowTokens($vars[1], $vars[2], $vars[3], $clan);
@@ -126,13 +126,13 @@ class tokens extends BaseActiveModule
         default:
             return "Broken plugin, received unhandled command: $command";
         }
-        return false;
+        return FALSE;
     }
 
 
     function ShowTokens($level, $goal, $current, $clan)
     {
-        $return = false;
+        $return = FALSE;
         // Make sure our goal is larger than our current tokens
         if ($goal == $current) {
             $this->error->set("Your goal tokens can not be the same as your current tokens!");

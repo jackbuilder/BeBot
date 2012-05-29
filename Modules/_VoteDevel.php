@@ -45,7 +45,7 @@ class Vote extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("votes", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("votes", "true") . "
 							(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 							description VARCHAR(255),
 							min_level INT default 10,
@@ -57,14 +57,14 @@ class Vote extends BaseActiveModule
 							votes_percent INT)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("vote_options", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("vote_options", "true") . "
 							(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 							vote_id INT,
 							description VARCHAR(255),
 							votes INT)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("vote_ballots", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("vote_ballots", "true") . "
 							(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 							vote_id INT,
 							player VARCHAR(14),

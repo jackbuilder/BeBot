@@ -54,7 +54,7 @@ class LeadEcho extends BaseActiveModule
         $this->registerEvent("privateGroup");
         $this->registerEvent("privateGroupLeave");
         $this->bot->core("colors")
-            ->define_scheme("leader_echo", "spam", "yellow");
+            ->defineScheme("leader_echo", "spam", "yellow");
         $this->help['description'] = 'Gives some LEADER access and highlights his chat';
         $this->help['command']['leader [<name>]'] = "Toggles leader status for yourself if no name is given, otherwise makes <name> new leader.";
         $this->help['command']['repeat <on|off>'] = "Toggles chat repeat for leader on or off.";

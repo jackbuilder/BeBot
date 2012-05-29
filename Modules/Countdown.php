@@ -45,21 +45,24 @@ class Countdown extends BaseActiveModule
         $this->registerAlias("countdown", "cd");
         $this->registerEvent("timer", "countdown");
         $classid = $this->bot->core("timer")
-            ->create_timer_class("Countdown", "Notify class used for countdowns, only last 5secs are shown.");
+            ->createTimerClass("Countdown", "Notify class used for countdowns, only last 5secs are shown.");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, -2, 0, "", "[##lightgreen##--&gt; GO GO GO &lt;--##end##]");
+            ->createTimerClassEntry($classid, -2, 0, "", "[##lightgreen##--&gt; GO GO GO &lt;--##end##]");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 1, "", "[##orange##--------&gt; 1 &lt;-------##end##]");
+            ->createTimerClassEntry($classid, $nextid, 1, "", "[##orange##--------&gt; 1 &lt;-------##end##]");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 2, "", "[##orange##--------&gt; 2 &lt;-------##end##]");
+            ->createTimerClassEntry($classid, $nextid, 2, "", "[##orange##--------&gt; 2 &lt;-------##end##]");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 3, "", "[##orange##--------&gt; 3 &lt;-------##end##]");
+            ->createTimerClassEntry($classid, $nextid, 3, "", "[##orange##--------&gt; 3 &lt;-------##end##]");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 4, "", "[##red##--------&gt; 4 &lt;-------##end##]");
+            ->createTimerClassEntry($classid, $nextid, 4, "", "[##red##--------&gt; 4 &lt;-------##end##]");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 5, "", "[##red##--------&gt; 5 &lt;-------##end##]");
+            ->createTimerClassEntry($classid, $nextid, 5, "", "[##red##--------&gt; 5 &lt;-------##end##]");
         $this->bot->core("settings")
-            ->create("Countdown", "Channel", "both", "In which channel should a countdown be shown? In the channel of origin, or in both sendToGuildChat and sendToGroup?", "both;sendToGuildChat;sendToGroup;origin");
+            ->create(
+            "Countdown", "Channel", "both", "In which channel should a countdown be shown? In the channel of origin, or in both sendToGuildChat and sendToGroup?",
+            "both;sendToGuildChat;sendToGroup;origin"
+        );
         $this->help['description'] = "A simple countdown plugin.";
         $this->help['command']['countdown'] = "Counts down to zero.";
         $this->help['notes'] = "<pre>cd is a synonym for <pre>countdown.";

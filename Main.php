@@ -41,7 +41,7 @@ define('BOT_VERSION_SNAPSHOT', TRUE);
 // Is this a stable release or a development release?
 define('BOT_VERSION_STABLE', FALSE);
 
-$bot_version = BOT_VERSION;
+$bot_version = 'BOT_VERSION';
 $php_version = phpversion();
 // Set the time zone to UTC
 date_default_timezone_set('UTC');
@@ -82,46 +82,46 @@ MySQL.php: Used to communicate with the MySQL database
 AOChat.php: Interface to communicate with AO chat servers
 Bot.php: The actual bot itself.
 */
-require_once "./Sources/RequirementCheck.php";
+require_once "./Sources/RequirementsCheck.php";
 require_once "./Sources/MySQL.php";
 require_once "./Sources/AOChat.php";
 require_once "./Sources/ConfigMagik.php";
 require_once "./Sources/Bot.php";
-require_once "./Sources/sfEventDispatcher.php";
+require_once "./Sources/SymfonyEvent/sfEventDispatcher.php";
 
 /*
 Creating the bot.
 */
 echo "Creating main Bot class!\n";
 if (isset($argv[1])) {
-    $bothandle = Bot::factory($argv[1]);
+    $botHandle = Bot::factory($argv[1]);
 }
 else {
-    $bothandle = Bot::factory();
+    $botHandle = Bot::factory();
 }
-$bot = Bot::getInstance($bothandle);
+$bot = Bot::getInstance($botHandle);
 $bot->dispatcher = new sfEventDispatcher();
 
 //Load modules.
-$bot->load_files('Commodities', 'commodities'); //Classes that do not instantiate themselves.
-$bot->load_files('Commodities', "commodities/{$bot->game}");
-$bot->load_files('Main', 'main');
-$bot->load_files('Core', 'core');
-$bot->load_files('Core', "core/{$bot->game}");
-$bot->load_files('Core', 'custom/core');
+$bot->loadFiles('Commodities', 'commodities'); //Classes that do not instantiate themselves.
+$bot->loadFiles('Commodities', "commodities/{$bot->game}");
+$bot->loadFiles('Main', 'main');
+$bot->loadFiles('Core', 'core');
+$bot->loadFiles('Core', "core/{$bot->game}");
+$bot->loadFiles('Core', 'custom/core');
 if (!empty($bot->core_directories)) {
     $core_dirs = explode(",", $bot->core_directories);
     foreach ($core_dirs as $core_dir) {
-        $bot->load_files('Core', trim($core_dir));
+        $bot->loadFiles('Core', trim($core_dir));
     }
 }
-$bot->load_files('Modules', 'modules');
-$bot->load_files('Modules', "modules/{$bot->game}");
-$bot->load_files('Modules', 'custom/modules');
+$bot->loadFiles('Modules', 'modules');
+$bot->loadFiles('Modules', "modules/{$bot->game}");
+$bot->loadFiles('Modules', 'custom/modules');
 if (!empty($bot->module_directories)) {
     $module_dirs = explode(",", $bot->module_directories);
     foreach ($module_dirs as $module_dir) {
-        $bot->load_files('Modules', trim($module_dir));
+        $bot->loadFiles('Modules', trim($module_dir));
     }
 }
 // Start up the bot.

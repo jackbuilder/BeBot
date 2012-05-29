@@ -42,7 +42,7 @@ class Quotes extends BaseActiveModule
         parent::__construct($bot, get_class($this));
         $this->registerCommand('all', 'quotes', 'MEMBER');
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("quotes", "false") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("quotes", "false") . "
 			(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, quote BLOB, contributor VARCHAR(15))"
         );
         $this->help['description'] = 'Immortalize your friends and enemies.';

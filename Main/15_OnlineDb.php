@@ -65,7 +65,7 @@ class OnlineDB_Core extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         // Create Table
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("online", "false") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("online", "false") . "
 		            (nickname varchar(25) NOT NULL,
 		             botname VARCHAR(25) NOT NULL,
 		             status_gc INT(1) DEFAULT '0',
@@ -111,7 +111,7 @@ class OnlineDB_Core extends BasePassiveModule
             ->create("Reinvite", "Notify", $reinvnot, "The notify sent on reinvites of silent is disabled.");
         $this->last_seen = array();
         $this->guest_cache = array();
-        $list = $this->bot->db->select("SELECT nickname, lastSeen FROM #___users WHERE lastSeen > 0");
+        $list = $this->bot->db->select("SELECT nickname, last_seen FROM #___users WHERE last_seen > 0");
         if (!empty($list)) {
             foreach ($list as $user) {
                 $this->last_seen[ucfirst(strtolower($user[0]))] = $user[1];
@@ -122,32 +122,32 @@ class OnlineDB_Core extends BasePassiveModule
     function updateOnlineTable()
     {
         if ($this->bot->core("settings")->exists("Online", "Schemaversion")) {
-            $this->bot->db->set_version(
+            $this->bot->db->setVersion(
                 "online", $this->bot->core("settings")
                     ->get("Online", "Schemaversion")
             );
             $this->bot->core("settings")->del("Online", "Schemaversion");
         }
-        if ($this->bot->db->get_version("online") == 5) {
+        if ($this->bot->db->getVersion("online") == 5) {
             return;
         }
-        switch ($this->bot->db->get_version("online")) {
+        switch ($this->bot->db->getVersion("online")) {
         case 1:
-            $this->bot->db->update_table("online", "profession", "drop", "ALTER IGNORE TABLE #___online DROP `profession`, DROP `level`, DROP `ailevel`");
+            $this->bot->db->updateTable("online", "profession", "drop", "ALTER IGNORE TABLE #___online DROP `profession`, DROP `level`, DROP `ailevel`");
         case 2:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "online", array(
                     "status_irc",
                     "status_irc_changetime"
                 ), "drop", "ALTER IGNORE TABLE #___online DROP status_irc, DROP status_irc_changetime"
             );
         case 3:
-            $this->bot->db->update_table("online", "reinvite", "add", "ALTER IGNORE TABLE #___online ADD reinvite INT(1) DEFAULT '0'");
+            $this->bot->db->updateTable("online", "reinvite", "add", "ALTER IGNORE TABLE #___online ADD reinvite INT(1) DEFAULT '0'");
         case 4:
-            $this->bot->db->update_table("online", "level", "add", "ALTER IGNORE TABLE #___online ADD level INT(1) DEFAULT '0'");
+            $this->bot->db->updateTable("online", "level", "add", "ALTER IGNORE TABLE #___online ADD level INT(1) DEFAULT '0'");
         default:
         }
-        $this->bot->db->set_version("online", 5);
+        $this->bot->db->setVersion("online", 5);
     }
 
 
@@ -261,7 +261,7 @@ class OnlineDB_Core extends BasePassiveModule
         $sql .= "ON DUPLICATE KEY UPDATE " . $column . " = '" . $newstatus . "', " . $column . "_changetime = '" . time() . "', level = " . $level;
         $this->bot->db->query($sql);
         // Update last seen field, doesn't matter if logon or logoff, this is last time we saw any change
-        $this->bot->db->query("UPDATE #___users SET lastSeen = " . time() . " WHERE nickname = '$name'");
+        $this->bot->db->query("UPDATE #___users SET last_seen = " . time() . " WHERE nickname = '$name'");
         $this->last_seen[$name] = time();
     } // End function statusChange()
 

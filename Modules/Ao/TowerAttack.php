@@ -42,7 +42,7 @@ class TowerAttack extends BaseActiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("tower_attack", "false") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("tower_attack", "false") . "
 				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				time int,
 				off_guild VARCHAR(50),
@@ -63,7 +63,7 @@ class TowerAttack extends BaseActiveModule
 				INDEX (zone))"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("tower_result", "false") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("tower_result", "false") . "
 				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				time int,
 				win_guild VARCHAR(50),
@@ -90,7 +90,9 @@ class TowerAttack extends BaseActiveModule
             "Should several attacks on the same site in a short timeframe be collected and spammed as a blob instead of showing each attack singulary?"
         );
         $this->bot->core("settings")
-            ->create("TowerAttack", "SpamTo", "both", "Where should any tower spam be displayed to? Just sendToGuildChat, just sendToGroup, or both?", "sendToGuildChat;sendToGroup;both");
+            ->create(
+            "TowerAttack", "SpamTo", "both", "Where should any tower spam be displayed to? Just sendToGuildChat, just sendToGroup, or both?", "sendToGuildChat;sendToGroup;both"
+        );
         $this->bot->core("settings")
             ->create("TowerAttack", "RelayTowerDamage", "none", "Should damage spam of towers be relayed to the private group and/or any linked bots?", "none;pgroup;relay;both");
         $this->bot->core("settings")
@@ -150,20 +152,20 @@ class TowerAttack extends BaseActiveModule
         if ($this->bot->core("settings")
             ->exists("TowerAttack", "SchemaVersion")
         ) {
-            $this->bot->db->set_version(
+            $this->bot->db->setVersion(
                 "tower_result", $this->bot
                     ->core("settings")->get("TowerAttack", "SchemaVersion")
             );
-            $this->bot->db->set_version(
+            $this->bot->db->setVersion(
                 "tower_attack", $this->bot
                     ->core("settings")->get("TowerAttack", "SchemaVersion")
             );
             $this->bot->core("settings")->del("TowerAttack", "SchemaVersion");
         }
-        switch ($this->bot->db->get_version("tower_result")) {
+        switch ($this->bot->db->getVersion("tower_result")) {
         case 1:
-            $this->bot->db->update_table("tower_result", "zone", "add", "ALTER IGNORE TABLE #___tower_result ADD zone VARCHAR(50)");
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable("tower_result", "zone", "add", "ALTER IGNORE TABLE #___tower_result ADD zone VARCHAR(50)");
+            $this->bot->db->updateTable(
                 "tower_result", array(
                     "time",
                     "win_guild",
@@ -175,8 +177,8 @@ class TowerAttack extends BaseActiveModule
                 . "ADD INDEX (win_guild), ADD INDEX (win_side), ADD INDEX (zone)"
             );
         }
-        $this->bot->db->set_version("tower_result", 2);
-        switch ($this->bot->db->get_version("tower_attack")) {
+        $this->bot->db->setVersion("tower_result", 2);
+        switch ($this->bot->db->getVersion("tower_attack")) {
         case 1:
             echo "\nMaking sure that tower_attack table does not contain duplicate entries (same timestamp, org, side and zone.\nThis may take a few seconds on large existing tables!\n";
             $tablename = "temp_tower_attack_" . time() . "_temp";
@@ -194,7 +196,7 @@ class TowerAttack extends BaseActiveModule
             $this->bot->db->dropTable("#___tower_attack");
             $this->bot->db->query("ALTER TABLE " . $tablename . " RENAME #___tower_attack");
         }
-        $this->bot->db->set_version("tower_attack", 2);
+        $this->bot->db->setVersion("tower_attack", 2);
     }
 
 
@@ -230,7 +232,7 @@ class TowerAttack extends BaseActiveModule
             $battle .= "##blob_text##" . $this->formatAttackString(
                 $res, $this->bot
                     ->core("settings")
-                    ->get("TowerAttack", "VictoryString"), true
+                    ->get("TowerAttack", "VictoryString"), TRUE
             ) . "</font>\n\n";
         }
         return "Tower Battles Won: " . $this->bot->core("tools")
@@ -274,8 +276,8 @@ class TowerAttack extends BaseActiveModule
     */
     function groupMessage($name, $group, $msg)
     {
-        $attack = false;
-        $victory = false;
+        $attack = FALSE;
+        $victory = FALSE;
         if (preg_match(
             "/The (clan|neutral|omni) organization (.+) just entered a state of war! (.+) attacked the (clan|neutral|omni) organization (.+)'s tower in (.+) at location \(([0-9]+), ([0-9]+)\)/i",
             $msg, $info
@@ -289,7 +291,7 @@ class TowerAttack extends BaseActiveModule
             $infos["zone"] = $info[6];
             $infos["x_coord"] = $info[7];
             $infos["y_coord"] = $info[8];
-            $attack = true;
+            $attack = TRUE;
         }
         else {
             if (preg_match("/(.+) just attacked the (clan|neutral|omni) organization (.+)'s tower in (.+) at location \(([0-9]+), ([0-9]+)\)/i", $msg, $info)) {
@@ -301,7 +303,7 @@ class TowerAttack extends BaseActiveModule
                 $infos["zone"] = $info[4];
                 $infos["x_coord"] = $info[5];
                 $infos["y_coord"] = $info[6];
-                $attack = true;
+                $attack = TRUE;
             }
             else {
                 if (preg_match("/(.+) (Clan|Omni|Neutral) organization (.+) attacked the (Clan|Omni|Neutral) (.+) at their base in (.+). The attackers won!!/i", $msg, $info)) {
@@ -337,9 +339,9 @@ class TowerAttack extends BaseActiveModule
                 ->lookup($infos["off_player"]);
             if ($player instanceof BotError) {
                 $player = array(
-                    'level' => '0',
+                    'level'      => '0',
                     'profession' => 'Unknown',
-                    'off_side' => 'Unknown'
+                    'off_side'   => 'Unknown'
                 );
             }
             else {
@@ -439,7 +441,7 @@ class TowerAttack extends BaseActiveModule
     // def_side, zone, x_coord, y_coord. time is expected as unix timestamp, meaning seconds since unix 0 time. It is gmdate'd.
     // off_guild, off_player iand def_guild are colorized using off_side information.
     // #!br!# can be used to add linebreaks to the output.
-    function formatAttackString($infos, $string, $victory = false)
+    function formatAttackString($infos, $string, $victory = FALSE)
     {
         if ($victory) {
             $infos["lca_num"] = "";

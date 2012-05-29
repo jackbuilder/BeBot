@@ -38,11 +38,11 @@ class OnlineCounting extends BaseActiveModule
     function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
-        $this->bot->core("colors")->define_scheme("counting", "text", "normal");
+        $this->bot->core("colors")->defineScheme("counting", "text", "normal");
         $this->bot->core("colors")
-            ->define_scheme("counting", "number", "lightgray");
+            ->defineScheme("counting", "number", "lightgray");
         $this->bot->core("colors")
-            ->define_scheme("counting", "name", "forestgreen");
+            ->defineScheme("counting", "name", "forestgreen");
         $this->registerCommand("all", "count", "GUEST");
         $this->registerCommand("all", "check", "GUEST");
         if ($this->bot->game == "aoc") {

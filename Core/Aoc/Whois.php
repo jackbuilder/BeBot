@@ -42,7 +42,7 @@ class Whois_Core extends BasePassiveModule
         Create tables for our whoIs cache if it does not already exist.
         */
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("whoIs", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("whoIs", "false") . " (
 					ID bigint NOT NULL default '0',
 					nickname varchar(15) NOT NULL default '',
 					level tinyint(3) unsigned NOT NULL default '1',
@@ -96,29 +96,29 @@ class Whois_Core extends BasePassiveModule
 
     function updateTable()
     {
-        if ($this->bot->db->get_version("whoIs") == 5) {
+        if ($this->bot->db->getVersion("whoIs") == 5) {
             return;
         }
-        switch ($this->bot->db->get_version("whoIs")) {
+        switch ($this->bot->db->getVersion("whoIs")) {
         case 1: // Update Table version to prevent repeat update calls
             //was an update for a setting which isnt used in AoC
         case 2:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "whoIs", "class1", "modify",
                 "ALTER IGNORE TABLE #___whois modify `class1` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "whoIs", "class2", "modify",
                 "ALTER IGNORE TABLE #___whois modify `class2` enum('','Alchemist','Architect','Armorsmith','Gemcutter','Weaponsmith','None') NOT NULL"
             );
         case 3:
-            $this->bot->db->update_table("whoIs", "id", "alter", "ALTER TABLE #___whois CHANGE `id` BIGINT NOT NULL");
-            $this->bot->db->set_version("whoIs", 4);
+            $this->bot->db->updateTable("whoIs", "id", "alter", "ALTER TABLE #___whois CHANGE `id` BIGINT NOT NULL");
+            $this->bot->db->setVersion("whoIs", 4);
             $this->updateTable();
             return;
         case 4:
-            $this->bot->db->update_table("whoIs", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
-            $this->bot->db->set_version("whoIs", 5);
+            $this->bot->db->updateTable("whoIs", "ID", "alter", "ALTER TABLE #___whois MODIFY ID BIGINT NOT NULL");
+            $this->bot->db->setVersion("whoIs", 5);
             $this->updateTable();
             break;
         default:

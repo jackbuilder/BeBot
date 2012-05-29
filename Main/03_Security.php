@@ -79,7 +79,7 @@ class Security_Core extends BaseActiveModule
 
         // Create security_groups table.
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_groups", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("security_groups", "true") . "
 					(gid INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 					name VARCHAR(35) UNIQUE,
 					description VARCHAR(80),
@@ -96,7 +96,7 @@ class Security_Core extends BaseActiveModule
 
         // Create security_members table.
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_members", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("security_members", "true") . "
 						(id INT UNIQUE NOT NULL AUTO_INCREMENT,
 						name VARCHAR(50),
 						gid INT,
@@ -107,17 +107,17 @@ class Security_Core extends BaseActiveModule
 
         // All org members will be bot members so give org ranks a default access_level of 2.
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_org", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("security_org", "true") . "
 					(org_gov VARCHAR(25) NOT NULL,
-					orgRank VARCHAR(25) NOT NULL,
-					orgRankId TINYINT UNSIGNED NOT NULL,
+					org_rank VARCHAR(25) NOT NULL,
+					org_rank_id TINYINT UNSIGNED NOT NULL,
 					access_level TINYINT UNSIGNED NOT NULL DEFAULT 2,
-					PRIMARY KEY (org_gov, orgRank, orgRankId))
+					PRIMARY KEY (org_gov, org_rank, org_rank_id))
 					"
         );
 
         // Insert Ranks into table.
-        $sql = "INSERT IGNORE INTO #___security_org (org_gov, orgRank, orgRankId) VALUES ";
+        $sql = "INSERT IGNORE INTO #___security_org (org_gov, org_rank, org_rank_id) VALUES ";
         $sql .= "('Department', 'President', 0), ";
         $sql .= "('Department', 'General', 1), ";
         $sql .= "('Department', 'Squad Commander', 2), ";
@@ -676,9 +676,9 @@ class Security_Core extends BaseActiveModule
         $gid = $result[0][0];
         unset($result);
         $tmp = array(
-            "gid" => $gid,
-            "name" => $groupname,
-            "description" => $description,
+            "gid"          => $gid,
+            "name"         => $groupname,
+            "description"  => $description,
             "access_level" => 0
         );
         $tmp['members'] = array();
@@ -1037,40 +1037,38 @@ class Security_Core extends BaseActiveModule
         }
         unset($result);
         if ($this->bot->guildbot) {
-            $sql = "SELECT orgRank, orgRankId, access_level FROM #___security_org ";
+            $sql = "SELECT org_rank, org_rank_id, access_level FROM #___security_org ";
             $sql .= "WHERE org_gov = '" . $this->bot->core("settings")
                 ->get('Security', 'Orggov') . "' ";
-            $sql .= "ORDER BY orgRankId ASC, access_level DESC";
+            $sql .= "ORDER BY org_rank_id ASC, access_level DESC";
             $result = $this->bot->db->select($sql, MYSQL_ASSOC);
             if (!empty($result)) // This really should never be empty as this module automaticaly inserts data here.
             {
                 foreach ($result as $rank) {
                     if ($rank['access_level'] == SUPERADMIN) {
                         $superadmin
-                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(SUPERADMIN, $rank, $msgtype)
+                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->changeLinks(SUPERADMIN, $rank, $msgtype)
                             . "\n";
                     }
                     if ($rank['access_level'] == ADMIN) {
                         $admin
-                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(ADMIN, $rank, $msgtype) . "\n";
+                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->changeLinks(ADMIN, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == LEADER) {
                         $leader
-                            .=
-                            "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(LEADER, $rank, $msgtype) . "\n";
+                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->changeLinks(LEADER, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == MEMBER) {
                         $member
-                            .=
-                            "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(MEMBER, $rank, $msgtype) . "\n";
+                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->changeLinks(MEMBER, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == GUEST) {
                         $guest
-                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(GUEST, $rank, $msgtype) . "\n";
+                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->changeLinks(GUEST, $rank, $msgtype) . "\n";
                     }
                     if ($rank['access_level'] == ANONYMOUS) {
                         $anonymous
-                            .= "+ Org Rank " . $rank['orgRank'] . ":\n    Change " . $rank['orgRank'] . " Access Level To: " . $this->changeLinks(ANONYMOUS, $rank, $msgtype)
+                            .= "+ Org Rank " . $rank['org_rank'] . ":\n    Change " . $rank['org_rank'] . " Access Level To: " . $this->changeLinks(ANONYMOUS, $rank, $msgtype)
                             . "\n";
                     }
                 }
@@ -1211,7 +1209,7 @@ class Security_Core extends BaseActiveModule
         }
         if (is_array($groupid)) {
             $vars = $this->bot->core("settings")
-                ->get('Security', 'Orggov') . " " . $groupid['orgRank'];
+                ->get('Security', 'Orggov') . " " . $groupid['org_rank'];
         }
         else {
             $vars = $groupid;
@@ -1261,7 +1259,7 @@ class Security_Core extends BaseActiveModule
             return "Error: Access level should be between " . ANONYMOUS . " and " . SUPERADMIN . ".";
         }
         if (is_numeric($groupid) && is_null($government)) {
-            $orgrank = FALSE;
+            $org_rank = FALSE;
             $sql = "UPDATE #___security_groups SET access_level = " . $newacl . " WHERE gid = " . $groupid;
             $return = "Group ID " . $groupid . " changed to access level " . $this->getAccessName($newacl);
         }
@@ -1270,8 +1268,8 @@ class Security_Core extends BaseActiveModule
                 ->core("settings")->get('Security', 'Orggov')
         )
         ) {
-            $orgrank = TRUE;
-            $sql = "UPDATE #___security_org SET access_level = " . $newacl . " WHERE org_gov = '" . mysql_real_escape_string($government) . "' AND orgRank = '"
+            $org_rank = TRUE;
+            $sql = "UPDATE #___security_org SET access_level = " . $newacl . " WHERE org_gov = '" . mysql_real_escape_string($government) . "' AND org_rank = '"
                 . mysql_real_escape_string($groupid) . "'";
             $return = "Org Rank " . $groupid . " changed to access level " . $this->getAccessName($newacl);
         }
@@ -1282,12 +1280,12 @@ class Security_Core extends BaseActiveModule
 
         if ($this->bot->db->returnQuery($sql)) // Success
         {
-            if ($orgrank) {
-                $this->cacheManager("add", "orgranks", $groupid, $newacl);
+            if ($org_rank) {
+                $this->cacheManager("add", "org_ranks", $groupid, $newacl);
             }
             else {
                 $tmp = array(
-                    'gid' => $groupid,
+                    'gid'  => $groupid,
                     'name' => $this->cache['groups'][$groupid]['name']
                 );
                 $this->cacheManager("add", "groups", $tmp, $newacl);
@@ -1395,7 +1393,7 @@ class Security_Core extends BaseActiveModule
 
         // Check Org Rank Access.
         if ($this->bot->guildbot && isset($this->cache['members'][$player])) {
-            $highestlevel = $this->orgRankAccess($player, $highestlevel);
+            $highestlevel = $this->org_rankAccess($player, $highestlevel);
         }
         // Check default and custom groups.
         $highestlevel = $this->groupAccess($player, $highestlevel);
@@ -1599,8 +1597,8 @@ class Security_Core extends BaseActiveModule
     /*
     Figures out the access level based on org rank.
     */
-    function orgRankAccess($player, $highest)
-    { // Start function orgRankAccess()
+    function org_rankAccess($player, $highest)
+    { // Start function org_rankAccess()
         $who = $this->bot->core("whoIs")
             ->lookup($player, TRUE); // Do whoIs with no XML lookup, guild members should be cached...
         if ($who instanceof BotError) {
@@ -1609,16 +1607,16 @@ class Security_Core extends BaseActiveModule
         if ($who['org'] <> $this->bot->guildname) {
             return $highest;
         }
-        if ($this->cache['orgranks'][$who["rank"]] > $highest) {
-            return $this->cache['orgranks'][$who["rank"]];
+        if ($this->cache['org_ranks'][$who["rank"]] > $highest) {
+            return $this->cache['org_ranks'][$who["rank"]];
         }
         else {
             return $highest;
         }
-    } // End function orgRankAccess()
+    } // End function org_rankAccess()
 
-    function orgRankId($player, $highest)
-    { // Start function orgRankAccess()
+    function org_rank_id($player, $highest)
+    { // Start function org_rankAccess()
         $who = $this->bot->core("whoIs")
             ->lookup($player, TRUE); // Do whoIs with no XML lookup, guild members should be cached...
         if ($who instanceof BotError) {
@@ -1627,13 +1625,13 @@ class Security_Core extends BaseActiveModule
         if ($who['org'] <> $this->bot->guildname) {
             return $highest;
         }
-        if ($this->cache['orgrank_ids'][$who["rank"]] < $highest) {
-            return $this->cache['orgrank_ids'][$who["rank"]];
+        if ($this->cache['org_rank_ids'][$who["rank"]] < $highest) {
+            return $this->cache['org_rank_ids'][$who["rank"]];
         }
         else {
             return $highest;
         }
-    } // End function orgRankAccess()
+    } // End function org_rankAccess()
 
     /*
     Figure out the access level based on group membership
@@ -1784,7 +1782,7 @@ class Security_Core extends BaseActiveModule
         if (empty($guild) || $guild != "") {
             $guild = $this->bot->guildname;
         }
-        $sql = "SELECT DISTINCT orgRankId,orgRank FROM #___whois WHERE org_name = '" . mysql_real_escape_string($guild) . "' ORDER BY orgRankId ASC"; // Gets the org ranks.
+        $sql = "SELECT DISTINCT org_rank_id,org_rank FROM #___whois WHERE org_name = '" . mysql_real_escape_string($guild) . "' ORDER BY org_rank_id ASC"; // Gets the org ranks.
         $result = $this->bot->db->select($sql);
         if (empty($result)) {
             //$this -> bot -> core("settings") -> save("Security", "orggov", "Unknown");
@@ -1837,7 +1835,7 @@ class Security_Core extends BaseActiveModule
                     ->save("Security", "orggov", $orggov);
                 $sql = "UPDATE #___security_org SET access_level = 2";
                 $this->bot->db->query($sql);
-                $this->cacheOrgRanks();
+                $this->cacheorg_ranks();
             }
         }
         return $this->bot->core("settings")->get('Security', 'Orggov');
@@ -1867,7 +1865,7 @@ class Security_Core extends BaseActiveModule
     /*
     Adds and removes information from the cache.
     $action: add or rem
-    $cache: Which cache to modify (groups, guests, members, banned, groupmem, orgranks, main, maincache)
+    $cache: Which cache to modify (groups, guests, members, banned, groupmem, org_ranks, main, maincache)
     $info: The information to add (or remove)
     $more: Extra informaion needed for some actions.
     */
@@ -1961,12 +1959,12 @@ class Security_Core extends BaseActiveModule
             unset($this->cache['mains'][$this->bot->core("alts")
                 ->main($member)]);
             break;
-        case "orgranks":
+        case "org_ranks":
             if ($action) {
-                $this->cache['orgranks'][$info] = $more;
+                $this->cache['org_ranks'][$info] = $more;
             }
             else {
-                unset($this->cache['orgranks'][$info]);
+                unset($this->cache['org_ranks'][$info]);
             }
             unset($this->cache['mains']);
             $this->cache['mains'] = array();
@@ -1990,7 +1988,7 @@ class Security_Core extends BaseActiveModule
         $this->cacheUsers(); // Cache users security.
         $this->cacheGroups(); // Admin groups and members.
         if ($this->bot->guildbot) {
-            $this->cacheOrgRanks(); // Cache org rank security if this is a guildBot.
+            $this->cacheorg_ranks(); // Cache org rank security if this is a guildBot.
         }
     } // End function cacheSecurity()
 
@@ -2026,10 +2024,10 @@ class Security_Core extends BaseActiveModule
         unset($result);
     } // End function cacheUsers()
 
-    // Adds the orgRank access levels to the cache.
-    function cacheOrgRanks()
-    { // Start function cacheOrgRanks()
-        $this->cache['orgranks'] = array();
+    // Adds the org_rank access levels to the cache.
+    function cacheorg_ranks()
+    { // Start function cacheorg_ranks()
+        $this->cache['org_ranks'] = array();
         if (!($this->bot->core("settings")->exists('Security', 'Orggov'))) {
             $this->setGovernment(); // Won't work until the org governing form is identified.
         }
@@ -2048,21 +2046,21 @@ class Security_Core extends BaseActiveModule
         ) {
             return FALSE; // Tried to ID the org government and failed. Try again in 12 hours.
         }
-        $sql = "SELECT orgRank, access_level, orgRankId FROM #___security_org ";
+        $sql = "SELECT org_rank, access_level, org_rank_id FROM #___security_org ";
         $sql .= "WHERE org_gov = '" . $this->bot->core("settings")
             ->get('Security', 'Orggov') . "' ";
-        $sql .= "ORDER BY orgRankId ASC";
+        $sql .= "ORDER BY org_rank_id ASC";
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
         if (empty($result)) {
             return FALSE;
         } // Nothing to cache.
         // Now cache them...
-        foreach ($result as $orgrank) {
-            $this->cache['orgranks'][$orgrank['orgRank']] = $orgrank['access_level'];
-            $this->cache['orgrank_ids'][$orgrank['orgRank']] = $orgrank['orgRankId'];
+        foreach ($result as $org_rank) {
+            $this->cache['org_ranks'][$org_rank['org_rank']] = $org_rank['access_level'];
+            $this->cache['org_rank_ids'][$org_rank['org_rank']] = $org_rank['org_rank_id'];
         }
         return TRUE;
-    } // End function cacheOrgRanks()
+    } // End function cacheorg_ranks()
 
     // Adds the groups and their members to the cache.
     function cacheGroups()

@@ -92,7 +92,7 @@ class Timer_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("timer", "true") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("timer", "true") . " (
 			id BIGINT(100) unsigned NOT NULL auto_increment,
 			name VARCHAR(200) NOT NULL default '',
 			timerclass INT(21) NOT NULL default -1,
@@ -105,7 +105,7 @@ class Timer_Core extends BasePassiveModule
 		)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("timer_class_entries", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("timer_class_entries", "false") . " (
 			id INT(20) unsigned NOT NULL auto_increment,
 			next_id INT(21) NOT NULL DEFAULT -1,
 			class_id INT(10) unsigned NOT NULL,
@@ -118,7 +118,7 @@ class Timer_Core extends BasePassiveModule
 		)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("timer_classes", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("timer_classes", "false") . " (
 			id INT(10) unsigned NOT NULL auto_increment,
 			name VARCHAR(25) NOT NULL DEFAULT '',
 			description VARCHAR(255) NOT NULL DEFAULT '',
@@ -127,7 +127,7 @@ class Timer_Core extends BasePassiveModule
 		)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("timer_class_settings", "true") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("timer_class_settings", "true") . " (
 			id INT(10) unsigned NOT NULL auto_increment,
 			name VARCHAR(25) NOT NULL DEFAULT '',
 			current_class INT(10) unsigned NOT NULL,
@@ -201,16 +201,16 @@ class Timer_Core extends BasePassiveModule
             $sv = $this->bot->core("settings")->get("timer", "schemaversion");
             Switch ($sv) {
             case 3:
-                $this->bot->db->set_version("timer", 2);
+                $this->bot->db->setVersion("timer", 2);
             case 2:
-                $this->bot->db->set_version("timer_class_entries", 2);
+                $this->bot->db->setVersion("timer_class_entries", 2);
             }
             $this->bot->core("settings")->del("timer", "schemaversion");
         }
-        switch ($this->bot->db->get_version("timer_class_entries")) {
+        switch ($this->bot->db->getVersion("timer_class_entries")) {
         case 1:
             $res = $this->bot->db->select("SELECT notify_suffix FROM #___timer_class_entries");
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "timer_class_entries", "notify_prefix", "add", "ALTER IGNORE TABLE #___timer_class_entries ADD notify_prefix VARCHAR(255) NOT "
                 . "NULL DEFAULT '' AFTER notify_delay, CHANGE notify_text notify_suffix VARCHAR(255) NOT NULL DEFAULT ''"
             );
@@ -218,14 +218,15 @@ class Timer_Core extends BasePassiveModule
                 $this->bot->db->query("UPDATE #___timer_class_entries SET notify_prefix = 'Timer' " . "WHERE notify_prefix = ''");
             }
         }
-        switch ($this->bot->db->get_version("timer")) {
+        switch ($this->bot->db->getVersion("timer")) {
         case 1:
-            $this->bot->db->update_table(
-                "timer", "channel", "modify", "ALTER IGNORE TABLE #___timer MODIFY channel ENUM('sendTell', 'sendToGuildChat', 'sendToGroup', 'both', 'global', 'internal') NOT NULL default 'both'"
+            $this->bot->db->updateTable(
+                "timer", "channel", "modify",
+                "ALTER IGNORE TABLE #___timer MODIFY channel ENUM('sendTell', 'sendToGuildChat', 'sendToGroup', 'both', 'global', 'internal') NOT NULL default 'both'"
             );
         }
-        $this->bot->db->set_version("timer", 2);
-        $this->bot->db->set_version("timer_class_entries", 2);
+        $this->bot->db->setVersion("timer", 2);
+        $this->bot->db->setVersion("timer_class_entries", 2);
     }
 
 

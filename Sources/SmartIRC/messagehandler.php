@@ -37,7 +37,8 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
 
     function _event_error(
         /** @noinspection PhpUnusedParameterInspection */
-        &$ircdata)
+        &$ircdata
+    )
     {
         if ($this->_autoretry == TRUE) {
             $this->reconnect();
@@ -444,7 +445,8 @@ class Net_SmartIRC_messagehandler extends Net_SmartIRC_irccommands
     /* err_ */
     function _event_err_nicknameinuse(
         /** @noinspection PhpUnusedParameterInspection */
-        &$ircdata)
+        &$ircdata
+    )
     {
         $this->_nicknameinuse();
     }

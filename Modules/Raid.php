@@ -118,7 +118,7 @@ class Raid extends BaseActiveModule
         $this->help['notes'] = "All commands except join and leave are restricted to users with " . $this->bot
             ->core("settings")->get('Raid', 'Command') . " or higher access.";
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("raid_log", "true") . "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("raid_log", "true") . "
 				(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
 				name VARCHAR(20),
 				points decimal(11,2) default '0.00',

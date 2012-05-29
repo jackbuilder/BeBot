@@ -46,14 +46,14 @@ class Whois extends BaseActiveModule
         $this->help['command']['whoIs <name>'] = "Shows information about player <name>.";
         $this->registerCommand("all", "whoIs", "GUEST");
         $this->bot->core("colors")
-            ->define_scheme("whoIs", "alienlevel", "lightgreen");
+            ->defineScheme("whoIs", "alienlevel", "lightgreen");
         $this->bot->core("colors")
-            ->define_scheme("whoIs", "level", "lightbeige");
-        $this->bot->core("colors")->define_scheme("whoIs", "name", "yellow");
-        $this->bot->core("colors")->define_scheme("whoIs", "info", "normal");
+            ->defineScheme("whoIs", "level", "lightbeige");
+        $this->bot->core("colors")->defineScheme("whoIs", "name", "yellow");
+        $this->bot->core("colors")->defineScheme("whoIs", "info", "normal");
         $this->bot->core("colors")
-            ->define_scheme("whoIs", "profession", "lightbeige");
-        $this->bot->core("colors")->define_scheme("whoIs", "orginfo", "normal");
+            ->defineScheme("whoIs", "profession", "lightbeige");
+        $this->bot->core("colors")->defineScheme("whoIs", "orginfo", "normal");
         if ($this->bot->guildbot) {
             $altstat = TRUE;
         }

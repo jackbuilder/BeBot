@@ -52,7 +52,7 @@ class Buddy_Queue_Core extends BasePassiveModule
         $this->bot->core("settings")
             ->create("Buddy_Queue", "Rate", 1, "How many buddy add and removes should be done per second?", "1;2;3;4;5;6;7;8;9;10");
         $this->bot->core("settings")
-            ->register_callback("Buddy_Queue", "Rate", $this);
+            ->registerCallback("Buddy_Queue", "Rate", $this);
         $this->settings(
             FALSE, FALSE, FALSE, $this->bot->core("settings")
                 ->get("Buddy_Queue", "Rate"), FALSE

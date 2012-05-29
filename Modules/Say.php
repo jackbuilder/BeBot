@@ -50,7 +50,10 @@ class Say extends BaseActiveModule
         $this->registerCommand("all", "say", "ADMIN");
         $this->registerCommand("all", "whoSaidThat", "MEMBER");
         $this->bot->core("settings")
-            ->create("Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either sendToGuildChat, sendToGroup, both or original channel.", "sendToGuildChat;sendToGroup;both;origin");
+            ->create(
+            "Say", "OutputChannel", "both", "Into which channel should the output of say be sent? Either sendToGuildChat, sendToGroup, both or original channel.",
+            "sendToGuildChat;sendToGroup;both;origin"
+        );
         $this->help['description'] = 'Makes the bot say things.';
         $this->help['command']['say something'] = "Makes that bot say 'something'";
         $this->help['command']['whoSaidThat'] = "Find out who made the bot say that.";

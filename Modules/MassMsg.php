@@ -61,10 +61,10 @@ class MassMsg extends BaseActiveModule
             ->create('MassMsg', 'receive_message', 'Do you want to receive mass-messages?', 'Yes', 'Yes;No');
         $this->bot->core('prefs')
             ->create('MassMsg', 'receive_invites', 'Do you want to receive mass-invites?', 'Yes', 'No;Yes');
-        $this->bot->core("colors")->define_scheme("massmsg", "type", "aqua");
-        $this->bot->core("colors")->define_scheme("massmsg", "msg", "orange");
+        $this->bot->core("colors")->defineScheme("massmsg", "type", "aqua");
+        $this->bot->core("colors")->defineScheme("massmsg", "msg", "orange");
         $this->bot->core("colors")
-            ->define_scheme("massmsg", "disable", "seablue");
+            ->defineScheme("massmsg", "disable", "seablue");
     }
 
 

@@ -392,7 +392,7 @@ function getSiteData(
 
     socket_set_option(
         $socket, SOL_SOCKET, SO_RCVTIMEO, array(
-            "sec" => $read_timeout,
+            "sec"  => $read_timeout,
             "usec" => 0
         )
     );
@@ -446,7 +446,7 @@ function getSiteData(
 
 
 function getSiteCurl(
-    $url, $timeout = FALSE,
+        $url, $timeout = FALSE,
 ) // login should be username:password
 {
     $ch = curl_init();

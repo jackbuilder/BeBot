@@ -58,14 +58,14 @@ class Colors_Core extends BasePassiveModule
         $this->registerModule("colors");
         $this->registerEvent("cron", "1hour");
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("colors", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("colors", "false") . " (
 						name varchar(25) NOT NULL default '',
 						code varchar(25) NOT NULL default '',
 						PRIMARY KEY  (name)
 					)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("color_schemes", "true") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("color_schemes", "true") . " (
 						module varchar(25) NOT NULL default '',
 						name varchar(25) NOT NULL default '',
 						color_code varchar(25) NOT NULL default '',

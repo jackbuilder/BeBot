@@ -55,7 +55,7 @@ class AccessControl_Core extends BasePassiveModule
         Create the table for access rights
         */
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("access_control", "true") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("access_control", "true") . " (
 					command varchar(50) NOT NULL default '',
 					subcommand varchar(50) NOT NULL default '*',
 					channel varchar(20) NOT NULL default '',
@@ -64,7 +64,7 @@ class AccessControl_Core extends BasePassiveModule
 				)"
         );
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("access_control_saves", "false") . " (
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("access_control_saves", "false") . " (
 					name varchar(50) NOT NULL default '',
 					description varchar(150) NULL,
 					commands TEXT NOT NULL,
@@ -122,19 +122,19 @@ class AccessControl_Core extends BasePassiveModule
         if ($this->bot->core("settings")
             ->exists("accesscontrol", "schemaversion")
         ) {
-            $this->bot->db->set_version(
+            $this->bot->db->setVersion(
                 "access_control", $this->bot
                     ->core("settings")->get("accesscontrol", "schemaversion")
             );
             $this->bot->core("settings")->del("accesscontrol", "schemaversion");
         }
-        switch ($this->bot->db->get_version("access_control")) {
+        switch ($this->bot->db->getVersion("access_control")) {
         case 1:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "access_control", "subcommand", "add", "ALTER IGNORE TABLE #___access_control ADD COLUMN subcommand VARCHAR(50) NOT NULL DEFAULT '*' AFTER command"
             );
             $this->bot->db->query("ALTER IGNORE TABLE #___access_control DROP PRIMARY KEY");
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "access_control", array(
                     "command",
                     "subcommand",
@@ -143,14 +143,14 @@ class AccessControl_Core extends BasePassiveModule
             );
             $this->bot->db->query("UPDATE #___access_control SET subcommand = '*' WHERE subcommand = ''");
         case 2:
-            $this->bot->db->update_table(
+            $this->bot->db->updateTable(
                 "access_control", "minlevel", "modify",
                 "ALTER IGNORE TABLE #___access_control MODIFY minlevel enum('ANONYMOUS', 'GUEST', 'MEMBER', 'LEADER', 'ADMIN', 'SUPERADMIN', 'OWNER', 'DISABLED', 'DELETED') NOT NULL DEFAULT 'DISABLED'"
             );
         case 3:
         default:
         }
-        $this->bot->db->set_version("access_control", 3);
+        $this->bot->db->setVersion("access_control", 3);
     }
 
 
@@ -452,20 +452,20 @@ class AccessControl_Core extends BasePassiveModule
         $count = 0;
         $countsub = 0;
         $cshort = array(
-            "sendTell" => "t",
-            "sendToGuildChat" => "g",
-            "sendToGroup" => "p",
+            "sendTell"                    => "t",
+            "sendToGuildChat"             => "g",
+            "sendToGroup"                 => "p",
             "externalPrivateGroupMessage" => "e"
         );
         $lshort = array(
-            "ANONYMOUS" => "AN",
-            "GUEST" => "G",
-            "MEMBER" => "M",
-            "LEADER" => "L",
-            "ADMIN" => "A",
+            "ANONYMOUS"  => "AN",
+            "GUEST"      => "G",
+            "MEMBER"     => "M",
+            "LEADER"     => "L",
+            "ADMIN"      => "A",
             "SUPERADMIN" => "SA",
-            "OWNER" => "O",
-            "DISABLED" => "D"
+            "OWNER"      => "O",
+            "DISABLED"   => "D"
         );
         foreach ($this->access_cache as $command => $value) {
             unset($subs);
@@ -483,7 +483,9 @@ class AccessControl_Core extends BasePassiveModule
                     }
                 }
                 if (!empty($chans)) {
-                    if ($chans["sendTell"] && $chans["sendTell"] == $chans["sendToGuildChat"] && $chans["sendTell"] == $chans["sendToGroup"] && !$chans["externalPrivateGroupMessage"]) {
+                    if ($chans["sendTell"] && $chans["sendTell"] == $chans["sendToGuildChat"] && $chans["sendTell"] == $chans["sendToGroup"]
+                        && !$chans["externalPrivateGroupMessage"]
+                    ) {
                         $chan[] = "a," . $lshort[$chans["sendTell"]];
                     }
                     elseif ($chans["sendTell"] && !$chans["sendToGuildChat"] && $chans["sendTell"] == $chans["sendToGroup"] && !$chans["externalPrivateGroupMessage"]) {
@@ -530,13 +532,13 @@ class AccessControl_Core extends BasePassiveModule
         );
         $llong = array(
             'AN' => 'ANONYMOUS',
-            'G' => 'GUEST',
-            'M' => 'MEMBER',
-            'L' => 'LEADER',
-            'A' => 'ADMIN',
+            'G'  => 'GUEST',
+            'M'  => 'MEMBER',
+            'L'  => 'LEADER',
+            'A'  => 'ADMIN',
             'SA' => 'SUPERADMIN',
-            'O' => 'OWNER',
-            'D' => 'DISABLED'
+            'O'  => 'OWNER',
+            'D'  => 'DISABLED'
         );
         $results = $this->bot->db->select("SELECT commands FROM #___access_control_saves WHERE name = '" . mysql_real_escape_string($name) . "'");
         if (!empty($results)) {

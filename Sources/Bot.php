@@ -183,11 +183,11 @@ class Bot
             }
         }
         //Determine which game we are playing
-        if (!empty($server_list['ao'][$dimension])) {
-            define('AOCHAT_GAME', 'ao');
+        if (!empty($_BEBOT_server_list['Ao'][$dimension])) {
+            define('AOCHAT_GAME', 'Ao');
         }
-        elseif (!empty($server_list['aoc'][$dimension])) {
-            define('AOCHAT_GAME', 'aoc');
+        elseif (!empty($_BEBOT_server_list['Aoc'][$dimension])) {
+            define('AOCHAT_GAME', 'Aoc');
         }
         else {
             die("Unable to find dimension '$dimension' in any game.");
@@ -206,15 +206,15 @@ class Bot
         //instantiate bot
         $class = __CLASS__;
         self::$instance[$botHandle] = new $class($botHandle);
-        self::$instance[$botHandle]->server = $server_list[AOCHAT_GAME][$dimension]['server'];
-        self::$instance[$botHandle]->port = $server_list[AOCHAT_GAME][$dimension]['port'];
+        self::$instance[$botHandle]->server = $_BEBOT_server_list[AOCHAT_GAME][$dimension]['server'];
+        self::$instance[$botHandle]->port = $_BEBOT_server_list[AOCHAT_GAME][$dimension]['port'];
         //initialize bot.
         self::$instance[$botHandle]->username = $ao_username;
         self::$instance[$botHandle]->password = $ao_password;
         self::$instance[$botHandle]->botname = ucfirst(strtolower($bot_name));
         self::$instance[$botHandle]->dimension = ucfirst(strtolower($dimension));
-        self::$instance[$botHandle]->botversion = 'BOT_VERSION';
-        self::$instance[$botHandle]->botversionname = 'BOT_VERSION_NAME';
+        self::$instance[$botHandle]->botversion = BOT_VERSION;
+        self::$instance[$botHandle]->botversionname = BOT_VERSION_NAME;
         self::$instance[$botHandle]->other_bots = $other_bots;
         self::$instance[$botHandle]->commands = array();
         self::$instance[$botHandle]->commpre = $command_prefix;
@@ -250,12 +250,12 @@ class Bot
             self::$instance[$botHandle]->super_admin = NULL;
         }
         // create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
-        self::$instance[$botHandle]->ini = ConfigMagik::get_instance($botHandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", TRUE, TRUE);
-        self::$instance[$botHandle]->register_module(self::$instance[$botHandle]->ini, 'ini');
+        self::$instance[$botHandle]->ini = ConfigMagik::get_instance($botHandle, "Conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", TRUE, TRUE);
+        self::$instance[$botHandle]->registerModule(self::$instance[$botHandle]->ini, 'ini');
         //Instantiate singletons
         self::$instance[$botHandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
-        self::$instance[$botHandle]->aoc = AOChat->get_instance($botHandle);
-        self::$instance[$botHandle]->db = MySQL->get_instance($botHandle);
+        self::$instance[$botHandle]->aoc = AOChat::get_instance($botHandle);
+        self::$instance[$botHandle]->db = MySQL::get_instance($botHandle);
         //Pass back the handle of the bot for future reference.
         return ($botHandle);
     }
@@ -312,35 +312,6 @@ class Bot
     {
         // Make sure all cronjobs are locked, we don't want to run any cronJob before we are logged in!
         $this->cron_activated = FALSE;
-        // Get dimension server
-        switch ($this->dimension) {
-        case "0":
-            $dimension = "Testlive";
-            break;
-        case "1":
-            $dimension = "Atlantean";
-            break;
-        case "2":
-            $dimension = "Rimor";
-            break;
-        case "3":
-            $dimension = "Die neue welt";
-            break;
-        Default:
-            $dimension = ucfirst(strtolower($this->dimension));
-        }
-        Require ("conf/ServerList.php");
-        if (isset($server_list['ao'][$dimension])) {
-            $server = $server_list['ao'][$dimension]['server'];
-            $port = $server_list['ao'][$dimension]['port'];
-        }
-        elseif (isset($server_list['aoc'][$dimension])) {
-            $server = $server_list['aoc'][$dimension]['server'];
-            $port = $server_list['aoc'][$dimension]['port'];
-        }
-        else {
-            die("Unknown dimension " . $this->dimension);
-        }
 
         if (!$this->aoc->connect($this->server, $this->port)) {
             $this->cron_activated = FALSE;
@@ -769,7 +740,9 @@ class Bot
     {
         $use = array(0);
         $percentage = 0;
-        if (isset($this->commands["sendTell"][$cmd]) || isset($this->commands["sendToGuildChat"][$cmd]) || isset($this->commands["sendToGroup"][$cmd]) || isset($this->commands["externalPrivateGroupMessage"][$cmd])) {
+        if (isset($this->commands["sendTell"][$cmd]) || isset($this->commands["sendToGuildChat"][$cmd]) || isset($this->commands["sendToGroup"][$cmd])
+            || isset($this->commands["externalPrivateGroupMessage"][$cmd])
+        ) {
             return $use;
         }
         $perc = $this->core("settings")->get("Core", "SimilarMinimum");
@@ -986,7 +959,10 @@ class Bot
         {
             return;
         }
-        if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match("/.sendTell (.+)help/i", $args[1]) || preg_match("/I only listen to members of this bot/i", $args[1])
+        if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match("/.sendTell (.+)help/i", $args[1])
+            || preg_match(
+                "/I only listen to members of this bot/i", $args[1]
+            )
             || preg_match("/I am away from my keyboard right now,(.+)your message has been logged./i", $args[1])
             || preg_match("/Away From Keyboard/i", $args[1])
         ) {
@@ -1542,24 +1518,24 @@ class Bot
         $events = array(
             'connect',
             'disconnect',
-            'privateGroupJoin',
-            'privateGroupInvite',
-            'privateGroupLeave',
-            'externalPrivateGroupJoin',
+            'privategroupjoin',
+            'privategroupinvite',
+            'privategroupleave',
+            'externalprivategroupjoin',
             'extpgleave',
             'cron',
             'settings',
             'timer',
             'logon_notify',
             'buddy',
-            'privateGroup',
-            'groupMessage',
+            'privategroup',
+            'groupmessage',
             'tells',
-            'externalPrivateGroup',
+            'externalprivategroup',
             'irc'
         );
         if (in_array($event, $events)) {
-            if ($event == 'groupMessage') {
+            if ($event == 'groupmessage') {
                 if ($target) {
                     $this->commands[$event][$target][get_class($module)] = &$module;
                     return FALSE;
@@ -1587,7 +1563,7 @@ class Bot
             }
             elseif ($event == 'timer') {
                 if ($target) {
-                    $this->core("timer")->register_callback($target, $module);
+                    $this->core("timer")->registerCallback($target, $module);
                     return FALSE;
                 }
                 else {
@@ -1601,7 +1577,7 @@ class Bot
             elseif ($event == 'settings') {
                 if (is_array($target) && isset($target['module']) && isset($target['setting'])) {
                     return $this->core("settings")
-                        ->register_callback($target['module'], $target['setting'], $module);
+                        ->registerCallback($target['module'], $target['setting'], $module);
                 }
                 return "No module and/or setting defined, can't register!";
             }
@@ -1664,7 +1640,7 @@ class Bot
                 }
             }
             elseif ($event == 'timer') {
-                return $this->core("timer")->unregister_callback($target);
+                return $this->core("timer")->unregisterCallback($target);
             }
             elseif ($event == 'logon_notify') {
                 $this->core("logon_notifies")->unregister($module);
@@ -1673,7 +1649,7 @@ class Bot
             elseif ($event == 'settings') {
                 if (is_array($target) && isset($target['module']) && isset($target['setting'])) {
                     return $this->core("settings")
-                        ->unregister_callback($target['module'], $target['setting'], $module);
+                        ->unregisterCallback($target['module'], $target['setting'], $module);
                 }
                 return "No module and/or setting defined, can't unRegister!";
             }

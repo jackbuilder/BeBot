@@ -52,7 +52,7 @@ class Alts_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("alts", "false")
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("alts", "false")
                 . " (alt VARCHAR(255) NOT NULL PRIMARY KEY, main VARCHAR(255), confirmed INT DEFAULT '1')"
         );
         $this->registerModule("alts");
@@ -75,13 +75,13 @@ class Alts_Core extends BasePassiveModule
 
     function updateTable()
     {
-        switch ($this->bot->db->get_version("alts")) {
+        switch ($this->bot->db->getVersion("alts")) {
         case 1:
-            $this->bot->db->update_table("alts", "confirmed", "add", "ALTER TABLE #___alts ADD `confirmed` INT DEFAULT '1'");
+            $this->bot->db->updateTable("alts", "confirmed", "add", "ALTER TABLE #___alts ADD `confirmed` INT DEFAULT '1'");
         case 2:
         default:
         }
-        $this->bot->db->set_version("alts", 2);
+        $this->bot->db->setVersion("alts", 2);
     }
 
 
@@ -108,7 +108,7 @@ class Alts_Core extends BasePassiveModule
             $this->mains[$altname] = $curmain;
             $this->alts[$curmain][$altname] = $altname;
         }
-        $this->bot->core("security")->cache_mgr("del", "maincache", "");
+        $this->bot->core("security")->cacheManager("del", "maincache", "");
     }
 
 
@@ -123,8 +123,8 @@ class Alts_Core extends BasePassiveModule
     {
         $main = ucfirst(strtolower($main));
         $alt = ucfirst(strtolower($alt));
-        $this->bot->core("security")->cache_mgr("add", "main", $main);
-        $this->bot->core("security")->cache_mgr("add", "main", $alt);
+        $this->bot->core("security")->cacheManager("add", "main", $main);
+        $this->bot->core("security")->cacheManager("add", "main", $alt);
         if (!isset($this->alts[$main])) {
             $this->alts[$main] = array();
         }
@@ -138,7 +138,7 @@ class Alts_Core extends BasePassiveModule
     function delAlt($main, $alt)
     {
         $this->bot->core("security")
-            ->cache_mgr("del", "main", ucfirst(strtolower($main)));
+            ->cacheManager("del", "main", ucfirst(strtolower($main)));
         unset($this->mains[ucfirst(strtolower($alt))]);
         unset($this->alts[ucfirst(strtolower($main))][ucfirst(strtolower($alt))]);
     }

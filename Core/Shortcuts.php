@@ -42,7 +42,7 @@ class ShortCuts_Core extends BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
-            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("shortcuts", "false") . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, "
+            "CREATE TABLE IF NOT EXISTS " . $this->bot->db->defineTableName("shortcuts", "false") . " (id INT NOT NULL AUTO_INCREMENT UNIQUE, "
                 . " shortcut VARCHAR(20) NOT NULL PRIMARY KEY, " . " long_desc VARCHAR(255) NOT NULL UNIQUE)"
         );
         $this->bot->db->query(

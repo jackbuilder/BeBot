@@ -53,10 +53,10 @@ class Gemcut extends BaseActiveModule
         $this->registerCommand('all', 'gemcut', 'GUEST');
         $this->registerCommand('all', 'geminfo', 'GUEST');
         $this->bot->core("colors")
-            ->define_scheme("gemcut", "highlight", "yellow");
-        $this->bot->core("colors")->define_scheme("gemcut", "normal", "white");
+            ->defineScheme("gemcut", "highlight", "yellow");
+        $this->bot->core("colors")->defineScheme("gemcut", "normal", "white");
         $this->bot->core("colors")
-            ->define_scheme("gemcut", "info", "lightgreen");
+            ->defineScheme("gemcut", "info", "lightgreen");
         $this->help['description'] = 'This module helps people with identifying gems and how to cut gems.';
         $this->help['command']['gem <itemref>'] = "Displays what bonuses an uncut gem will give and how to cut it.";
         $this->help['command']['gemcut <tier>'] = "Displays a list of gems for the specified tier.";
@@ -172,103 +172,103 @@ class Gemcut extends BaseActiveModule
         // We need the name, the three cuts (1H/2H/Arm), the rarity (Common, Rare, Both), Min/Max Tiers and the effect
         //   <name>           :          0/1 : 0/1 : 0/1       :         0/1/2         : 1-6 : 1-6  =>  <effect>
         $this->gem_types["black"][] = array(
-            "Baneful:" . "1:1:1:" . "2:" . "1:6" => "+X Unholy Damage (Magic)",
+            "Baneful:" . "1:1:1:" . "2:" . "1:6"    => "+X Unholy Damage (Magic)",
             "Corruptive:" . "0:0:1:" . "1:" . "1:6" => "On-hit Unholy Damage (Proc)",
-            "Defiling:" . "1:1:0:" . "2:" . "1:6" => "Unholy Damage (Proc)",
+            "Defiling:" . "1:1:0:" . "2:" . "1:6"   => "Unholy Damage (Proc)",
             "Envenoming:" . "0:0:1:" . "1:" . "1:6" => "On-hit Poison Damage (Proc)",
-            "Malefic:" . "1:1:0:" . "2:" . "1:6" => "+X Unholy Damage (Melee)",
-            "Noxious:" . "1:1:0:" . "2:" . "1:6" => "+X Poison Damage (Melee)",
-            "Umbral:" . "0:0:1:" . "2:" . "1:6" => "+X Hiding",
+            "Malefic:" . "1:1:0:" . "2:" . "1:6"    => "+X Unholy Damage (Melee)",
+            "Noxious:" . "1:1:0:" . "2:" . "1:6"    => "+X Poison Damage (Melee)",
+            "Umbral:" . "0:0:1:" . "2:" . "1:6"     => "+X Hiding",
             "Unhallowed:" . "0:0:1:" . "2:" . "1:6" => "+X% Holy Invulnerability",
-            "Venemous:" . "1:1:0:" . "2:" . "1:6" => "Poison Damage (Proc)"
+            "Venemous:" . "1:1:0:" . "2:" . "1:6"   => "Poison Damage (Proc)"
         );
         $this->gem_types["blue"][] = array(
-            "Draining:" . "1:1:0:" . "2:" . "1:6" => "+X% Tap Mana % (Magic)",
+            "Draining:" . "1:1:0:" . "2:" . "1:6"     => "+X% Tap Mana % (Magic)",
             "Enlightening:" . "1:1:1:" . "2:" . "1:6" => "+X Intelligence",
-            "Fatiguing:" . "1:1:0:" . "2:" . "1:6" => "+X% Tap Stamina % (Magic)",
-            "Gelid:" . "1:1:0:" . "2:" . "1:6" => "Cold Damage (Proc)",
-            "Glacial:" . "1:1:1:" . "2:" . "1:6" => "+X Cold Damage (Magic)",
-            "Icy:" . "0:0:1:" . "1:" . "1:6" => "On-hit Cold Damage (Proc)",
-            "Imbued:" . "0:0:1:" . "2:" . "1:6" => "+X Max Mana",
-            "Leeching:" . "1:1:0:" . "2:" . "1:6" => "+X% Tap Health % (Magic)",
-            "Negating:" . "0:0:1:" . "2:" . "1:6" => "+X% Immunity",
-            "Quenching:" . "0:0:1:" . "2:" . "1:6" => "+X% Fire Invulnerability",
+            "Fatiguing:" . "1:1:0:" . "2:" . "1:6"    => "+X% Tap Stamina % (Magic)",
+            "Gelid:" . "1:1:0:" . "2:" . "1:6"        => "Cold Damage (Proc)",
+            "Glacial:" . "1:1:1:" . "2:" . "1:6"      => "+X Cold Damage (Magic)",
+            "Icy:" . "0:0:1:" . "1:" . "1:6"          => "On-hit Cold Damage (Proc)",
+            "Imbued:" . "0:0:1:" . "2:" . "1:6"       => "+X Max Mana",
+            "Leeching:" . "1:1:0:" . "2:" . "1:6"     => "+X% Tap Health % (Magic)",
+            "Negating:" . "0:0:1:" . "2:" . "1:6"     => "+X% Immunity",
+            "Quenching:" . "0:0:1:" . "2:" . "1:6"    => "+X% Fire Invulnerability",
             "Replenishing:" . "0:0:1:" . "2:" . "1:6" => "+X Natural Mana Region",
-            "Repletive:" . "0:0:1:" . "2:" . "1:6" => "+X Non-Combat Mana Regen",
-            "Sagacious:" . "1:1:1:" . "2:" . "1:6" => "+X Wisdom",
-            "Stupefying:" . "1:1:0:" . "2:" . "1:6" => "+X% Tap Mana"
+            "Repletive:" . "0:0:1:" . "2:" . "1:6"    => "+X Non-Combat Mana Regen",
+            "Sagacious:" . "1:1:1:" . "2:" . "1:6"    => "+X Wisdom",
+            "Stupefying:" . "1:1:0:" . "2:" . "1:6"   => "+X% Tap Mana"
         );
         $this->gem_types["green"][] = array(
-            "Brutal:" . "1:1:0:" . "2:" . "1:6" => "+X% Fatality",
-            "Deft:" . "1:1:1:" . "2:" . "1:6" => "+X Dexterity",
-            "Dense:" . "0:0:1:" . "0:" . "1:6" => "+X% Piercing Invulnerability",
-            "Enfeebling:" . "1:1:0:" . "2:" . "1:6" => "+X% Tap Stamina",
-            "Evasive:" . "0:0:1:" . "2:" . "1:6" => "+X% Evade",
-            "Frenzied:" . "1:0:1:" . "2:" . "1:6" => "+X% Offhand Chance",
+            "Brutal:" . "1:1:0:" . "2:" . "1:6"       => "+X% Fatality",
+            "Deft:" . "1:1:1:" . "2:" . "1:6"         => "+X Dexterity",
+            "Dense:" . "0:0:1:" . "0:" . "1:6"        => "+X% Piercing Invulnerability",
+            "Enfeebling:" . "1:1:0:" . "2:" . "1:6"   => "+X% Tap Stamina",
+            "Evasive:" . "0:0:1:" . "2:" . "1:6"      => "+X% Evade",
+            "Frenzied:" . "1:0:1:" . "2:" . "1:6"     => "+X% Offhand Chance",
             "Invigorating:" . "0:0:1:" . "2:" . "1:6" => "+X Max Stamina",
-            "Panoptic:" . "1:1:0:" . "2:" . "1:6" => "+X Damage (Melee)",
-            "Poised:" . "0:0:1:" . "2:" . "1:6" => "+X Bow Damage",
-            "Puncturing:" . "1:1:0:" . "2:" . "1:6" => "+X Piercing Damage (Melee)",
+            "Panoptic:" . "1:1:0:" . "2:" . "1:6"     => "+X Damage (Melee)",
+            "Poised:" . "0:0:1:" . "2:" . "1:6"       => "+X Bow Damage",
+            "Puncturing:" . "1:1:0:" . "2:" . "1:6"   => "+X Piercing Damage (Melee)",
             "Rejuvenating:" . "0:0:1:" . "2:" . "1:6" => "+X Natural Stamina Regen",
-            "Retortive:" . "0:0:1:" . "1:" . "1:6" => "On-hit Slashing Damage (Proc)",
-            "Ripping:" . "1:1:1:" . "2:" . "1:6" => "On-hit Crushing Damage (Proc)",
-            "Sacrosanct:" . "0:0:1:" . "2:" . "1:6" => "+X% Unholy Invulnerability",
-            "Salubrious:" . "0:0:1:" . "2:" . "1:6" => "+X Non-Combat Stamina Regen",
-            "Steady:" . "0:0:1:" . "2:" . "1:6" => "+X Crossbow Damage",
-            "Tenacious:" . "0:0:1:" . "0:" . "1:6" => "+X% Slashing Invulnerability",
-            "Thrusting:" . "0:0:1:" . "2:" . "1:6" => "+X Dagger Damage (Melee)",
-            "Unyielding:" . "0:0:1:" . "0:" . "1:6" => "+X% Crushing Invulnerability"
+            "Retortive:" . "0:0:1:" . "1:" . "1:6"    => "On-hit Slashing Damage (Proc)",
+            "Ripping:" . "1:1:1:" . "2:" . "1:6"      => "On-hit Crushing Damage (Proc)",
+            "Sacrosanct:" . "0:0:1:" . "2:" . "1:6"   => "+X% Unholy Invulnerability",
+            "Salubrious:" . "0:0:1:" . "2:" . "1:6"   => "+X Non-Combat Stamina Regen",
+            "Steady:" . "0:0:1:" . "2:" . "1:6"       => "+X Crossbow Damage",
+            "Tenacious:" . "0:0:1:" . "0:" . "1:6"    => "+X% Slashing Invulnerability",
+            "Thrusting:" . "0:0:1:" . "2:" . "1:6"    => "+X Dagger Damage (Melee)",
+            "Unyielding:" . "0:0:1:" . "0:" . "1:6"   => "+X% Crushing Invulnerability"
         );
         $this->gem_types["orange"][] = array(
-            "Algid:" . "0:0:1:" . "2:" . "1:6" => "+X% Cold Invulnerability",
-            "Flaring:" . "1:1:0:" . "2:" . "1:6" => "Fire Damage (Proc)",
-            "Igneous:" . "1:1:1:" . "2:" . "1:6" => "+X Fire Damage (Magic)",
+            "Algid:" . "0:0:1:" . "2:" . "1:6"    => "+X% Cold Invulnerability",
+            "Flaring:" . "1:1:0:" . "2:" . "1:6"  => "Fire Damage (Proc)",
+            "Igneous:" . "1:1:1:" . "2:" . "1:6"  => "+X Fire Damage (Magic)",
             "Scalding:" . "0:0:1:" . "2:" . "1:6" => "On-hit Fire Damage (Proc)",
-            "Searing:" . "1:1:0:" . "2:" . "1:6" => "+X Fire Damage (Melee)"
+            "Searing:" . "1:1:0:" . "2:" . "1:6"  => "+X Fire Damage (Melee)"
         );
         $this->gem_types["purple"][] = array(
             "Immutable:" . "0:0:1:" . "1:" . "1:6" => "+X% Invul. to all Magic Types",
-            "Mocking:" . "1:1:1:" . "2:" . "1:6" => "+X% Hate Modifier",
+            "Mocking:" . "1:1:1:" . "2:" . "1:6"   => "+X% Hate Modifier",
             "Sacrarial:" . "0:0:1:" . "1:" . "1:6" => "On-hit +X% Invul. to all Melee (Proc)",
-            "Vexing:" . "1:1:1:" . "2:" . "1:6" => "+X Taunt"
+            "Vexing:" . "1:1:1:" . "2:" . "1:6"    => "+X Taunt"
         );
         $this->gem_types["red"][] = array(
-            "Concussant:" . "0:0:1:" . "2:" . "1:6" => "+X 2H Blunt Damage (Melee)",
-            "Destructive:" . "1:1:0:" . "2:" . "1:6" => "+X Crushing Damage (Melee)",
-            "Destructive:" . "1:1:0:" . "2:" . "1:6" => "Crushing Damage (Proc)",
-            "Eviscerating:" . "1:1:0:" . "2:" . "1:6" => "+X Slashing Damage (Melee)",
+            "Concussant:" . "0:0:1:" . "2:" . "1:6"     => "+X 2H Blunt Damage (Melee)",
+            "Destructive:" . "1:1:0:" . "2:" . "1:6"    => "+X Crushing Damage (Melee)",
+            "Destructive:" . "1:1:0:" . "2:" . "1:6"    => "Crushing Damage (Proc)",
+            "Eviscerating:" . "1:1:0:" . "2:" . "1:6"   => "+X Slashing Damage (Melee)",
             "Exsanguinating:" . "1:1:0:" . "2:" . "1:6" => "+X% Tap Health",
-            "Fortifying:" . "0:0:1:" . "2:" . "1:6" => "+X Constitution",
-            "Inviolate:" . "0:0:1:" . "1:" . "1:6" => "+X% Invulerability to all Melee",
-            "Mighty:" . "1:1:1:" . "2:" . "1:6" => "+X Stength",
-            "Pulsing:" . "0:0:1:" . "1:" . "1:6" => "On-hit Heal + HoT (Proc)",
-            "Rending:" . "1:1:0:" . "2:" . "1:6" => "Slashing Damage + DoT (Proc)",
-            "Revitalising:" . "0:0:1:" . "2:" . "1:6" => "+X Non-Combat Health Regen",
-            "Rupturing:" . "1:1:0:" . "2:" . "1:6" => "Piercing DoT (Proc)",
-            "Scything:" . "0:0:1:" . "2:" . "1:6" => "+X 2H Edged Damage (Melee)",
-            "Secular:" . "0:0:1:" . "1:" . "1:6" => "On-hit +X% Invul. to all Melee (Proc)",
-            "Thrashing:" . "0:0:1:" . "2:" . "1:6" => "+X 1H Blunt Damage (Melee)",
-            "Vicious:" . "0:0:1:" . "2:" . "1:6" => "+X 1H Edged Damage (Melee)",
-            "Violent:" . "0:0:1:" . "2:" . "1:6" => "+X Polearm Damage (Melee)"
+            "Fortifying:" . "0:0:1:" . "2:" . "1:6"     => "+X Constitution",
+            "Inviolate:" . "0:0:1:" . "1:" . "1:6"      => "+X% Invulerability to all Melee",
+            "Mighty:" . "1:1:1:" . "2:" . "1:6"         => "+X Stength",
+            "Pulsing:" . "0:0:1:" . "1:" . "1:6"        => "On-hit Heal + HoT (Proc)",
+            "Rending:" . "1:1:0:" . "2:" . "1:6"        => "Slashing Damage + DoT (Proc)",
+            "Revitalising:" . "0:0:1:" . "2:" . "1:6"   => "+X Non-Combat Health Regen",
+            "Rupturing:" . "1:1:0:" . "2:" . "1:6"      => "Piercing DoT (Proc)",
+            "Scything:" . "0:0:1:" . "2:" . "1:6"       => "+X 2H Edged Damage (Melee)",
+            "Secular:" . "0:0:1:" . "1:" . "1:6"        => "On-hit +X% Invul. to all Melee (Proc)",
+            "Thrashing:" . "0:0:1:" . "2:" . "1:6"      => "+X 1H Blunt Damage (Melee)",
+            "Vicious:" . "0:0:1:" . "2:" . "1:6"        => "+X 1H Edged Damage (Melee)",
+            "Violent:" . "0:0:1:" . "2:" . "1:6"        => "+X Polearm Damage (Melee)"
         );
         $this->gem_types["white"][] = array(
-            "Arcing:" . "1:1:0:" . "1:" . "1:6" => "Electrical Damage (Proc)",
-            "Grounding:" . "0:0:1:" . "2:" . "1:6" => "+X% Electrical Unvulnerability",
-            "Observers:" . "0:0:1:" . "2:" . "1:6" => "+X Perception",
-            "Shocking:" . "0:0:1:" . "1:" . "1:6" => "On-hit Electrical Damage (Proc)",
+            "Arcing:" . "1:1:0:" . "1:" . "1:6"      => "Electrical Damage (Proc)",
+            "Grounding:" . "0:0:1:" . "2:" . "1:6"   => "+X% Electrical Unvulnerability",
+            "Observers:" . "0:0:1:" . "2:" . "1:6"   => "+X Perception",
+            "Shocking:" . "0:0:1:" . "1:" . "1:6"    => "On-hit Electrical Damage (Proc)",
             "Stormforged:" . "1:1:0:" . "2:" . "1:6" => "+X Electrical Damage (Melee)",
             "Tempestuous:" . "1:1:1:" . "2:" . "1:6" => "+X Electrical Damage (Magic)"
         );
         $this->gem_types["yellow"][] = array(
-            "Focusing:" . "1:1:1:" . "2:" . "1:6" => "+X Casting Concentration",
-            "Merciful:" . "0:0:1:" . "2:" . "1:6" => "+X% Hate Modifier",
-            "Omnific:" . "1:1:0:" . "2:" . "1:6" => "+X Damage (Magic)",
-            "Purifying:" . "0:0:1:" . "2:" . "1:6" => "+X% Poison Invulnerability",
+            "Focusing:" . "1:1:1:" . "2:" . "1:6"    => "+X Casting Concentration",
+            "Merciful:" . "0:0:1:" . "2:" . "1:6"    => "+X% Hate Modifier",
+            "Omnific:" . "1:1:0:" . "2:" . "1:6"     => "+X Damage (Magic)",
+            "Purifying:" . "0:0:1:" . "2:" . "1:6"   => "+X% Poison Invulnerability",
             "Retributive:" . "1:1:0:" . "2:" . "1:6" => "+X Holy Damage (Melee)",
-            "Sacred:" . "1:1:0:" . "2:" . "1:6" => "+X Holy Damage (Magic)",
+            "Sacred:" . "1:1:0:" . "2:" . "1:6"      => "+X Holy Damage (Magic)",
             "Sancrosanct:" . "0:0:1:" . "2:" . "1:6" => "+X% Unholy Invulnerability",
-            "Vengeful:" . "0:0:1:" . "1:" . "1:6" => "On-hit Holy Damage (Proc)",
-            "Wrathful:" . "1:0:0:" . "2:" . "1:6" => "Holy Damage (Proc)"
+            "Vengeful:" . "0:0:1:" . "1:" . "1:6"    => "On-hit Holy Damage (Proc)",
+            "Wrathful:" . "1:0:0:" . "2:" . "1:6"    => "Holy Damage (Proc)"
         );
         // Lookup Structure
         // eg. $gem_array["Obsidian"]  = array(1, "black");
@@ -329,17 +329,17 @@ class Gemcut extends BaseActiveModule
     {
         $items = $this->bot->core('items')->parse_items($msg);
         if (empty($items)) {
-            return false;
+            return FALSE;
         }
         $txt = '';
         foreach ($items as $item) {
             $result = $this->bot->core('items')->submit_item($item, $name);
             preg_match("/(Flawless|Uncut)\s(.*)/", $item['name'], $matches);
             if ($matches[1] == "Flawless") {
-                $rare = true;
+                $rare = TRUE;
             }
             else {
-                $rare = false;
+                $rare = FALSE;
             }
             $gem_info = $this->gem_array[$matches[2]];
             if (count($gem_info) == 2) {
@@ -487,9 +487,9 @@ class Gemcut extends BaseActiveModule
                 }
             }
             $txt .= "##gemcut_highlight##Rare Cuts##end##\n";
-            $txt .= $this->renderBlock($rare, true);
+            $txt .= $this->renderBlock($rare, TRUE);
             $txt .= "\n##gemcut_highlight##Common Cuts##end##\n";
-            $txt .= $this->renderBlock($common, false);
+            $txt .= $this->renderBlock($common, FALSE);
             return "Gem Information : " . $this->bot->core("tools")
                 ->make_blob("$msg", $txt) . ".";
         }

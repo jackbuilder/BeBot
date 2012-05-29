@@ -80,14 +80,14 @@ abstract class BaseActiveModule extends BasePassiveModule
             'sendTell'
         );
         if ((in_array($channel, $channels)) && (in_array($access, $levels))) {
-            if (!$this->bot->exists_command($channel, $command)) {
-                $this->bot->register_command($channel, $command, $this);
+            if (!$this->bot->existsCommand($channel, $command)) {
+                $this->bot->registerCommand($channel, $command, $this);
                 $this->bot->core("access_control")
                     ->create($channel, $command, $access);
                 if ($subcommands != NULL) {
                     foreach ($subcommands as $subcommand => $subacl) {
                         $this->bot->core("access_control")
-                            ->create_subcommand($channel, $command, $subcommand, $subacl);
+                            ->createSubCommand($channel, $command, $subcommand, $subacl);
                     }
                 }
             }
@@ -121,8 +121,8 @@ abstract class BaseActiveModule extends BasePassiveModule
             'sendTell'
         );
         if (in_array($channel, $channels)) {
-            if ($this->bot->exists_command($channel, $command)) {
-                $this->bot->unregister_command($channel, $command);
+            if ($this->bot->existsCommand($channel, $command)) {
+                $this->bot->unregisterCommand($channel, $command);
             }
         }
     }
@@ -131,13 +131,13 @@ abstract class BaseActiveModule extends BasePassiveModule
     // Registers a command alias for an already defined command.
     protected function registerAlias($command, $alias)
     {
-        $this->bot->core("commandAlias")->register($command, $alias);
+        $this->bot->core("command_alias")->register($command, $alias);
     }
 
 
     protected function unregisterAlias($alias)
     {
-        $this->bot->core("commandAlias")->del($alias);
+        $this->bot->core("command_alias")->del($alias);
     }
 
 

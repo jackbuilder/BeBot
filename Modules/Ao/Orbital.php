@@ -40,17 +40,17 @@ class Orbital extends BasePassiveModule
         parent::__construct($bot, get_class($this));
         $this->registerEvent("groupMessage", "Org Msg");
         $classid = $this->bot->core("timer")
-            ->create_timer_class("OrbitalWarning", "Notify class used for timer on orbitals.");
+            ->createTimerClass("OrbitalWarning", "Notify class used for timer on orbitals.");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, -2, 0, "", ", hit them again");
+            ->createTimerClassEntry($classid, -2, 0, "", ", hit them again");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 60, "", "in one minute");
+            ->createTimerClassEntry($classid, $nextid, 60, "", "in one minute");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 300, "", "in five minutes");
+            ->createTimerClassEntry($classid, $nextid, 300, "", "in five minutes");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 600, "", "in 10 minutes");
+            ->createTimerClassEntry($classid, $nextid, 600, "", "in 10 minutes");
         $nextid = $this->bot->core("timer")
-            ->create_timer_class_entry($classid, $nextid, 900, "", "in 15 minutes");
+            ->createTimerClassEntry($classid, $nextid, 900, "", "in 15 minutes");
     }
 
 
