@@ -327,6 +327,10 @@ class Bot
         case "3":
             $dimension = "Die neue welt";
             break;
+        case "5":
+        	$dimension = "Rubi-Ka";
+        	break;
+        	
         Default:
             $dimension = ucfirst(strtolower($this->dimension));
         }
