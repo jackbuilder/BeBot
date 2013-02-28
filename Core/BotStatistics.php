@@ -35,37 +35,36 @@ $botstatistics_core = new BotStatistics_Core($bot);
 class BotStatistics_Core extends BasePassiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->core("settings")
             ->create("Bots", "DB", "", "Use dif Database? (Restart Required)");
         if ($this->bot->core("settings")->get("bots", "DB") !== "") {
             $this->DB = $this->bot->core("settings")->get("bots", "DB") . ".";
-        }
-        else {
+        } else {
             $this->DB = "";
         }
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->DB . $this->bot->db->define_tablename("bots", "false") . " (
-				ID INT NOT NULL auto_increment PRIMARY KEY,
-				bot VARCHAR(20),
-				dim VARCHAR(20) NOT NULL default '',
-				online INT NOT NULL default '0',
-				time INT NOT NULL default '0',
-				start INT NOT NULL default '0',
-				total INT NOT NULL default '0',
-				restarts INT NOT NULL default '0'
-				)"
+                ID INT NOT NULL auto_increment PRIMARY KEY,
+                bot VARCHAR(20),
+                dim VARCHAR(20) NOT NULL default '',
+                online INT NOT NULL default '0',
+                time INT NOT NULL default '0',
+                start INT NOT NULL default '0',
+                total INT NOT NULL default '0',
+                restarts INT NOT NULL default '0'
+                )"
         );
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->DB . $this->bot->db->define_tablename("bots_log", "false") . " (
-				ID INT NOT NULL auto_increment PRIMARY KEY,
-				bot VARCHAR(20),
-				dim VARCHAR(20) NOT NULL default '',
-				start INT NOT NULL default '0',
-				end INT NOT NULL default '0'
-				)"
+                ID INT NOT NULL auto_increment PRIMARY KEY,
+                bot VARCHAR(20),
+                dim VARCHAR(20) NOT NULL default '',
+                start INT NOT NULL default '0',
+                end INT NOT NULL default '0'
+                )"
         );
         $this->update_table();
         $this->start();
@@ -75,8 +74,7 @@ class BotStatistics_Core extends BasePassiveModule
         $this->register_module("bot_statistics");
     }
 
-
-    function update_table()
+    public function update_table()
     {
         Switch ($this->bot->db->get_version("bots")) {
         case 1:
@@ -94,8 +92,7 @@ class BotStatistics_Core extends BasePassiveModule
         $this->bot->db->set_version("bots", 2);
     }
 
-
-    function start()
+    public function start()
     {
         $result = $this->bot->db->select(
             "SELECT bot, dim, online, time FROM " . $this->DB . "#___bots WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $this->bot->dimension . "'"
@@ -105,10 +102,8 @@ class BotStatistics_Core extends BasePassiveModule
                 "INSERT INTO " . $this->DB . "#___bots (bot, dim, online, time, start) VALUES ('" . $this->bot->botname . "', '" . $this->bot->dimension . "', " . time() . ", 0, "
                     . time() . ")"
             );
-        }
-        else {
-            if ($result[0][2] < $result[0][3]) // Make sure Bot was Online long enough to do time stamp with cron to prevent Spamming into log if crashloop.
-            {
+        } else {
+            if ($result[0][2] < $result[0][3]) { // Make sure Bot was Online long enough to do time stamp with cron to prevent Spamming into log if crashloop.
                 $this->bot->db->query(
                     "INSERT INTO " . $this->DB . "#___bots_log (bot, dim, start, end) VALUES ('" . $result[0][0] . "', '" . $result[0][1] . "', " . $result[0][2] . ", "
                         . $result[0][3] . ")"
@@ -120,8 +115,7 @@ class BotStatistics_Core extends BasePassiveModule
         }
     }
 
-
-    function check_bots($name, $origin, $bot = FALSE, $dim = FALSE)
+    public function check_bots($name, $origin, $bot = FALSE, $dim = FALSE)
     {
         if (!$dim) {
             $dim = $this->bot->dimension;
@@ -138,8 +132,7 @@ class BotStatistics_Core extends BasePassiveModule
                 $inside .= "\nStatus: ";
                 if ($bot[3] + (60 * 3) > time()) {
                     $inside .= "##green##Online##end## for " . $this->timedif($bot[2], $bot[3]);
-                }
-                else {
+                } else {
                     $inside .= "##red##Offline##end## for " . $this->timedif($bot[3], time());
                 }
                 $log = $this->bot->db->select("SELECT start, end FROM " . $this->DB . "#___bots_log WHERE bot = '" . $bot[0] . "' AND dim = '" . $bot[1] . "'");
@@ -177,8 +170,7 @@ class BotStatistics_Core extends BasePassiveModule
                         $restartd += 1;
                         $on = $l[1] - $l[0];
                         $dayon += $on;
-                    }
-                    elseif ($l[1] > $daytime) {
+                    } elseif ($l[1] > $daytime) {
                         $restartd += 1;
                         $on = $l[1] - $daytime;
                         $dayon += $on;
@@ -187,8 +179,7 @@ class BotStatistics_Core extends BasePassiveModule
                         $restartw += 1;
                         $on = $l[1] - $l[0];
                         $weekon += $on;
-                    }
-                    elseif ($l[1] > $weektime) {
+                    } elseif ($l[1] > $weektime) {
                         $restartw += 1;
                         $on = $l[1] - $weektime;
                         $weekon += $on;
@@ -197,8 +188,7 @@ class BotStatistics_Core extends BasePassiveModule
                         $restartm += 1;
                         $on = $l[1] - $l[0];
                         $monthon += $on;
-                    }
-                    elseif ($l[1] > $monthtime) {
+                    } elseif ($l[1] > $monthtime) {
                         $restartm += 1;
                         $on = $l[1] - $monthtime;
                         $monthon += $on;
@@ -248,19 +238,16 @@ class BotStatistics_Core extends BasePassiveModule
                 $inside .= "\n\nSince Install:\n     Online: $allon\n     Offline: $off\n     Restarts: $restart\n     Percent: " . $perc . "%";
                 Return ("Bot Stats for ##highlight##" . $bot[0] . "##end## :: " . $this->bot
                     ->core("tools")->make_blob("click to view", $inside));
-            }
-            else {
+            } else {
                 Return ("Bot not Found.");
             }
-        }
-        else {
+        } else {
             $result = $this->bot->db->select("SELECT bot, dim, online, time FROM " . $this->DB . "#___bots ORDER BY dim, online DESC");
             if (!empty($result)) {
                 foreach ($result as $bot) {
                     if ($bot[3] + (60 * 3) > time()) {
                         $status = "##green##Online##end## for " . $this->timedif($bot[2], $bot[3]);
-                    }
-                    else {
+                    } else {
                         $status = "##red##Offline##end## for " . $this->timedif($bot[3], time());
                     }
                     $inside[$bot[1]] .= "\n" . $this->bot->core("tools")
@@ -276,15 +263,13 @@ class BotStatistics_Core extends BasePassiveModule
                 }
                 Return ("Bots :: " . $this->bot->core("tools")
                     ->make_blob("click to view", $inside2));
-            }
-            else {
+            } else {
                 Return ("No Bots Found.");
             }
         }
     }
 
-
-    function timedif($low, $high, $showmins = TRUE)
+    public function timedif($low, $high, $showmins = TRUE)
     {
         $dif = $high - $low;
         if ($dif < 60 * 60) {
@@ -293,8 +278,7 @@ class BotStatistics_Core extends BasePassiveModule
                 $ms = "s";
             }
             Return ($mins . " Minute" . $ms);
-        }
-        elseif ($dif < 60 * 60 * 24) {
+        } elseif ($dif < 60 * 60 * 24) {
             $mins = floor($dif / 60);
             $hours = floor($mins / 60);
             $minstorem = $hours * 60;
@@ -307,12 +291,10 @@ class BotStatistics_Core extends BasePassiveModule
             }
             if ($showmins) {
                 Return ($hours . " Hour" . $hs . " and " . $minsrem . " Minute" . $ms);
-            }
-            else {
+            } else {
                 Return ($hours . " Hour" . $hs);
             }
-        }
-        else {
+        } else {
             $mins = floor($dif / 60);
             $hours = floor($mins / 60);
             $days = floor($hours / 24);
@@ -331,15 +313,13 @@ class BotStatistics_Core extends BasePassiveModule
             }
             if ($showmins) {
                 Return ($days . " Day" . $ds . ", " . $hoursrem . " Hour" . $hs . " and " . $minsrem . " Minute" . $ms);
-            }
-            else {
+            } else {
                 Return ($days . " Day" . $ds . ", " . $hoursrem . " Hour" . $hs);
             }
         }
     }
 
-
-    function cron($cron)
+    public function cron($cron)
     {
         $this->online = TRUE;
         $this->bot->db->query("UPDATE " . $this->DB . "#___bots SET time = '" . time() . "' WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $this->bot->dimension . "'");
@@ -362,13 +342,10 @@ class BotStatistics_Core extends BasePassiveModule
         }
     }
 
-
-    function disconnect()
+    public function disconnect()
     {
         if ($this->online) {
             $this->bot->db->query("UPDATE " . $this->DB . "#___bots SET time = " . time() . " WHERE bot = '" . $this->bot->botname . "' AND dim = '" . $this->bot->dimension . "'");
         }
     }
 }
-
-?>

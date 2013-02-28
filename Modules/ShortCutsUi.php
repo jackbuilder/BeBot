@@ -35,7 +35,7 @@ $shortcut_gui = new ShortCutGUI($bot);
 class ShortCutGUI extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "shortcuts", "SUPERADMIN");
@@ -44,22 +44,18 @@ class ShortCutGUI extends BaseActiveModule
         $this->help['command']['shortcuts add "<short>" "<long>"'] = "Adds <short> as shortcut for <long> to the database. Neither <short> nor <long> can contain any \".";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^shortcuts$/i", $msg)) {
             return $this->show_shortcuts();
-        }
-        elseif (preg_match("/^shortcuts add &quot;(.*)&quot; &quot;(.*)&quot;$/i", $msg, $info)) {
+        } elseif (preg_match("/^shortcuts add &quot;(.*)&quot; &quot;(.*)&quot;$/i", $msg, $info)) {
             return $this->add($info[1], $info[2]);
-        }
-        elseif (preg_match("/^shortcuts del ([01-9]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^shortcuts del ([01-9]+)$/i", $msg, $info)) {
             return $this->del($info[1]);
         }
     }
 
-
-    function show_shortcuts()
+    public function show_shortcuts()
     {
         $shortcuts = $this->bot->db->select("SELECT shortcut, long_desc, id FROM #___shortcuts ORDER BY shortcut ASC");
         if (empty($shortcuts)) {
@@ -72,20 +68,17 @@ class ShortCutGUI extends BaseActiveModule
             $blob .= $this->bot->core("tools")
                 ->chatcmd("shortcuts del " . $shortcut[2], "[DELETE]");
         }
+
         return $this->bot->core("tools")->make_blob("Defined shortcuts", $blob);
     }
 
-
-    function add($short, $long)
+    public function add($short, $long)
     {
         return $this->bot->core("shortcuts")->add($short, $long);
     }
 
-
-    function del($id)
+    public function del($id)
     {
         return $this->bot->core("shortcuts")->delete_id($id);
     }
 }
-
-?>

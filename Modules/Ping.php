@@ -35,10 +35,10 @@ $ping = new ping($bot);
 /*
 The Class itself...
 */
-class ping extends BaseActiveModule
+class Ping extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->verify = array();
@@ -53,21 +53,18 @@ class ping extends BaseActiveModule
             ->create("Ping", "PingCount", 4, "How many times should we ping the server?", "1;2;3;4;5;7;10");
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^ping$/i", $msg)) {
             return $this->ping_server();
-        }
-        else {
+        } else {
             if (preg_match("/^tracert$/i", $msg)) {
                 return $this->tracert_server();
             }
         }
     }
 
-
-    function ping_server()
+    public function ping_server()
     {
         $count = $this->bot->core("settings")->get("Ping", "PingCount");
         $host = $this->select_dimension(); //Dimension we're on
@@ -78,8 +75,7 @@ class ping extends BaseActiveModule
         if ($this->bot->core("settings")->get("Ping", "Server") == "Linux") {
             $results = system("ping -c$count -w$count $host", $details);
             system("killall ping");
-        }
-        else {
+        } else {
             $results = exec("ping -n $count $host", $details);
         }
         $msg = "<b>Server:</b> " . $host . "\n";
@@ -87,18 +83,18 @@ class ping extends BaseActiveModule
         $msg .= "<b>Results:</b>\n";
         if (empty($results)) {
             $msg .= "Could not find results.  Please check <i>!settings ping</i> and verify you have the correct system type selected.";
-        }
-        else {
+        } else {
             foreach ($details as $key => $value) {
                 $msg .= $value . "\n";
             }
         }
+
         return "Ping results :: " . $this->bot->core("tools")
             ->make_blob("click to view", $msg);
     }
 
 
-    function tracert_server()
+    public function tracert_server()
     {
         $count = $this->bot->core("settings")->get("Ping", "PingCount");
         $host = $this->select_dimension(); //Dimension we're on
@@ -109,29 +105,27 @@ class ping extends BaseActiveModule
         if ($this->bot->core("settings")->get("Ping", "Server") == "Linux") {
             $results = system("traceroute $host", $details);
             system("killall -q traceroute");
-        }
-        else {
+        } else {
             $results = exec("tracert $host", $details);
         }
         $msg = "<b>Server:</b> " . $host . "\n";
         $msg .= "<b>Results:</b>\n";
         if (empty($results)) {
             $msg .= "Could not find results.  Please check <i>!settings ping</i> and verify you have the correct system type selected.";
-        }
-        else {
+        } else {
             foreach ($details as $key => $value) {
                 $msg .= $value . "\n";
             }
         }
+
         return "Trace route results :: " . $this->bot->core("tools")
             ->make_blob("Click to view", $msg);
     }
 
-
     /*
     Pick the correct dimention
     */
-    function select_dimension()
+    public function select_dimension()
     {
         switch ($this->bot->dimension) {
         case 0:
@@ -147,5 +141,3 @@ class ping extends BaseActiveModule
         }
     }
 }
-
-?>

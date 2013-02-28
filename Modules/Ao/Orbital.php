@@ -35,7 +35,7 @@ $orbital = new Orbital($bot);
 class Orbital extends BasePassiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_event("gmsg", "Org Msg");
@@ -53,8 +53,7 @@ class Orbital extends BasePassiveModule
             ->create_timer_class_entry($classid, $nextid, 900, "", "in 15 minutes");
     }
 
-
-    function gmsg($name, $group, $msg)
+    public function gmsg($name, $group, $msg)
     {
         if (preg_match('/Blammo! (.+) has launched an orbital attack!/i', $msg, $info)) {
             $this->bot->core("timer")
@@ -66,5 +65,3 @@ class Orbital extends BasePassiveModule
         }
     }
 }
-
-?>

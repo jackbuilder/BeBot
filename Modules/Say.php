@@ -39,10 +39,9 @@ The Class itself...
 */
 class Say extends BaseActiveModule
 { // Start Class
-    var $whosaidthat;
+    public $whosaidthat;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->whosaidthat = array();
@@ -56,8 +55,7 @@ class Say extends BaseActiveModule
         $this->help['command']['whosaidthat'] = "Find out who made the bot say that.";
     }
 
-
-    function command_handler($name, $msg, $source)
+    public function command_handler($name, $msg, $source)
     { // Start function handler()
         $args = $this->parse_com(
             $msg, array(
@@ -73,36 +71,36 @@ class Say extends BaseActiveModule
             ) == "origin"
             ) {
                 return $this->saythis($name, $args['args']);
-            }
-            else {
+            } else {
                 $this->bot->send_output(
                     $name, $this->saythis($name, $args['args']), $this->bot
                         ->core("settings")->get("Say", "OutputChannel")
                 );
             }
+
             return FALSE;
         case "whosaidthat":
             return $this->whosaidthat();
         }
         $this->bot->send_help($name);
+
         return FALSE;
     } // End function handler()
 
-    function saythis($name, $message)
+    public function saythis($name, $message)
     {
         $this->whosaidthat['time'] = time();
         $this->whosaidthat['name'] = $name;
         $this->whosaidthat['what'] = $message;
+
         return $message;
     }
 
-
-    function whosaidthat()
+    public function whosaidthat()
     {
         if (empty($this->whosaidthat)) {
             $output = "Nobody has used the say command since I logged in.";
-        }
-        else {
+        } else {
             $output = $this->whosaidthat['name'];
             $output .= ' made me say "';
             $output .= $this->whosaidthat['what'];
@@ -110,7 +108,7 @@ class Say extends BaseActiveModule
             $output .= time() - $this->whosaidthat['time'];
             $output .= ' seconds ago.';
         }
+
         return $output;
     }
 } // End of Class
-?>

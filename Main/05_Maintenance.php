@@ -42,7 +42,7 @@ class Maintenance extends BaseActiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_event("cron", "5sec");
@@ -51,8 +51,7 @@ class Maintenance extends BaseActiveModule
         // TODO: help
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $msg = strtolower($msg);
         $vars = explode(" ", $msg, 4);
@@ -83,8 +82,7 @@ class Maintenance extends BaseActiveModule
                         break;
                     }
                 }
-            }
-            else {
+            } else {
                 return $this->main($origin);
             }
         default:
@@ -92,23 +90,20 @@ class Maintenance extends BaseActiveModule
         }
     }
 
-
-    function connect()
+    public function connect()
     {
         $this->register_command("all", "maintenance", "SUPERADMIN");
         $this->bot->core("settings")
             ->create("Maintenance", "info", "", "Info saved while restarting, blank when not doing maintenance.", NULL, TRUE, 2);
         /*	$info = $this -> bot -> core("settings") -> get("Maintenance", "info");
 
-       if($info != "")
-       {
+       if ($info != "") {
            $rostermod = $this -> bot -> core("roster_core");
            $this -> bot -> unregister_event("cron", "24hour", $rostermod);
        } */
     }
 
-
-    function cron()
+    public function cron()
     {
         $this->croncount++;
         Switch ($this->croncount) {
@@ -144,8 +139,7 @@ class Maintenance extends BaseActiveModule
         }
     }
 
-
-    function main($origin)
+    public function main($origin)
     {
         $info = $this->bot->core("settings")->get("Maintenance", "info");
         if ($info != "") {
@@ -156,8 +150,7 @@ class Maintenance extends BaseActiveModule
                 ->chatcmd("maintenance settings done", "Run Settings Maintenance", $origin) . "\n##end##";
             Return ("Maintenance Control Panel :: " . $this->bot->core("tools")
                 ->make_blob("Click to view", $inside));
-        }
-        else {
+        } else {
             $inside = "##blob_title##     Maintenance Main Screen##end##\n\n";
             $inside .= "##blob_text##" . $this->bot->core("tools")
                 ->chatcmd("maintenance settings start", "Settings", $origin) . " (will restart)\n##end##";
@@ -166,8 +159,7 @@ class Maintenance extends BaseActiveModule
         }
     }
 
-
-    function step1($name, $mode, $origin)
+    public function step1($name, $mode, $origin)
     {
         $mode = strtolower($mode);
         Switch ($mode) {
@@ -182,8 +174,7 @@ class Maintenance extends BaseActiveModule
         }
     }
 
-
-    function step2($name, $mode, $origin)
+    public function step2($name, $mode, $origin)
     {
         $mode = strtolower($mode);
         Switch ($mode) {
@@ -210,16 +201,14 @@ class Maintenance extends BaseActiveModule
                 if (!$inside) {
                     $this->bot->send_output($name, "No Maintenance Required for Settings", $origin);
                     $this->step3('settings');
-                }
-                else {
+                } else {
                     $this->bot->send_output(
                         $name, "Maintenance ToDo list: " . $this->bot
                         ->core("tools")
                         ->make_blob("Click to view", $inside), $origin
                     );
                 }
-            }
-            else {
+            } else {
                 $this->bot->send_output($name, "Error: Old or New Table is Empty or doesnt Exist", $origin);
             }
             Break;
@@ -228,8 +217,7 @@ class Maintenance extends BaseActiveModule
         }
     }
 
-
-    function check($old, $new, $compare)
+    public function check($old, $new, $compare)
     {
         $this->del = array();
         $this->update = array();
@@ -240,8 +228,7 @@ class Maintenance extends BaseActiveModule
                         $mod,
                         $set
                     );
-                }
-                else {
+                } else {
                     if ($compare) {
                         foreach ($compare as $id => $name) {
                             if (!isset($this->dontupdate[$mod][$set][$name]) && $value[$id] != $new[strtolower($mod)][strtolower($set)][$id]) {
@@ -289,8 +276,7 @@ class Maintenance extends BaseActiveModule
         Return $inside;
     }
 
-
-    function dontdo($name, $msg, $origin)
+    public function dontdo($name, $msg, $origin)
     {
         $msg = explode(" ", $msg, 4);
         Switch ($msg[0]) {
@@ -298,8 +284,7 @@ class Maintenance extends BaseActiveModule
             if (isset($this->old_data[$msg[1]][$msg[2]])) {
                 unset($this->old_data[$msg[1]][$msg[2]]);
                 Return ($msg[1] . " => " . $msg[2] . " Will not be Deleted.");
-            }
-            else {
+            } else {
                 Return ("Error: Setting " . $msg[1] . " => " . $msg[2] . " Not found");
             }
         case 'update':
@@ -308,12 +293,10 @@ class Maintenance extends BaseActiveModule
                 if (isset($compare[$msg[3]])) {
                     $this->dontupdate[$msg[1]][$msg[2]][$msg[3]] = TRUE;
                     Return ($msg[1] . " => " . $msg[2] . " => " . $msg[3] . " Will not be Changed.");
-                }
-                else {
+                } else {
                     Return ("Error: Field " . $msg[3] . " Not found");
                 }
-            }
-            else {
+            } else {
                 Return ("Error: Setting " . $msg[1] . " => " . $msg[2] . " Not found");
             }
         Default:
@@ -321,8 +304,7 @@ class Maintenance extends BaseActiveModule
         }
     }
 
-
-    function step3($mode)
+    public function step3($mode)
     {
         $mode = strtolower($mode);
         Switch ($mode) {
@@ -346,8 +328,7 @@ class Maintenance extends BaseActiveModule
                 $this->bot->send_output("", "Maintenance Complete", "both");
                 $this->bot->core("settings")->load_all();
                 Return FALSE;
-            }
-            else {
+            } else {
                 Return ("Error: Maintenance Table for Settings Not Found. Aborting.");
             }
             Break;
@@ -356,5 +337,3 @@ class Maintenance extends BaseActiveModule
         }
     }
 }
-
-?>

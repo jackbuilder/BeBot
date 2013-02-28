@@ -36,37 +36,36 @@ $statistics = new statistics($bot);
 /*
 The Class itself...
 */
-class statistics extends BasePassiveModule
+class Statistics extends BasePassiveModule
 { // Start Class
 
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("statistics", "true") . " (
-					id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-					module VARCHAR(100) NOT NULL,
-					action VARCHAR(100) NOT NULL,
-					comment VARCHAR(100) default '',
-					count INT(10) unsigned NOT NULL
-				)"
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    module VARCHAR(100) NOT NULL,
+                    action VARCHAR(100) NOT NULL,
+                    comment VARCHAR(100) default '',
+                    count INT(10) unsigned NOT NULL
+                )"
         );
         $this->register_module("statistics");
         $this->bot->core("settings")
             ->create('Statistics', "Enabled", FALSE, "Capture Statistics?");
     }
 
-
     /*
     This is a relatively simple module,
     but one that will perform some important functions.
     What we're capturing is the module name, the action, and a simple count.
     */
-    function capture_statistic(
+    public function capture_statistic(
         $module, $action, $comment = "", $count = 1
     )
         //function capture_statistic ()
@@ -82,16 +81,16 @@ class statistics extends BasePassiveModule
                 $this->bot->db->query(
                     "UPDATE #___statistics SET count = '" . $total_count . "' WHERE module = '" . $module . "' AND action = '" . $action . "' AND comment = '" . $comment . "'"
                 );
+
                 return;
-            }
-            else {
+            } else {
                 $total_count = $count;
                 $this->bot->db->query(
                     "INSERT INTO #___statistics (module, action, comment, count) VALUES ('" . $module . "','" . $action . "','" . $comment . "'," . $total_count . ")"
                 );
+
                 return;
             }
         }
     }
 } // End of Class
-?>

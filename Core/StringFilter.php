@@ -38,22 +38,21 @@ The Class itself...
 */
 class stringfilter_core extends BasePassiveModule
 { // Start Class
-    var $stringlist;
-
+    public $stringlist;
 
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         // Create Table
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("string_filter", "true") . "
-			(search varchar(255) NOT NULL,
-				new VARCHAR(255) NOT NULL DEFAULT '**bleep**',
-				PRIMARY KEY (search))"
+            (search varchar(255) NOT NULL,
+                new VARCHAR(255) NOT NULL DEFAULT '**bleep**',
+                PRIMARY KEY (search))"
         );
         $this->register_module("stringfilter");
         $this->register_event("connect");
@@ -64,16 +63,15 @@ class stringfilter_core extends BasePassiveModule
             ->create("Filter", "Funmode", "off", "Select a fun bot output filter. (See documentation)", "off;chef;eleet;fudd;pirate;nofont;", FALSE, 10);
     }
 
-
     /*
     This gets called when bot connects
     */
-    function connect()
+    public function connect()
     { // Start function connect()
         $this->get_strings(TRUE);
     } // End function connect()
 
-    function output_filter($text)
+    public function output_filter($text)
     { // Start function output_filter()
         foreach ($this->stringlist as $search => $new) {
             $text = preg_replace("/" . $search . "/i", $new, $text);
@@ -86,6 +84,7 @@ class stringfilter_core extends BasePassiveModule
                     ->get("Filter", "Funmode")
             );
         }
+
         return $text;
     } // End function output_filter()
 
@@ -93,12 +92,13 @@ class stringfilter_core extends BasePassiveModule
     This function can be used to filter input against the string list.
     What else could we do for input filtering?
     */
-    function input_filter($text)
+    public function input_filter($text)
     { // Start function input_filter()
         foreach ($this->stringlist as $search => $new) {
             $text = preg_replace("/" . stripslashes($search) . "/i", stripslashes($new), $text);
             // $text = str_ireplace($search, $new, $text); // str_ireplace is php5+
         }
+
         return $text;
     } // End function input_filter()
 
@@ -106,58 +106,60 @@ class stringfilter_core extends BasePassiveModule
     Gets the filterd string list from the database.
     If update is true, the array is refreshed from the database.
     */
-    function get_strings($update = FALSE)
+    public function get_strings($update = FALSE)
     { // Start function get_strings()
         if ($update) {
             $sql = "SELECT * FROM #___string_filter";
             $result = $this->bot->db->select($sql, MYSQL_ASSOC);
             if (empty($result)) {
                 return FALSE;
-            }
-            else {
+            } else {
                 foreach ($result as $info) {
                     $this->stringlist[$info["search"]] = $info["new"];
                 }
                 unset($result);
             }
         }
+
         return $this->stringlist;
     } // End function get_strings()
 
     /*
     Adds a string to the filtered string list.
     */
-    function add_string($search, $new = NULL)
+    public function add_string($search, $new = NULL)
     { // Start function add_string()
         $search = mysql_real_escape_string(strtolower($search));
         if (isset($this->stringlist[$search])) {
             $this->error->set("The string '" . $search . "' is already on the filtered word list.");
+
             return $this->error;
         }
         if (!is_null($new)) {
             $new = mysql_real_escape_string(strtolower($new));
             $sql = "INSERT INTO #___string_filter (search, new) VALUES ('" . $search . "', '" . $new . "')";
-        }
-        else {
+        } else {
             $sql = "INSERT INTO #___string_filter (search) VALUES ('" . $search . "')";
             $new = "**bleep**";
         }
         $this->bot->db->query($sql);
         $this->stringlist[$search] = $new;
+
         return "Added '" . $search . "' to the filterd string list. It will be replaced with '" . $new . "'";
     } // End function add_string()
 
-    function rem_string($search)
+    public function rem_string($search)
     { // Start function rem_string()
         $search = mysql_real_escape_string(strtolower($search));
         if (isset($this->stringlist[$search])) {
             unset($this->stringlist[$search]);
             $sql = "DELETE FROM #___string_filter WHERE search = '" . $search . "'";
             $this->bot->db->query($sql);
+
             return "Removed " . $search . " from the filtered string list.";
-        }
-        else {
+        } else {
             $this->error->set($search . " is not on the filtered string list.");
+
             return $this->error;
         }
     } // End function rem_string()
@@ -165,7 +167,7 @@ class stringfilter_core extends BasePassiveModule
     /*
     Returns garbled text. ;-)
     */
-    function funmode($text, $filter)
+    public function funmode($text, $filter)
     { // Start function funmode()
         $filter = strtolower($filter);
         switch ($filter) {
@@ -189,9 +191,9 @@ class stringfilter_core extends BasePassiveModule
             break;
         default:
             $this->bot->log("FILTER", "ERROR", $filter . " is not a valid fun mode.");
+
             return $text;
             break;
         }
     } // End function funmode()
 } // End of Class
-?>

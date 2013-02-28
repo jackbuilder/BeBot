@@ -46,7 +46,7 @@ $do_unorged_users = FALSE;
 $delete_not_updated = FALSE;
 $show_org_names = TRUE;
 $show_character_names = FALSE;
-require ('whois-update.conf');
+require 'whois-update.conf';
 // disable execution timeout:
 set_time_limit(0);
 
@@ -55,8 +55,7 @@ if (!extension_loaded("curl")) {
     if ($os_windows) {
         if (@!dl("php_curl.dll")) {
             echo "Curl not available\n";
-        }
-        else {
+        } else {
             echo "Curl extension loaded\n";
             if (!extension_loaded("sockets")) {
                 if (!dl("php_sockets.dll")) {
@@ -64,12 +63,10 @@ if (!extension_loaded("curl")) {
                 }
             }
         }
-    }
-    else {
+    } else {
         if (function_exists('curl_init')) {
             echo "Curl extension loaded\n";
-        }
-        else {
+        } else {
             echo "Curl not available\n";
             if (!extension_loaded("sockets")) {
                 die("Sockets extention required to run this script");
@@ -83,8 +80,7 @@ if (!extension_loaded("mysql")) {
         if (!dl("php_mysql.dll")) {
             die("Loading php_mysql.dll failed. MySQL extention required to run this script");
         }
-    }
-    else {
+    } else {
         die("MySQL support required to run this script");
     }
 }
@@ -113,8 +109,7 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
     if (!$org_cont) {
         echo "     Could not get roster for " . $orgid['org_name'] . " (" . $orgid['org_id'] . ")!\n";
         $failedrosterlookup++;
-    }
-    else {
+    } else {
         $starttime = time();
         $orgname = mysql_real_escape_string(xmlparse($org_cont, "name"));
         $orgfaction = xmlparse($org_cont, "side");
@@ -142,48 +137,39 @@ while ($orgid = mysql_fetch_array($result, MYSQL_ASSOC)) {
             if (empty($who["nickname"])) {
                 echo "     Warning! Missing members nickname!\n";
                 $failedpersonlookup++;
-            }
-            else {
+            } else {
                 if (empty($who["level"])) {
                     echo "     Warning! Missing members level! (" . $who["nickname"] . ")\n";
                     $failedpersonlookup++;
-                }
-                else {
+                } else {
                     if (empty($who["gender"])) {
                         echo "     Warning! Missing members gender! (" . $who["nickname"] . ")\n";
                         $failedpersonlookup++;
-                    }
-                    else {
+                    } else {
                         if (empty($who["breed"])) {
                             echo "     Warning! Missing members breed! (" . $who["nickname"] . ")\n";
                             $failedpersonlookup++;
-                        }
-                        else {
+                        } else {
                             if (empty($who["profession"])) {
                                 echo "     Warning! Missing members profession! (" . $who["nickname"] . ")\n";
                                 $failedpersonlookup++;
-                            }
-                            else {
+                            } else {
                                 if (empty($who["faction"])) {
                                     echo "     Warning! Missing members faction! (" . $who["nickname"] . ")\n";
                                     $failedpersonlookup++;
-                                }
-                                else {
+                                } else {
                                     if (empty($who["rank"])) {
                                         echo "     Warning! Missing members rank! (" . $who["nickname"] . ")\n";
                                         $failedpersonlookup++;
-                                    }
-                                    else {
+                                    } else {
                                         if (empty($who["org"])) {
                                             echo "     Warning! Missing members organization name! (" . $who["nickname"] . ")\n";
                                             $failedpersonlookup++;
-                                        }
-                                        else {
+                                        } else {
                                             if (empty($who["org_id"])) {
                                                 echo "     Warning! Missing members organization ID! (" . $who["nickname"] . ")\n";
                                                 $failedpersonlookup++;
-                                            }
-                                            else {
+                                            } else {
                                                 // INSERT new entries into DB, UPDATE existing ones:
                                                 $query = "INSERT INTO " . $tablename . " (nickname, firstname, lastname, level, gender, breed, faction,"
                                                     . " profession, defender_rank_id, org_id, org_name, org_rank, org_rank_id, pictureurl, updated)" . " VALUES ('"
@@ -323,7 +309,6 @@ if (file_exists($addons) && is_readable($addons)) {
 }
 mysql_close($link);
 
-
 function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
 {
     echo "     Fetching $url";
@@ -331,15 +316,13 @@ function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
 
     if (!function_exists('curl_init')) {
         $return = get_site_sock($url, $strip_headers, $read_timeout);
-    }
-    else {
+    } else {
         $return = get_site_curl($url, $strip_headers, $read_timeout);
     }
 
     if ($return) {
         echo " .... completed in " . (time() - $starttime) . " seconds\n";
-    }
-    else {
+    } else {
         echo "\n";
     }
 
@@ -371,8 +354,7 @@ function get_site_data(
         $proxy_address = explode(":", $proxy);
         $address = gethostbyname($proxy_address[0]);
         $service_port = $proxy_address[1];
-    }
-    else {
+    } else {
         $address = gethostbyname($get_url['host']);
         /* Get the port for the WWW service. */
         $service_port = getservbyname('www', 'tcp');
@@ -382,6 +364,7 @@ function get_site_data(
     // Check to see if the socket failed to create.
     if ($socket === FALSE) {
         echo "Failed to create socket. Error was: " . socket_strerror(socket_last_error());
+
         return FALSE;
     }
 
@@ -402,6 +385,7 @@ function get_site_data(
     // Make sure we have a connection
     if ($connect_result === FALSE) {
         echo "Failed to connect to server " . $address . ":" . $service_port . " (" . $url . ") Error was: " . socket_strerror(socket_last_error());
+
         return FALSE;
     }
     // Rebuild the full query after parse_url
@@ -417,6 +401,7 @@ function get_site_data(
     // Make sure we wrote to the server okay.
     if ($write_result === FALSE) {
         echo "Failed to write to server: " . socket_strerror(socket_last_error());
+
         return FALSE;
     }
     $return["content"] = "";
@@ -428,12 +413,14 @@ function get_site_data(
     // Make sure we got a response back from the server.
     if ($read_result === FALSE) {
         echo "Failed to read response: " . socket_strerror(socket_last_error());
+
         return FALSE;
     }
     $close_result = @socket_close($socket);
     // Make sure we closed our socket properly.  Open sockets are bad!
     if ($close_result === FALSE) {
         echo "Failed to close socket: " . socket_strerror(socket_last_error());
+
         return FALSE;
     }
     // Did the calling function want http headers stripped?
@@ -441,6 +428,7 @@ function get_site_data(
         $split = split("\r\n\r\n", $return);
         $return = $split[1];
     }
+
     return $return;
 }
 
@@ -505,7 +493,6 @@ function xmlparse($xml, $tag)
         $tmp[1] = "";
     }
     $tmp = explode("</" . $tag . ">", $tmp[1]);
+
     return $tmp[0];
 }
-
-?>

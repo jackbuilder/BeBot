@@ -42,16 +42,16 @@ class Log extends BaseActiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("log_message", "true") . "
-		        (id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-		        message VARCHAR(500) NOT NULL,
-		        first VARCHAR(45) NOT NULL,
-		        second VARCHAR(45) NOT NULL,
-		        timestamp INTEGER UNSIGNED NOT NULL)"
+                (id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                message VARCHAR(500) NOT NULL,
+                first VARCHAR(45) NOT NULL,
+                second VARCHAR(45) NOT NULL,
+                timestamp INTEGER UNSIGNED NOT NULL)"
         );
         $this->register_command("all", "log", "OWNER");
         $this->bot->core("settings")
@@ -66,24 +66,21 @@ class Log extends BaseActiveModule
             ->get("Log", "LimitMessage") . " logs for all log messages.";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^log$/i", $msg)) {
             return $this->show_log();
-        }
-        else {
+        } else {
             if (preg_match("/^log (.+)$/i", $msg, $info)) {
                 return $this->show_log($info[1]);
             }
         }
     }
 
-
     /*
     Starts a Log
     */
-    function show_log($category = FALSE)
+    public function show_log($category = FALSE)
     {
         if ($category === FALSE) {
             $results = $this->bot->db->select("SELECT DISTINCT first FROM #___log_message ORDER BY first");
@@ -98,14 +95,13 @@ class Log extends BaseActiveModule
                     $inside .= $this->bot->core("tools")
                         ->chatcmd("log " . $result[0], $result[0]) . "\n";
                 }
-            }
-            else {
+            } else {
                 $inside = "No log messages found.";
             }
+
             return "Log categories :: " . $this->bot->core("tools")
                 ->make_blob("Click to view", $inside);
-        }
-        elseif ($category == "all") {
+        } elseif ($category == "all") {
             $results = $this->bot->db->select(
                 "SELECT first,second,message,timestamp FROM #___log_message ORDER BY timestamp DESC LIMIT " . $this->bot
                     ->core("settings")->get("Log", "LimitMessage")
@@ -117,14 +113,13 @@ class Log extends BaseActiveModule
                             ->get("time", "formatstring"), $result[3]
                     ) . "]\n" . $result[1] . ": " . $result[2] . "\n\n";
                 }
-            }
-            else {
+            } else {
                 $inside = "No log messages found.";
             }
+
             return "Log messages :: " . $this->bot->core("tools")
                 ->make_blob("Click to view", $inside);
-        }
-        else {
+        } else {
             $results = $this->bot->db->select(
                 "SELECT first,second,message,timestamp FROM #___log_message WHERE first = '" . $category . "' ORDER BY timestamp DESC LIMIT " . $this->bot
                     ->core("settings")->get("Log", "LimitMessage")
@@ -136,14 +131,12 @@ class Log extends BaseActiveModule
                             ->get("time", "formatstring"), $result[3]
                     ) . "]\n" . $result[1] . ": " . $result[2] . "\n\n";
                 }
-            }
-            else {
+            } else {
                 $inside = "No log messages found.";
             }
+
             return "Log messages for " . $category . " :: " . $this->bot
                 ->core("tools")->make_blob("Click to view", $inside);
         }
     }
 }
-
-?>

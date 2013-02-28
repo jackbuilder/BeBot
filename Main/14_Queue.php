@@ -32,9 +32,7 @@
 *  USA
 */
 
-
 $queue_core = new Queue_Core($bot);
-
 
 /*
 The Class itself...
@@ -46,12 +44,11 @@ class Queue_Core extends BasePassiveModule
     private $queue_left;
     private $last_call;
 
-
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
 
@@ -62,26 +59,24 @@ class Queue_Core extends BasePassiveModule
         $this->queue_low = array();
     }
 
-
     /*
     $name = name of module, to be used when adding stuff to que
     $delay = min time between each in seconds
     $max = max count on items before que
     */
-    function register(&$module, $name, $delay, $max = 0, $filter = TRUE)
+    public function register(&$module, $name, $delay, $max = 0, $filter = TRUE)
     {
         $name = strtolower($name);
         $this->link[$name] = $module;
         $this->delay[$name] = $delay;
         $this->max[$name] = $max;
-        $this->filter = (bool)$filter;
+        $this->filter = (bool) $filter;
     }
-
 
     /*
     This gets called on cron
     */
-    function cron()
+    public function cron()
     {
         foreach ($this->link as $name => $mod) {
             if (!empty($this->queue[$name])) {
@@ -109,19 +104,17 @@ class Queue_Core extends BasePassiveModule
         }
     }
 
-
     /*
     Sets messages left...
     */
-    function set_queue($name)
+    public function set_queue($name)
     {
         $time = time();
         $add = ($time - $this->last_call[$name]) / $this->delay[$name];
         if ($add > 0) {
             if (!isset($this->queue_left[$name])) {
                 $this->queue_left[$name] = $add;
-            }
-            else {
+            } else {
                 $this->queue_left[$name] += $add;
             }
             $this->last_call[$name] = $time;
@@ -131,26 +124,26 @@ class Queue_Core extends BasePassiveModule
         }
     }
 
-
     /*
     Checks if tell can be sent. true if yes, false it has to be put to queue
     */
-    function check_queue($name)
+    public function check_queue($name)
     {
         $name = strtolower($name);
         $this->set_queue($name);
         if (($this->queue_left[$name] >= 1) && empty($this->queue[$name]) && empty($this->queue_low[$name])) {
             $this->queue_left[$name] -= 1;
+
             return TRUE;
         }
+
         return FALSE;
     }
-
 
     /*
     Puts a msg into queue
     */
-    function into_queue($name, $info, $priority = 0)
+    public function into_queue($name, $info, $priority = 0)
     {
         $name = strtolower($name);
         if ($priority == 0) {
@@ -166,8 +159,7 @@ class Queue_Core extends BasePassiveModule
                 }
             }
             $this->queue[$name][] = $info;
-        }
-        else {
+        } else {
             // Filter duplicate messages.
             if ($this->filter[$name]) {
                 foreach ($this->queue_low[$name] as $item) {
@@ -180,5 +172,3 @@ class Queue_Core extends BasePassiveModule
         }
     }
 }
-
-?>

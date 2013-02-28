@@ -50,11 +50,10 @@
 $logon_notifies_core = new Logon_Notifies_Core($bot);
 class Logon_Notifies_Core extends BasePassiveModule
 {
-    var $bot;
-    var $modules;
+    public $bot;
+    public $modules;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("logon_notifies");
@@ -73,15 +72,13 @@ class Logon_Notifies_Core extends BasePassiveModule
         $this->startup = time() + 3600;
     }
 
-
     // registers a new module
-    function register(&$module)
+    public function register(&$module)
     {
         $this->modules[get_class($module)] = &$module;
     }
 
-
-    function unregister(&$module)
+    public function unregister(&$module)
     {
         if (isset($this->modules[get_class($module)])) {
             $this->modules[get_class($module)] = NULL;
@@ -89,8 +86,7 @@ class Logon_Notifies_Core extends BasePassiveModule
         }
     }
 
-
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
         if ($msg == 1
             && $this->bot->core("settings")
@@ -106,15 +102,13 @@ class Logon_Notifies_Core extends BasePassiveModule
         }
     }
 
-
-    function connect()
+    public function connect()
     {
         $this->startup = time() + 120 + $this->bot->core("settings")
             ->get("Logon_notifies", "Notify_delay");
     }
 
-
-    function cron()
+    public function cron()
     {
         if (!($this->waiting) || empty($this->modules)) {
             return;
@@ -122,19 +116,18 @@ class Logon_Notifies_Core extends BasePassiveModule
         if (empty($this->notifies)) {
             $this->waiting = FALSE;
             $this->cron_running = 0;
+
             return;
         }
         if ($this->cron_running == 0) {
             $this->cron_running = 1;
-        }
-        else {
+        } else {
             return;
         }
         $thistime = time();
         if ($thistime >= $this->startup) {
             $starting = FALSE;
-        }
-        else {
+        } else {
             $starting = TRUE;
         }
         foreach ($this->notifies as $user => $time) {
@@ -148,8 +141,7 @@ class Logon_Notifies_Core extends BasePassiveModule
             }
         }
         $this->cron_running = 0;
+
         return;
     }
 }
-
-?>

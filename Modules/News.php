@@ -49,17 +49,17 @@ class News extends BaseActiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("news", "true") . " (
-		           id INT NOT NULL auto_increment PRIMARY KEY,
-		           type INT default '1',
-		           time INT NOT NULL default '0',
-		           name VARCHAR(30) default NULL,
-		           news TEXT
-		           )"
+                   id INT NOT NULL auto_increment PRIMARY KEY,
+                   type INT default '1',
+                   time INT NOT NULL default '0',
+                   name VARCHAR(30) default NULL,
+                   news TEXT
+                   )"
         );
         //Regiser commands
         $this->register_command('all', 'news', 'GUEST', array('add' => 'MEMBER'));
@@ -91,8 +91,7 @@ class News extends BaseActiveModule
         $this->help['notes'] = "The deletion of headlines, news and raids are managed by the GUI.";
     }
 
-
-    function notify($name, $startup = FALSE)
+    public function notify($name, $startup = FALSE)
     {
         if (!$startup) {
             switch ($this->bot->core("prefs")->get($name, "News", "Logonspam")) {
@@ -112,8 +111,7 @@ class News extends BaseActiveModule
         }
     }
 
-
-    function pgjoin($name)
+    public function pgjoin($name)
     {
         switch ($this->bot->core("prefs")->get($name, "News", "PGjoinspam")) {
         case 'Last_headline':
@@ -131,8 +129,7 @@ class News extends BaseActiveModule
         }
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $com = $this->parse_com($msg);
         switch ($com['com']) {
@@ -147,21 +144,20 @@ class News extends BaseActiveModule
             break;
         default:
             $this->error->set("News received unknown command '{$com['com']}'.");
+
             return $this->error;
             break;
         }
     }
 
-
-    function sub_handler($name, $com, $type)
+    public function sub_handler($name, $com, $type)
     {
         switch ($com['sub']) {
         case '':
         case 'read':
             if (($type == 1) || ($type == 2)) {
                 return $this->get_news($name);
-            }
-            else {
+            } else {
                 return $this->get_raids($name);
             }
             break;
@@ -175,16 +171,16 @@ class News extends BaseActiveModule
         default:
             //No keywords recognized. Assume that person in attempting to add news and forgot the "add" keyword
             $news = "{$com['sub']} {$com['args']}";
+
             return $this->set_news($name, $news, $type);
             break;
         }
     }
 
-
     /*
     Get news
     */
-    function get_news($name)
+    public function get_news($name)
     {
         // Create Headline
         $result_headline = $this->bot->db->select("SELECT id, time, name, news FROM #___news WHERE type = '2' ORDER BY time DESC LIMIT 0, 3");
@@ -241,34 +237,31 @@ class News extends BaseActiveModule
         if (!empty($inside)) {
             return "News last updated " . $newsdate . ":: " . $this->bot
                 ->core("tools")->make_blob("click to view", $inside);
-        }
-        else {
+        } else {
             return "No news.";
         }
     }
 
-
     /*
     Fetch the latest newsitem
     */
-    function get_last_headline()
+    public function get_last_headline()
     {
         $query = "SELECT name, news from #___news WHERE type = '2' ORDER BY time DESC LIMIT 1";
         $news = $this->bot->db->select($query, MYSQL_ASSOC);
         if (empty($news)) {
             return FALSE;
-        }
-        else {
+        } else {
             $news = $news[0]['name'] . ':##highlight## ' . $news[0]['news'] . "##end##\n";
+
             return $news;
         }
     }
 
-
     /*
     Get Raids
     */
-    function get_raids($name)
+    public function get_raids($name)
     {
         $inside = "<center>##ao_infoheadline##:::: Planned Raids ::::##end##</center>\n";
         $result = $this->bot->db->select("SELECT id, time  FROM #___news WHERE type = '3' ORDER BY id DESC LIMIT 0, 1");
@@ -300,29 +293,29 @@ class News extends BaseActiveModule
                 $inside .= "\n\n";
             }
         }
+
         return "Planned Raids last updated " . $newsdate . ":: " . $this->bot
             ->core("tools")->make_blob("click to view", $inside);
     }
 
-
     /*
     Adds news (Access is checked on command level)
     */
-    function set_news($name, $msg, $type)
+    public function set_news($name, $msg, $type)
     {
         $this->bot->db->query("INSERT INTO #___news (type, time, name, news) VALUES ('" . $type . "', " . time() . ", '" . $name . "', '" . addslashes($msg) . "')");
+
         return "Your entry has been submitted.";
     }
 
-
-    function del_news($name, $msg)
+    public function del_news($name, $msg)
     {
         $result = $this->bot->db->select("SELECT name  FROM #___news WHERE id = '" . $msg . "'");
         if (empty($result)) {
             $this->error->set("No entry with id '$msg' found.");
+
             return $this->error;
-        }
-        else {
+        } else {
             foreach ($result as $val) {
                 $res_name = $val[0];
             }
@@ -335,16 +328,15 @@ class News extends BaseActiveModule
             || ($name == $res_name)
         ) {
             $this->bot->db->query("DELETE FROM #___news WHERE id = '" . $msg . "'");
+
             return "Entry has been removed.";
-        }
-        else {
+        } else {
             $this->error->set(
                 "You must be " . $this->bot->core("settings")
                     ->get('News', 'News_del') . " or higher or own the entry to delete news"
             );
+
             return $this->error;
         }
     }
 }
-
-?>

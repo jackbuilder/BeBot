@@ -38,7 +38,7 @@ The Class itself...
 class Countdown extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'countdown', 'MEMBER');
@@ -65,8 +65,7 @@ class Countdown extends BaseActiveModule
         $this->help['notes'] = "<pre>cd is a synonym for <pre>countdown.";
     }
 
-
-    function timer($name, $prefix, $suffix, $delay)
+    public function timer($name, $prefix, $suffix, $delay)
     {
         $parts = explode(" ", $name);
         $user = $parts[0];
@@ -74,22 +73,19 @@ class Countdown extends BaseActiveModule
         $out = $this->bot->core("settings")->get("Countdown", "Channel");
         if (strtolower($out) == 'origin') {
             $this->bot->send_output($user, $prefix . $suffix, $origin);
-        }
-        else {
+        } else {
             $this->bot->send_output($user, $prefix . $suffix, $out);
         }
     }
 
-
     /*
     This gets called on a msg in the privgroup with the command
     */
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $ret = $this->bot->core("timer")
             ->add_timer(FALSE, "countdown", 6, $name . " " . $origin, "internal", 0, "Countdown");
+
         return "Countdown started!";
     }
 }
-
-?>

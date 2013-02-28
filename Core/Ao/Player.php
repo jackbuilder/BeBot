@@ -48,7 +48,6 @@ class Player
     private $user_level = FALSE;
     private $preferences = array();
 
-
     //When constructing a new player we need to have the bot handle so that the
     //class can look up certain variables automagically.
     public function __construct(&$bothandle, $data)
@@ -59,7 +58,6 @@ class Player
             $this->$key = $value;
         }
     }
-
 
     /*
         This function allows coders to use $player->uid instead of player->get_uid() when wanting to
@@ -95,11 +93,11 @@ class Player
             break;
         default:
             $this->error->set("Unknown attribute '$variable'.");
+
             return $this->error;
             break;
         }
     }
-
 
     public function get_uid($uname)
     {
@@ -110,12 +108,13 @@ class Player
                 //The uid could not be resolved.
                 $this->error = $this->uid;
                 $this->uid = FALSE;
+
                 return $this->error;
             }
         }
+
         return $this->uid;
     }
-
 
     public function get_uname($uid)
     {
@@ -126,12 +125,13 @@ class Player
                 //The uid could not be resolved.
                 $this->error = $this->uname;
                 $this->uname = 'Unknown';
+
                 return $this->error;
             }
         }
+
         return $this->uid;
     }
-
 
     public function get_whois($attribute)
     {
@@ -147,6 +147,7 @@ class Player
                 $this->$key = $value;
             }
         }
+
         return ($this->$attribute);
     }
 
@@ -156,5 +157,3 @@ class Player
     {
     }
 }
-
-?>

@@ -31,16 +31,15 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-class MySQL
+class Mysql
 {
-    var $CONN = "";
-    var $DBASE = "";
-    var $USER = "";
-    var $PASS = "";
-    var $SERVER = "";
-    var $bot;
+    public $CONN = "";
+    public $DBASE = "";
+    public $USER = "";
+    public $PASS = "";
+    public $SERVER = "";
+    public $bot;
     public static $instance;
-
 
     public function get_instance($bothandle)
     {
@@ -49,9 +48,9 @@ class MySQL
             $class = __CLASS__;
             self::$instance[$bothandle] = new $class($bothandle);
         }
+
         return self::$instance[$bothandle];
     }
-
 
     private function __construct($bothandle)
     {
@@ -69,9 +68,8 @@ class MySQL
         if (file_exists($botname_mysql_conf)) {
             include $botname_mysql_conf;
             $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from " . $botname_mysql_conf, FALSE);
-        }
-        else {
-            include "Conf/MySQL.conf";
+        } else {
+            include 'Conf/MySQL.conf';
             $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from Conf/MySQL.conf", FALSE);
         }
         $this->USER = $user;
@@ -80,15 +78,13 @@ class MySQL
         $this->DBASE = $dbase;
         if (empty($master_tablename)) {
             $this->master_tablename = strtolower($this->botname) . "_tablenames";
-        }
-        else {
+        } else {
             $master_tablename = str_ireplace("<botname>", strtolower($this->botname), $master_tablename);
             $this->master_tablename = $master_tablename;
         }
         if (!isset($table_prefix)) {
             $this->table_prefix = strtolower($this->botname);
-        }
-        else {
+        } else {
             $table_prefix = str_ireplace("<botname>", strtolower($this->botname), $table_prefix);
             $this->table_prefix = $table_prefix;
         }
@@ -105,11 +101,11 @@ class MySQL
         );
         $this->query("CREATE TABLE IF NOT EXISTS table_versions (internal_name VARCHAR(255) NOT NULL PRIMARY KEY, schemaversion INT(3) NOT NULL DEFAULT 1)");
         $this->update_master_table();
+
         return true;
     }
 
-
-    function update_master_table()
+    public function update_master_table()
     {
         $columns = array_flip(
             array(
@@ -136,8 +132,7 @@ class MySQL
         }
     }
 
-
-    function connect($initial = false)
+    public function connect($initial = false)
     {
         if ($initial) {
             $this->bot->log("MYSQL", "START", "Establishing MySQL database connection....");
@@ -145,10 +140,12 @@ class MySQL
         $conn = @mysql_connect($this->SERVER, $this->USER, $this->PASS);
         if (!$conn) {
             $this->error("Cannot connect to the database server!", $initial, false);
+
             return false;
         }
         if (!mysql_select_db($this->DBASE, $conn)) {
             $this->error("Database not found or insufficient priviledges!", $initial, false);
+
             return false;
         }
         if ($initial == true) {
@@ -157,8 +154,7 @@ class MySQL
         $this->CONN = $conn;
     }
 
-
-    function close()
+    public function close()
     {
         if ($this->CONN != NULL) {
             mysql_close($this->CONN);
@@ -166,8 +162,7 @@ class MySQL
         }
     }
 
-
-    function error($text, $fatal = false, $connected = true)
+    public function error($text, $fatal = false, $connected = true)
     {
         $msg = mysql_error();
         $this->error_count++;
@@ -181,8 +176,7 @@ class MySQL
         }
     }
 
-
-    function select($sql, $result_form = MYSQL_NUM)
+    public function select($sql, $result_form = MYSQL_NUM)
     {
         $this->connect();
         $data = "";
@@ -190,6 +184,7 @@ class MySQL
         $result = mysql_query($sql, $this->CONN);
         if (!$result) {
             $this->error($sql);
+
             return false;
         }
         if (empty($result)) {
@@ -199,57 +194,54 @@ class MySQL
             $data[] = $row;
         }
         mysql_free_result($result);
+
         return $data;
     }
 
-
-    function query($sql)
+    public function query($sql)
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
         $return = mysql_query($sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
+
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
 
-
-    function returnQuery($sql)
+    public function returnQuery($sql)
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
         $result = mysql_query($sql, $this->CONN);
         if (!$result) {
             return false;
-        }
-        else {
+        } else {
             return $result;
         }
     }
 
-
-    function dropTable($sql)
+    public function dropTable($sql)
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
         $result = mysql_query("DROP TABLE " . $sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
+
             return false;
-        }
-        else {
+        } else {
             return true;
         }
     }
 
-
-    function add_prefix($sql)
+    public function add_prefix($sql)
     {
         $pattern = '/\w?(#___.+?)\b/';
+
         return preg_replace_callback(
             $pattern, array(
                 &$this,
@@ -258,20 +250,19 @@ class MySQL
         );
     }
 
-
-    function strip_prefix_control($matches)
+    public function strip_prefix_control($matches)
     {
         $tablename = $this->get_tablename(substr($matches[1], 4));
+
         return $tablename;
     }
-
 
     /*
     Returns a table name, adding prefix.
     Creates a default name of $prefix_$table and adds this to the database if the tablename doesn't exist yet.
     For speed purposes names are cached after the first query - tablenames don't change during runtime.
     */
-    function get_tablename($table)
+    public function get_tablename($table)
     {
         // get name out of cached entries if possible:
         if (isset($this->tablenames[$table])) {
@@ -283,26 +274,23 @@ class MySQL
             // no entry existing, create one:
             if (empty($this->table_prefix)) {
                 $tablename = $table;
-            }
-            else {
+            } else {
                 $tablename = $this->table_prefix . $this->underscore . $table;
             }
             $this->query("INSERT INTO " . $this->master_tablename . " (internal_name, prefix, use_prefix) VALUES ('" . $table . "', '" . $this->table_prefix . "', 'true')");
-        }
-        else {
+        } else {
             // entry exists, create the correct tablename:
             if ($name[0][2] == 'true' && !empty($this->table_prefix)) {
                 $tablename = $name[0][1] . $this->underscore . $table;
-            }
-            else {
+            } else {
                 $tablename = $table;
             }
         }
         // cache the entry and return it:
         $this->tablenames[$table] = $tablename;
+
         return $tablename;
     }
-
 
     /*
     Used for first defines of tablenames, allows to set if prefix should be used.
@@ -310,7 +298,7 @@ class MySQL
 
     Otherwise same as get_tablename()
     */
-    function define_tablename($table, $use_prefix)
+    public function define_tablename($table, $use_prefix)
     {
         // get name out of cached entries if possible:
         if (isset($this->tablenames[$table])) {
@@ -326,29 +314,26 @@ class MySQL
                 $prefix = $this->table_prefix;
                 $tablename = $prefix . $this->underscore . $table;
                 $use_prefix = 'true';
-            }
-            else {
+            } else {
                 $tablename = $table;
                 $use_prefix = 'false';
             }
             $this->query("INSERT INTO " . $this->master_tablename . " (internal_name, prefix, use_prefix) VALUES ('" . $table . "', '" . $prefix . "', '" . $use_prefix . "')");
-        }
-        else {
+        } else {
             // entry exists, create the correct tablename:
             if ($name[0][2] == 'true' && !empty($this->table_prefix)) {
                 $tablename = $name[0][1] . $this->underscore . $table;
-            }
-            else {
+            } else {
                 $tablename = $table;
             }
         }
         // cache the entry and return it:
         $this->tablenames[$table] = $tablename;
+
         return $tablename;
     }
 
-
-    function get_version($table)
+    public function get_version($table)
     {
         $version = $this->select("SELECT schemaversion, use_prefix FROM " . $this->master_tablename . " WHERE internal_name = '" . $table . "'");
         if (!empty($version)) {
@@ -359,20 +344,17 @@ class MySQL
                 }
             }
             Return ($version[0][0]);
-        }
-        else {
+        } else {
             Return (1);
         }
     }
 
-
-    function set_version($table, $version)
+    public function set_version($table, $version)
     {
         if (!is_numeric($version)) {
             echo "DB Error Trying to set version: " . $version . " for table " . $table . "!\n";
             //$this->bot->log("DB", "ERROR", "Trying to set version: " . $version . " for table " . $table . "!");
-        }
-        else {
+        } else {
             $this->query("UPDATE " . $this->master_tablename . " SET schemaversion = " . $version . " WHERE internal_name = '" . $table . "'");
             $usep = $this->select("SELECT use_prefix FROM " . $this->master_tablename . " WHERE internal_name = '" . $table . "'");
             if ($usep[0][0] == "false") {
@@ -384,8 +366,7 @@ class MySQL
         }
     }
 
-
-    function update_table($table, $column, $action, $query)
+    public function update_table($table, $column, $action, $query)
     {
         $fields = $this->select("EXPLAIN #___" . $table, MYSQL_ASSOC);
         if (!empty($fields)) {
@@ -402,8 +383,7 @@ class MySQL
                         $do = FALSE;
                     }
                 }
-            }
-            else {
+            } else {
                 if (isset($columns[$column])) {
                     $do = FALSE;
                 }
@@ -422,8 +402,7 @@ class MySQL
                         $do = FALSE;
                     }
                 }
-            }
-            else {
+            } else {
                 if (!isset($columns[$column])) {
                     $do = FALSE;
                 }
@@ -443,5 +422,3 @@ class MySQL
         }
     }
 }
-
-?>

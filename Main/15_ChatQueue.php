@@ -42,12 +42,11 @@ class Chat_Queue_Core extends BasePassiveModule
     private $msgs_left;
     private $last_call;
 
-
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("chat_queue");
@@ -56,11 +55,10 @@ class Chat_Queue_Core extends BasePassiveModule
             ->register($this, "chat", ($this->bot->telldelay / 1000), 4);
     }
 
-
     /*
     This gets called on cron
     */
-    function queue($name, $info)
+    public function queue($name, $info)
     {
         $to = $info[0];
         $msg = $info[1];
@@ -71,27 +69,24 @@ class Chat_Queue_Core extends BasePassiveModule
             );
             $msg = utf8_encode($msg);
             $this->bot->aoc->send_tell($to, $msg);
-        }
-        else {
+        } else {
             $msg = utf8_encode($msg);
             $this->bot->aoc->send_group($to, $msg);
         }
     }
 
-
     /*
     Checks if tell can be sent. true if yes, false it has to be put to queue
     */
-    function check_queue()
+    public function check_queue()
     {
         return $this->bot->core("queue")->check_queue("chat");
     }
 
-
     /*
     Puts a msg into queue
     */
-    function into_queue($to, $msg, $type, $priority)
+    public function into_queue($to, $msg, $type, $priority)
     {
         $info = array(
             $to,
@@ -101,5 +96,3 @@ class Chat_Queue_Core extends BasePassiveModule
         $this->bot->core("queue")->into_queue("chat", $info, $priority);
     }
 }
-
-?>

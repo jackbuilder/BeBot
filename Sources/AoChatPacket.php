@@ -15,12 +15,11 @@
 *
 */
 
-class AOChatPacket
+class AoChatPacket
 {
-    var $args, $type, $dir, $data;
+    public $args, $type, $dir, $data;
 
-
-    function AOChatPacket($dir, $type, $data)
+    public function AOChatPacket($dir, $type, $data)
     {
 //This is a hack that should be done better. I'm just not sure how.
         if (strtolower(AOCHAT_GAME) == "ao") {
@@ -30,8 +29,7 @@ class AOChatPacket
                 "IS",
                 "s"
             );
-        }
-        else {
+        } else {
             $aocpdifs = array(
                 "IIS",
                 "IBBIB",
@@ -243,11 +241,13 @@ class AOChatPacket
         $pmap = $GLOBALS["aochat-packetmap"][$dir][$type];
         if (!$pmap) {
             echo "Unsupported packet type (" . $dir . ", " . $type . ")\n";
+
             return false;
         }
         if ($dir == "in") {
             if (!is_string($data)) {
                 echo "Incorrect argument for incoming packet, expecting a string.\n";
+
                 return false;
             }
             for ($i = 0; $i < strlen($pmap["args"]); $i++) {
@@ -306,12 +306,10 @@ class AOChatPacket
                 }
                 $this->args[] = $res;
             }
-        }
-        else {
+        } else {
             if (!is_array($data)) {
                 $args = array($data);
-            }
-            else {
+            } else {
                 $args = $data;
             }
             $data = "";
@@ -348,8 +346,7 @@ class AOChatPacket
             }
             $this->data = $data;
         }
+
         return true;
     }
 }
-
-?>

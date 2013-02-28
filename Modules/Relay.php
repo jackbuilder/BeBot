@@ -38,7 +38,7 @@ The Class itself...
 class Relay extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("relay");
@@ -62,10 +62,10 @@ class Relay extends BaseActiveModule
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("relay", "false") . "
                (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-						botname VARCHAR(20),
-        	 			type VARCHAR(30),
-						time INT,
-        				msg TEXT)"
+                        botname VARCHAR(20),
+                         type VARCHAR(30),
+                        time INT,
+                        msg TEXT)"
         );
         $this->bot->core("settings")
             ->create('Relay', 'Priv', 'Both', 'Where should private group relay to', 'Both;Guildchat;Relaybots;None');
@@ -128,8 +128,7 @@ class Relay extends BaseActiveModule
         $this->monbuds = FALSE;
     }
 
-
-    function update()
+    public function update()
     {
         switch ($this->bot->db->get_version("relay")) {
         case 1:
@@ -140,8 +139,7 @@ class Relay extends BaseActiveModule
         $this->bot->db->set_version("relay", 2);
     }
 
-
-    function pginvite($group)
+    public function pginvite($group)
     {
         if (strtolower(
             $this->bot->core("settings")
@@ -152,31 +150,28 @@ class Relay extends BaseActiveModule
         }
     }
 
-
     /*
     This gets called on a msg in the private group.
     This is where we send our message to org chat and to our relay.
     */
-    function privgroup($name, $msg)
+    public function privgroup($name, $msg)
     {
         $this->relay_to_gc($name, $msg);
     }
-
 
     /*
     This gets called on a msg in the group.
     This is where we send our message to the private group and to our relay.
     */
-    function gmsg($name, $group, $msg)
+    public function gmsg($name, $group, $msg)
     {
         $this->relay_to_pgroup($name, $msg, "chat");
     }
 
-
     /*
     This gets called on a tell with the command
     */
-    function tell($name, $msg)
+    public function tell($name, $msg)
     {
         $input = $this->parse_com(
             $msg, array(
@@ -186,8 +181,7 @@ class Relay extends BaseActiveModule
         );
         if (strtolower($input['com']) == 'gcrc') {
             $this->inc_com($name, $input['args'], "tell");
-        }
-        elseif (strtolower($input['com']) == 'gcr'
+        } elseif (strtolower($input['com']) == 'gcr'
             && $this->bot
                 ->core("settings")->get('Relay', 'Status')
             && (($this->bot
@@ -222,8 +216,7 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function extpgmsg($pgroup, $name, $msg, $db = FALSE)
+    public function extpgmsg($pgroup, $name, $msg, $db = FALSE)
     {
         $input = $this->parse_com(
             $msg, array(
@@ -233,8 +226,7 @@ class Relay extends BaseActiveModule
         );
         if (strtolower($input['com']) == 'gcrc') {
             $this->inc_com($name, $input['args'], "extpg");
-        }
-        elseif (strtolower($input['com']) == 'gcr'
+        } elseif (strtolower($input['com']) == 'gcr'
             && $this->bot
                 ->core("settings")
                 ->get('Relay', 'Status')
@@ -248,8 +240,7 @@ class Relay extends BaseActiveModule
             $txt = explode(" ", $txt, 2);
             if ($txt[0] == '&$enc$&') {
                 $txt = $this->dec($txt[1]);
-            }
-            else {
+            } else {
                 $txt = implode(" ", $txt);
             }
             Switch ($this->bot->core("settings")->get('Relay', 'Orgnameon')) {
@@ -300,8 +291,7 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function extprivgroup($group, $name, $msg)
+    public function extprivgroup($group, $name, $msg)
     {
         if (strtolower(
             $this->bot->core("settings")
@@ -334,17 +324,15 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
     }
-
 
     /*
     This gets called on a msg in the group.
     This is where we send our message to the private group and to our relay.
     */
-    function relay_to_pgroup($name, $msg, $type = "notchat")
+    public function relay_to_pgroup($name, $msg, $type = "notchat")
     {
         if ($this->bot->core("settings")->get('Relay', 'Status')) {
             $namestr = "";
@@ -380,17 +368,15 @@ class Relay extends BaseActiveModule
         }
     }
 
-
     // Relays $msg without any further modifications to other bot(s).
     // If $chat is true $msg will be relayed as chat with added "<pre>gcr " prefix.
     // If $chat is false $msg will be relayed as it is without any addon, this can be used to relay commands to the other bot(s).
-    function relay_to_bot($msg, $chat = TRUE, $alt = FALSE, $type = "notchat")
+    public function relay_to_bot($msg, $chat = TRUE, $alt = FALSE, $type = "notchat")
     {
         $type = strtolower($type);
         if ($alt) {
             $prefix = "<pre>$alt ";
-        }
-        elseif ($chat) {
+        } elseif ($chat) {
             $prefix = "<pre>gcr ";
             if ($this->bot->core("settings")->get('Relay', 'TypeTag')) {
                 $msg = str_replace(
@@ -401,8 +387,7 @@ class Relay extends BaseActiveModule
                     ->get('Relay', 'Gcname') . "##end##] #&%" . $type . "%&#", $msg
                 );
             }
-        }
-        else {
+        } else {
             $prefix = "";
         }
         if ($this->bot->core("settings")->get('Relay', 'Status')
@@ -424,8 +409,7 @@ class Relay extends BaseActiveModule
                     $this->bot->core("settings")
                         ->get('Relay', 'Relay'), $prefix . $msg, 0, FALSE, TRUE, $color
                 );
-            }
-            elseif (strtolower(
+            } elseif (strtolower(
                 $this->bot->core("settings")
                     ->get('Relay', 'Type')
             ) == "pgroup"
@@ -441,12 +425,10 @@ class Relay extends BaseActiveModule
                     $prefix . $msg, $this->bot
                         ->core("settings")->get('Relay', 'Relay'), TRUE, $color
                 );
-            }
-            else {
+            } else {
                 if ($alt) {
                     $prefix = $alt;
-                }
-                else {
+                } else {
                     $prefix = "gcr";
                 }
                 $this->bot->db->query(
@@ -456,21 +438,19 @@ class Relay extends BaseActiveModule
         }
     }
 
-
     // Relays $msg to IRC module (and from there after formatting to IRC channel)
-    function relay_to_irc($msg)
+    public function relay_to_irc($msg)
     {
         $msg = preg_replace("/##end##/U", "", $msg);
         $msg = preg_replace("/##(.+)##/U", "", $msg);
         $this->bot->send_irc("", "", $msg);
     }
 
-
     /*
     This gets called on a msg in the private group.
     This is where we send our message to org chat and to our relay.
     */
-    function relay_to_gc($name, $msg)
+    public function relay_to_gc($name, $msg)
     {
         if ($this->bot->core("settings")->get('Relay', 'Status')) {
             $namestr = "";
@@ -501,9 +481,8 @@ class Relay extends BaseActiveModule
         }
     }
 
-
     // This gets called on cron
-    function cron($cron)
+    public function cron($cron)
     {
         if ($cron == 300) {
             if (!isset($this->guildnameset)) {
@@ -537,12 +516,10 @@ class Relay extends BaseActiveModule
                                 }
                             }
                         }
-                    }
-                    else {
+                    } else {
                         echo " Error: Relay Module is Unable to find Security group \"$security_group\"\n";
                     }
-                }
-                else {
+                } else {
                     $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level >= 1");
                     if (!empty($members)) {
                         foreach ($members as $member) {
@@ -559,8 +536,7 @@ class Relay extends BaseActiveModule
                 $old = time() - 300;
                 $this->bot->db->query("DELETE FROM #___relay WHERE time < " . $old);
             }
-        }
-        elseif ($cron == 2) {
+        } elseif ($cron == 2) {
             if (strtoupper(
                 $this->bot->core("settings")
                     ->get("Relay", "Type")
@@ -571,10 +547,8 @@ class Relay extends BaseActiveModule
                     foreach ($result as $res) {
                         if (strtolower($res[1]) == "gcrc" && $this->db_relay) {
                             $this->inc_com($name, $res[3], "db");
-                        }
-                        elseif (strtolower($res[1]) == "gcr" && $this->db_relay) {
-                            if (ucfirst(strtolower($res[2])) != $this->bot->botname) // make sure we are not doing our own command
-                            {
+                        } elseif (strtolower($res[1]) == "gcr" && $this->db_relay) {
+                            if (ucfirst(strtolower($res[2])) != $this->bot->botname) { // make sure we are not doing our own command
                                 if ($this->bot->core("access_control")
                                     ->check_for_access($res[2], "gcr")
                                 ) {
@@ -586,15 +560,13 @@ class Relay extends BaseActiveModule
                     }
                 }
                 $this->db_relay = TRUE;
-            }
-            else {
+            } else {
                 $this->db_relay = FALSE;
             }
         }
     }
 
-
-    function connect()
+    public function connect()
     {
         if ($this->bot->core("settings")->get('Relay', 'Autoinvite')) {
             $security_group = $this->bot->core("settings")
@@ -615,8 +587,7 @@ class Relay extends BaseActiveModule
                         }
                     }
                 }
-            }
-            else {
+            } else {
                 $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level > 0");
                 if (!empty($members)) {
                     foreach ($members as $member) {
@@ -632,8 +603,7 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
         if ($this->monbuds && ($msg == 1 || $msg == 0)) {
             if ($this->bot->core("notify")->check($name)) {
@@ -641,8 +611,7 @@ class Relay extends BaseActiveModule
                     $level = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'");
                     if (!empty($level)) {
                         $level = $level[0][0];
-                    }
-                    else {
+                    } else {
                         $level = 0;
                     }
                     $msg = "buddy $msg $name gc $level";
@@ -668,12 +637,10 @@ class Relay extends BaseActiveModule
                             }
                         }
                     }
-                }
-                else {
+                } else {
                     echo " Error: Relay Module is Unable to find Security group \"$security_group\"\n";
                 }
-            }
-            else {
+            } else {
                 $members = $this->bot->db->select("SELECT nickname FROM #___users WHERE user_level >= 1 AND nickname = '$name'");
                 if (!empty($members)) {
                     if ($this->bot->core('prefs')
@@ -687,8 +654,7 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function extpgjoin($pgname, $name, $cron = FALSE)
+    public function extpgjoin($pgname, $name, $cron = FALSE)
     {
         $onmsg = "";
         if (!$cron && $name != $this->bot->botname) {
@@ -707,8 +673,7 @@ class Relay extends BaseActiveModule
             );
             if (empty($online)) {
                 $online = "";
-            }
-            else {
+            } else {
                 foreach ($online as $on) {
                     $level = $on[3];
                     if ($on[1] == 1) {
@@ -730,8 +695,7 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function pgjoin($name)
+    public function pgjoin($name)
     {
         if (!isset($this->bot->other_bots[$name])) {
             $msg = "buddy 1 $name pg";
@@ -739,8 +703,7 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function pgleave($name)
+    public function pgleave($name)
     {
         if (!isset($this->bot->other_bots[$name])) {
             $msg = "buddy 0 $name pg";
@@ -748,8 +711,7 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function inc_com($name, $msg, $source)
+    public function inc_com($name, $msg, $source)
     {
         $msg = explode(" ", $msg);
         Switch ($msg[0]) {
@@ -804,14 +766,12 @@ class Relay extends BaseActiveModule
         }
     }
 
-
-    function enc($string)
+    public function enc($string)
     {
         if (!extension_loaded("mcrypt")) {
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $module = 'mcrypt.dll';
-            }
-            else {
+            } else {
                 $module = 'mcrypt.so';
             }
             if (!dl($module)) {
@@ -824,8 +784,7 @@ class Relay extends BaseActiveModule
         if (!extension_loaded("mhash")) {
             if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
                 $module = 'mhash.dll';
-            }
-            else {
+            } else {
                 $module = 'mhash.so';
             }
             if (!dl($module)) {
@@ -857,25 +816,23 @@ class Relay extends BaseActiveModule
         //$return['encrypted'] = $encrypted_string;
         //$return['decrypted'] = $decrypted_string;
         $return = "$encrypted_string $hmac $iv";
+
         return $return;
     }
 
-
-    function dec($txt)
+    public function dec($txt)
     {
         $txt = explode(" ", $txt);
         $key = $this->bot->core("settings")->get("Relay", "Key");
         $data = $this->verify_rec_data($txt[0], $txt[1], $txt[2], $key);
         if ($data['error']) {
             return ($data['errormsg']);
-        }
-        else {
+        } else {
             return ($this->decrypt_data($data['iv'], $data['ciphrtxt'], $key));
         }
     }
 
-
-    function decrypt_data($iv, $ciphrtxt, $key)
+    public function decrypt_data($iv, $ciphrtxt, $key)
     {
         // There is no hex2bin, pack() does the job.
         $iv = pack("H*", $iv);
@@ -886,14 +843,14 @@ class Relay extends BaseActiveModule
         $decrypted_string = mcrypt_decrypt($cipher_alg, $key, $ciphrtxt, MCRYPT_MODE_CBC, $iv);
         // For some reason there is always some junk on the string until it gets timmed.
         $decrypted_string = trim($decrypted_string);
+
         return $decrypted_string;
     }
-
 
     /*
     This function verifies the data's authenticity and integrity.
     */
-    function verify_rec_data($rec_string, $rec_hmac, $rec_iv, $key)
+    public function verify_rec_data($rec_string, $rec_hmac, $rec_iv, $key)
     {
         /*
         //DEBUG
@@ -907,24 +864,19 @@ class Relay extends BaseActiveModule
         // String has to be long enough to be valid.
         if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_string)) {
             return ("Invalid String, Expected Hex Characters only.");
-        }
-        else {
+        } else {
             if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_hmac)) {
                 return ("Invalid HMAC, Expected Hex Characters only.");
-            }
-            else {
+            } else {
                 if (!preg_match("/^[0-9A-Fa-f].+$/", $rec_iv)) {
                     return ("Invalid IV, Expected Hex Characters only.");
-                }
-                else {
+                } else {
                     if (strlen($rec_iv) != 32) {
                         return ("Invalid IV Length.");
-                    }
-                    else {
+                    } else {
                         if (strlen($rec_string) < 32 && strlen($rec_string) <= 1024) {
                             return ("Invalid String Length.");
-                        }
-                        else {
+                        } else {
                             if (strlen($rec_iv) <= 32 && strlen($rec_iv) >= 255) {
                                 return ("Invalid HMAC Length.");
                             }
@@ -940,14 +892,14 @@ class Relay extends BaseActiveModule
             $return['errormsg'] = "Failed to Decript Message from Relay";
             //print_r("\nReciv: ".$rec_hmac."\n");
             //print_r("\nCheck: ".$chk_hmac."\n");
-        }
-        else {
+        } else {
             $return['error'] = FALSE;
             $return['errormsg'] = "";
             $return['iv'] = $rec_iv;
             $return['hmac'] = $rec_hmac;
             $return['ciphrtxt'] = $rec_string;
         }
+
         return $return;
     }
 
@@ -955,7 +907,7 @@ class Relay extends BaseActiveModule
     /*
     Take a supplied name a build a namestring containing colors and additional information for it to be used in relay.
     */
-    function get_namestring($name)
+    public function get_namestring($name)
     {
         $mainstr = "";
         if ($this->bot->core("settings")->get('Relay', 'ShowMain') != "") {
@@ -971,8 +923,7 @@ class Relay extends BaseActiveModule
             }
         }
         $namestr = "##relay_name##" . $name . $mainstr . ":##end## ";
+
         return $namestr;
     }
 }
-
-?>

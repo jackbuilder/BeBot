@@ -42,7 +42,7 @@ class Alts extends BaseActiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "alts", "GUEST", array("confirm" => "ANONYMOUS"));
@@ -62,8 +62,7 @@ class Alts extends BaseActiveModule
         );
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $security = FALSE;
         $vars = explode(' ', strtolower($msg));
@@ -100,18 +99,15 @@ class Alts extends BaseActiveModule
                         ->core("security")->get_access_level($vars[2])
                     ) {
                         return "##error##Character ##highlight##$vars[2]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
-                    }
-                    elseif ($this->bot->core("security")
+                    } elseif ($this->bot->core("security")
                         ->get_access_level($name) < $this->bot
                         ->core("security")->get_access_level($vars[3])
                     ) {
                         return "##error##Character ##highlight##$vars[3]##end## has a higher security level then you, so you cannot add ##highlight##$vars[3]##end## to ##highlight##$vars[2]##end##'s alts.##end##";
-                    }
-                    else {
+                    } else {
                         return $this->add_alt($vars[2], $vars[3], 1);
                     }
-                }
-                else {
+                } else {
                     return $this->add_alt($vars[2], $vars[3], 1);
                 }
             case 'rem':
@@ -125,11 +121,11 @@ class Alts extends BaseActiveModule
         default:
             return "Broken plugin, received unhandled command: $command";
         }
+
         return FALSE;
     }
 
-
-    function display_alts($name)
+    public function display_alts($name)
     {
         if (!$this->bot->core("player")->id($name)) {
             return "##error##Character ##highlight##$name##end## does not exist.##end##";
@@ -145,26 +141,24 @@ class Alts extends BaseActiveModule
 
         if ($this->bot->game == "aoc") {
             $retstr = "{$whois['nickname']} ({$whois['level']} / {$whois['class']}) - ";
-        }
-        else {
+        } else {
             $retstr
                 = "{$whois['firstname']}' ##{$whois['faction']}##{$whois['nickname']}##end##' {$whois['lastname']} ({$whois['level']} / ##lime## {$whois['at_id']}##end## {$whois['profession']}) - ";
         }
 
         if ($alts['alts']) {
             $retstr .= $alts['list'];
-        }
-        else {
+        } else {
             $retstr .= "has no alts defined!";
         }
+
         return $retstr;
     }
-
 
     /*
     Adds an alt to your alt list
     */
-    function add_alt($name, $alt, $admin = 0)
+    public function add_alt($name, $alt, $admin = 0)
     {
         $security = FALSE;
         $name = ucfirst(strtolower($name));
@@ -198,8 +192,7 @@ class Alts extends BaseActiveModule
         if (!empty($result)) {
             if ($result[0][1] == 1) {
                 return ("##highlight##$alt##end## is already registered as an alt of ##highlight##" . $result[0][0] . "##end##.");
-            }
-            else {
+            } else {
                 return ("##highlight##$alt##end## is already an unconfirmed alt of ##highlight##" . $result[0][0] . "##end##.");
             }
         }
@@ -238,6 +231,7 @@ class Alts extends BaseActiveModule
                 $alt, "Alt Confirmation :: " . $this->bot
                 ->core("tools")->make_blob("Click to view", $inside)
             );
+
             return "##highlight##$alt##end## has been registered but Now requires Confirmation, to confirm do ##highlight##<pre>alts confirm $main##end## on $alt";
         }
         $this->bot->db->query("INSERT INTO #___alts (alt, main) VALUES ('$alt', '$main')");
@@ -245,6 +239,7 @@ class Alts extends BaseActiveModule
         if ($this->bot->exists_module("points")) {
             $this->bot->core("points")->check_alts($main);
         }
+
         return "##highlight##$alt##end## has been registered as a new alt of ##highlight##$main##end##.";
     }
 
@@ -252,7 +247,7 @@ class Alts extends BaseActiveModule
     /*
     Removes an alt form your alt list
     */
-    function del_alt($name, $alt)
+    public function del_alt($name, $alt)
     {
         $name = ucfirst(strtolower($name));
         $alt = ucfirst(strtolower($alt));
@@ -275,16 +270,15 @@ class Alts extends BaseActiveModule
         $result = $this->bot->db->select("SELECT main FROM #___alts WHERE alt = '$alt' AND main = '$main'");
         if (empty($result)) {
             return "##highlight##$alt##end## is not registered as an alt of ##highlight##$main##end##.";
-        }
-        else {
+        } else {
             $this->bot->db->query("DELETE FROM #___alts WHERE alt = '" . ucfirst(strtolower($alt)) . "'");
             $this->bot->core("alts")->del_alt($main, $alt);
+
             return "##highlight##$alt##end## has been removed from ##highlight##$main##end##s alt-list.";
         }
     }
 
-
-    function confirm($alt, $main)
+    public function confirm($alt, $main)
     {
         $result = $this->bot->db->select("SELECT confirmed FROM #___alts WHERE alt = '$alt' AND main = '$main'");
         if (!empty($result)) {
@@ -294,16 +288,13 @@ class Alts extends BaseActiveModule
                 if ($this->bot->exists_module("points")) {
                     $this->bot->core("points")->check_alts($main);
                 }
+
                 return "##highlight##$alt##end## has been confirmed as a new alt of ##highlight##$main##end##.";
-            }
-            else {
+            } else {
                 return ("##highlight##$alt##end## is already a confirmed alt of ##highlight##$main##end##.");
             }
-        }
-        else {
+        } else {
             return "##error####highlight##$alt##end## is not registered as an alt of ##highlight##$main##end##.##end##";
         }
     }
 }
-
-?>

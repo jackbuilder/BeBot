@@ -43,12 +43,11 @@ class Alts_Core extends BasePassiveModule
     private $mains;
     private $alts;
 
-
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
@@ -72,8 +71,7 @@ class Alts_Core extends BasePassiveModule
             ->create('Alts', "incAll", FALSE, "Should the Alt that was used to call the info also be listed inside the blob?");
     }
 
-
-    function update_table()
+    public function update_table()
     {
         switch ($this->bot->db->get_version("alts")) {
         case 1:
@@ -84,11 +82,10 @@ class Alts_Core extends BasePassiveModule
         $this->bot->db->set_version("alts", 2);
     }
 
-
     /*
     Create the caches to look up main and alts
     */
-    function create_caches()
+    public function create_caches()
     {
         $this->mains = array();
         $this->alts = array();
@@ -111,15 +108,13 @@ class Alts_Core extends BasePassiveModule
         $this->bot->core("security")->cache_mgr("del", "maincache", "");
     }
 
-
-    function cron()
+    public function cron()
     {
         $this->create_caches();
     }
 
-
     // Adds new alt to cache
-    function add_alt($main, $alt)
+    public function add_alt($main, $alt)
     {
         $main = ucfirst(strtolower($main));
         $alt = ucfirst(strtolower($alt));
@@ -133,9 +128,8 @@ class Alts_Core extends BasePassiveModule
         $this->mains[$alt] = $main;
     }
 
-
     // Removes alt from cache
-    function del_alt($main, $alt)
+    public function del_alt($main, $alt)
     {
         $this->bot->core("security")
             ->cache_mgr("del", "main", ucfirst(strtolower($main)));
@@ -143,27 +137,24 @@ class Alts_Core extends BasePassiveModule
         unset($this->alts[ucfirst(strtolower($main))][ucfirst(strtolower($alt))]);
     }
 
-
     /*
     Return main char
     */
-    function main($char)
+    public function main($char)
     {
         $char = ucfirst(strtolower($char));
         // 		$char = ucfirst(strtolower($this -> bot -> core("chat") -> get_uname($char)));
         if (isset($this->mains[$char])) {
             return $this->mains[$char];
-        }
-        else {
+        } else {
             return $char;
         }
     }
 
-
     /*
     Return array of alts
     */
-    function get_alts($char)
+    public function get_alts($char)
     {
         if (is_numeric($char)) {
             $char = $this->bot->core("player")->name($char);
@@ -174,30 +165,29 @@ class Alts_Core extends BasePassiveModule
                 $ret[] = $curalt;
             }
         }
+
         return $ret;
     }
 
-
-    function old_output($who, $returntype = 0)
+    public function old_output($who, $returntype = 0)
     {
         $main = $this->main($who);
         $alts = $this->get_alts($main);
         if (empty($alts)) {
             $ret['alts'] = FALSE;
             $ret['list'] = "";
-        }
-        else {
+        } else {
             $ret['alts'] = TRUE;
             $ret['list'] = $this->make_alt_blob($main, ucfirst(strtolower($who)), $alts, $returntype);
         }
+
         return $ret;
     }
-
 
     /*
     Return main char
     */
-    function make_alt_blob($main, $who, $alts, $returntype)
+    public function make_alt_blob($main, $who, $alts, $returntype)
     {
         $result = "##highlight##::: " . $main . "'s Alts :::##end##\n\n";
         foreach ($alts as $alt) {
@@ -206,23 +196,20 @@ class Alts_Core extends BasePassiveModule
         }
         if ($main == $who) {
             $title = "Alts";
-        }
-        else {
+        } else {
             $title = $main . "�s alts";
         }
         if ($returntype == 1) {
             return $result;
-        }
-        else {
+        } else {
             return $this->bot->core("tools")->make_blob($title, $result);
         }
     }
 
-
     /*
     Show fancy alts list
     */
-    function fancy_output($name, $returntype)
+    public function fancy_output($name, $returntype)
     {
         if ($this->bot->core("player")->id($name)) {
             $name = ucfirst(strtolower($name));
@@ -242,23 +229,21 @@ class Alts_Core extends BasePassiveModule
             }
             if (empty($alts)) {
                 $ret['alts'] = FALSE;
-            }
-            else {
+            } else {
                 $ret['alts'] = TRUE;
             }
             $ret['list'] = $this->make_info_blob($whois, $main, $alts, $returntype);
+
             return $ret;
-        }
-        else {
+        } else {
             return ("##highlight##$name##end## does not exist.");
         }
     }
 
-
     /*
     Make a big blob
     */
-    function make_info_blob($whois, $main, $alts = '', $returntype)
+    public function make_info_blob($whois, $main, $alts = '', $returntype)
     {
         if (!empty($alts)) {
             $window = "##normal##:::  $main's alts  :::##end##\n\n";
@@ -272,7 +257,6 @@ class Alts_Core extends BasePassiveModule
                     $online = $this->bot->core("online")
                         ->get_online_state($alt);
                     $window .= " " . $online['content'];
-
 
                     if ($this->bot->core("settings")->get('Alts', 'Detail')) {
                         $whoisalt = $this->bot->core("whois")->lookup($alt);
@@ -309,25 +293,22 @@ class Alts_Core extends BasePassiveModule
         }
         if (strtolower($whois['nickname']) == strtolower($main)) {
             $title = "Alts";
-        }
-        else {
+        } else {
             $title = $main . "�s alts";
         }
         if ($returntype == 1) {
             return $window;
-        }
-        else {
+        } else {
             return ($this->bot->core("tools")->make_blob($title, $window));
         }
     }
-
 
     /*
     Show mains/alts
     You should use this function when calling your alts list
     This way you ensure that the formatting is the same across all modules
     */
-    function show_alt($who, $returntype = 0)
+    public function show_alt($who, $returntype = 0)
     {
         switch ($this->bot->core("settings")->get('Alts', 'Output')) {
         case 'Old':
@@ -342,5 +323,3 @@ class Alts_Core extends BasePassiveModule
         }
     }
 }
-
-?>

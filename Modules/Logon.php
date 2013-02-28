@@ -37,17 +37,16 @@ The Class itself...
 */
 class Logon extends BaseActiveModule
 {
-    var $last_log;
-    var $start;
+    public $last_log;
+    public $start;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("logon", "true") . "
-				(id BIGINT NOT NULL PRIMARY KEY,
-				message VARCHAR(255))"
+                (id BIGINT NOT NULL PRIMARY KEY,
+                message VARCHAR(255))"
         );
         $this->last_log = array();
         $this->start = time() + 3600;
@@ -97,8 +96,7 @@ class Logon extends BaseActiveModule
             ->create("Relay", "Alias", TRUE, "Should a Users Main Alias be Shown with logon message?");
     }
 
-
-    function update_table()
+    public function update_table()
     {
         if ($this->bot->db->get_version("logon") == 2) {
             return;
@@ -112,20 +110,18 @@ class Logon extends BaseActiveModule
         }
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^logon (.+)/i", $msg, $info)) {
             return $this->set_msg($name, $info[1]);
-        }
-        elseif (preg_match("/^logon$/i", $msg, $info)) {
+        } elseif (preg_match("/^logon$/i", $msg, $info)) {
             return $this->set_msg($name, '');
         }
+
         return FALSE;
     }
 
-
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
         $spam = FALSE;
 
@@ -138,8 +134,7 @@ class Logon extends BaseActiveModule
                     $level = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'");
                     if (!empty($level)) {
                         $level = $level[0][0];
-                    }
-                    else {
+                    } else {
                         $level = 0;
                     }
                     if ($level == "2") {
@@ -148,15 +143,13 @@ class Logon extends BaseActiveModule
                         ) {
                             $spam = TRUE;
                         }
-                    }
-                    elseif ($level == "1") {
+                    } elseif ($level == "1") {
                         if ($this->bot->core("settings")
                             ->get("Logon", "Guests")
                         ) {
                             $spam = TRUE;
                         }
-                    }
-                    elseif ($this->bot->core("settings")
+                    } elseif ($this->bot->core("settings")
                         ->get("Logon", "Others")
                     ) {
                         $spam = TRUE;
@@ -184,8 +177,7 @@ class Logon extends BaseActiveModule
                                 if ($aliasm) {
                                     $res = "##highlight##" . $aliasm . "##end## Logged On";
                                     $res .= " (" . $name . " ";
-                                }
-                                else {
+                                } else {
                                     $res = "\"##highlight##" . $name . "##end##\"";
                                     if (!empty($result["firstname"])) {
                                         $res = $result["firstname"] . " " . $res;
@@ -201,8 +193,7 @@ class Logon extends BaseActiveModule
                                     if ($result["org"] != '') {
                                         $res .= ", ##logon_organization##" . $result["rank"] . " of " . $result["org"] . "##end##";
                                     }
-                                }
-                                else {
+                                } else {
                                     $res .= " " . $result["class"];
                                 }
 
@@ -227,9 +218,7 @@ class Logon extends BaseActiveModule
                                 ) {
                                     $res .= " :: " . $this->bot->core("whois")
                                         ->whois_details($name, $result);
-                                }
-
-                                else {
+                                } else {
                                     if ($this->bot->core("settings")
                                         ->get("Logon", "ShowAlts") == TRUE
                                     ) {
@@ -250,8 +239,7 @@ class Logon extends BaseActiveModule
                                 $this->show_logon("##logon_logon_spam##" . $res . "##end##");
                                 $this->last_log["on"][$name] = time();
                             }
-                        }
-                        else {
+                        } else {
                             if ($this->last_log["off"][$name] < (time() - 5)) {
                                 $this->show_logon("##logon_logoff_spam##" . $name . " logged off##end##");
                                 $this->last_log["off"][$name] = time();
@@ -263,8 +251,7 @@ class Logon extends BaseActiveModule
         }
     }
 
-
-    function show_logon($txt)
+    public function show_logon($txt)
     {
         $this->bot->send_gc($txt);
         if ($this->bot->core("settings")->get("Relay", "Logoninpgroup")) {
@@ -291,20 +278,17 @@ class Logon extends BaseActiveModule
 
     }
 
-
-    function connect()
+    public function connect()
     {
         $this->start = time() + 3 * $this->bot->crondelay;
     }
 
-
-    function set_msg($name, $message)
+    public function set_msg($name, $message)
     {
         $id = $this->bot->core('player')->id($name);
         $message = mysql_real_escape_string($message);
         $this->bot->db->query("REPLACE INTO #___logon (id, message) VALUES ('" . $id . "', '" . $message . "')");
+
         return "Thank you " . $name . ". You logon message has been set.";
     }
 }
-
-?>

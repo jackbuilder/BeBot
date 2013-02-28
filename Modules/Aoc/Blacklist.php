@@ -41,17 +41,16 @@ class Blacklist extends BaseActiveModule
 {
     private $table_version;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("blacklist", "true") . "
-			  (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-			  name VARCHAR(30) NOT NULL,
-			  noteid INT NOT NULL,
-			  expire INT UNSIGNED DEFAULT 0,
-			  INDEX expire (expire))"
+              (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+              name VARCHAR(30) NOT NULL,
+              noteid INT NOT NULL,
+              expire INT UNSIGNED DEFAULT 0,
+              INDEX expire (expire))"
         );
         $this->table_version = 2;
         $this->table_update(); // Update Blacklist table if needed.
@@ -68,41 +67,35 @@ class Blacklist extends BaseActiveModule
         $this->help['command']['blacklist rem <target>'] = "Removes <target> from blacklist.";
     }
 
-
-    function cron()
+    public function cron()
     {
         $this->clean_blacklist();
     }
-
 
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
     sutible for output via send_tell, send_pgroup, and send_gc.
     */
-    function command_handler($name, $msg, $source)
+    public function command_handler($name, $msg, $source)
     {
         if (preg_match("/^blacklist add (.+?) (.+)$/i", $msg, $info)) {
             return $this->set_blacklist($name, $info[1], $info[2]);
-        }
-        elseif (preg_match("/^blacklist rem (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^blacklist rem (.+)$/i", $msg, $info)) {
             return $this->del_blacklist($name, $info[1]);
-        }
-        else {
+        } else {
             return $this->get_blacklist($name);
         }
     }
 
-
     /*
     Get Blacklist
     */
-    function get_blacklist($name)
+    public function get_blacklist($name)
     {
         if ($this->bot->guildbot) {
             $title = "Guild";
-        }
-        else {
+        } else {
             $title = "<botname>";
         }
         $inside = "##blob_title##:::: " . $title . " Blacklist ::::##end##\n\n";
@@ -117,8 +110,7 @@ class Blacklist extends BaseActiveModule
                 unset($tmp);
                 if ($val['expire'] == 0) {
                     $expire_string = "Never";
-                }
-                else {
+                } else {
                     $expire_string = gmdate(
                         $this->bot->core("settings")
                             ->get("Time", "FormatString"), $val['expire']
@@ -127,20 +119,19 @@ class Blacklist extends BaseActiveModule
                 $inside
                     .= "##blob_text##" . $val['name'] . " - Set by: ##red##" . $note['author'] . "##end## Reason: " . $note['note'] . " Expires: " . $expire_string . "##end##\n";
             }
-        }
-        else // Nobody on Blacklist.
-        {
+        } else { // Nobody on Blacklist.
+
             return "Blacklist is empty.";
         }
+
         return $title . " Blacklist :: " . $this->bot->core("tools")
             ->make_blob("click to view", $inside);
     }
 
-
     /*
     Sets new name on blacklist
     */
-    function set_blacklist($source, $target, $reason, $expire = 0)
+    public function set_blacklist($source, $target, $reason, $expire = 0)
     {
         $source = ucfirst(strtolower($source));
         $target = ucfirst(strtolower($target));
@@ -163,22 +154,20 @@ class Blacklist extends BaseActiveModule
                 $this->bot->db->query($sql);
                 $this->bot->core("security")
                     ->set_ban($source, $target, "Blacklisted by " . $source);
+
                 return $target . " has been added to blacklist.";
-            }
-            else {
+            } else {
                 return "Your access level must be LEADER or higher to do this.";
             }
-        }
-        else {
+        } else {
             return "There isn't any person named " . $target . " registered on this server!";
         }
     }
 
-
     /*
     Removes name from blacklist
     */
-    function del_blacklist($admin, $target)
+    public function del_blacklist($admin, $target)
     {
         if ($this->bot->core("security")->is_banned($target)) {
             if ($this->bot->core("security")->check_access($admin, "LEADER")) {
@@ -188,22 +177,20 @@ class Blacklist extends BaseActiveModule
                 $sql = "DELETE FROM #___blacklist WHERE name = '" . $target . "'";
                 $this->bot->db->query($sql);
                 $this->bot->core("security")->rem_ban($admin, $target);
+
                 return $target . " has been removed from blacklist.";
-            }
-            else {
+            } else {
                 return "Your access level must be LEADER or higher to do this.";
             }
-        }
-        else {
+        } else {
             return $target . " is not active on the blacklist.";
         }
     }
 
-
     /*
     Clean Blacklist
     */
-    function clean_blacklist()
+    public function clean_blacklist()
     { // Start function clean_blacklist()
         $sql = "SELECT * FROM #___blacklist WHERE expire > 0 AND expire < " . time();
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
@@ -218,11 +205,10 @@ class Blacklist extends BaseActiveModule
         }
     }
 
-
     /*
     Table Update.
     */
-    function table_update()
+    public function table_update()
     {
         $this->bot->core("settings")
             ->create("Blacklist", "table_version", 0, "Table version for Blacklist database table", NULL, TRUE, 99);
@@ -243,5 +229,3 @@ class Blacklist extends BaseActiveModule
         }
     }
 }
-
-?>

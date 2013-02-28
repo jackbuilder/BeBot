@@ -54,9 +54,9 @@ class City extends BaseActiveModule
             girder (duskmetal), slab (basalt), frame (oak), grand facade (gold)
 
     */
-    var $buildtimer = 0;
-    var $buildid = 0;
-    var $stock
+    public $buildtimer = 0;
+    public $buildid = 0;
+    public $stock
         = array(
             0,
             0,
@@ -72,7 +72,7 @@ class City extends BaseActiveModule
             0,
             0
         );
-    var $progress
+    public $progress
         = array(
             0,
             0,
@@ -126,7 +126,7 @@ class City extends BaseActiveModule
             0,
             0
         );
-    var $max
+    public $max
         = array(
             'LacheishEast' => array(
                 1,
@@ -553,7 +553,7 @@ class City extends BaseActiveModule
                 0
             )
         );
-    var $sequence
+    public $sequence
         = array(
             -1,
             0,
@@ -607,7 +607,7 @@ class City extends BaseActiveModule
             42,
             43
         );
-    var $names
+    public $names
         = array(
             'Keep I',
             'Trade Post I',
@@ -661,7 +661,7 @@ class City extends BaseActiveModule
             'Ending Tower III',
             'Corner Tower III'
         );
-    var $resources
+    public $resources
         = array(
             array(
                 10,
@@ -1438,7 +1438,7 @@ class City extends BaseActiveModule
                 249
             )
         );
-    var $bonuslist
+    public $bonuslist
         = array(
             "Max Health, based on level",
             "Trader NPC in Guild City",
@@ -1492,7 +1492,7 @@ class City extends BaseActiveModule
             "",
             ""
         );
-    var $gathernames
+    public $gathernames
         = array(
             "Copper",
             "Sandstone",
@@ -1508,7 +1508,7 @@ class City extends BaseActiveModule
             "Gold",
             "Coins"
         );
-    var $refinednames
+    public $refinednames
         = array(
             "Brace",
             "Brick",
@@ -1525,27 +1525,24 @@ class City extends BaseActiveModule
             "Coins"
         );
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("city", "true") . "(
-				`key` VARCHAR(32) NOT NULL PRIMARY KEY,
-				`vark` VARCHAR(255))"
+                `key` VARCHAR(32) NOT NULL PRIMARY KEY,
+                `vark` VARCHAR(255))"
         );
         $result = $this->bot->db->select("SELECT `vark` FROM #___city WHERE `key` = 'progress'");
         if (!empty($result)) {
             $this->progress = explode(",", $result[0][0]);
-        }
-        else {
+        } else {
             $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
         }
         $result = $this->bot->db->select("SELECT `vark` FROM #___city WHERE `key` = 'stock'");
         if (!empty($result)) {
             $this->stock = explode(",", $result[0][0]);
-        }
-        else {
+        } else {
             $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')");
         }
         $this->help['description'] = 'Tracks guild city progression and resources management';
@@ -1581,8 +1578,7 @@ class City extends BaseActiveModule
         // $this -> bot -> core("settings") -> get("City", "Show All Buildings")
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $vars = explode(' ', strtolower($msg));
         switch ($vars[0]) {
@@ -1616,6 +1612,7 @@ class City extends BaseActiveModule
                     }
                     $m .= $vars[$i];
                 }
+
                 return $this->setmaterial($m, $vars[$c - 1]);
                 break;
             default:
@@ -1626,11 +1623,11 @@ class City extends BaseActiveModule
             return "Error: City.php was given an unsupported command.";
             break;
         }
+
         return false;
     }
 
-
-    function status()
+    public function status()
     {
         //create bubble on complete city status'
         $status = $this->bot->core("colors")
@@ -1643,8 +1640,7 @@ class City extends BaseActiveModule
                 ->core("tools")
                 ->chatcmd("city help Resources", "help") . "]\n  "
             );
-        }
-        else {
+        } else {
             $status .= $this->bot->core("colors")
                 ->colorize("city_titles", "Guild Bank\n  ");
         }
@@ -1675,8 +1671,7 @@ class City extends BaseActiveModule
                 ->core("tools")
                 ->chatcmd("city help Third Tier Buildings", "help") . "]\n"
             );
-        }
-        else {
+        } else {
             $t1block = $this->bot->core("colors")
                 ->colorize("city_titles", " First Tier Buildings\n");
             $t2block = $this->bot->core("colors")
@@ -1883,8 +1878,7 @@ class City extends BaseActiveModule
                 ->core("tools")
                 ->chatcmd("city help Third Tier Walls", "help") . "]\n"
             );
-        }
-        else {
+        } else {
             $w1block = $this->bot->core("colors")
                 ->colorize("city_titles", " First Tier Walls\n");
             $w2block = $this->bot->core("colors")
@@ -2066,12 +2060,13 @@ class City extends BaseActiveModule
             $status .= $w3status;
         }
         $status .= "\n";
+
         return $this->bot->core("tools")
             ->make_blob("City Progression and Resource Data", $status);
     }
 
 
-    function help($topic)
+    public function help($topic)
     {
         $topic = ucwords(strtolower($topic));
         //build bubble explaining how resources make building parts and city progression
@@ -2079,8 +2074,7 @@ class City extends BaseActiveModule
             $topic = "Content";
             $guide = $this->bot->core("colors")
                 ->colorize("city_titles", "<center>City Building Guide</center>\n\n");
-        }
-        else {
+        } else {
             $guide = $this->bot->core("colors")
                 ->colorize("city_titles", "<center>City Building Guide: $topic</center>\n\n");
             $guide .= "[" . $this->bot->core("tools")
@@ -2195,12 +2189,13 @@ class City extends BaseActiveModule
         default:
             return "No guide on '$topic'";
         }
+
         return $this->bot->core("tools")
             ->make_blob("City Building Guide: $topic", $guide);
     }
 
 
-    function details($id)
+    public function details($id)
     {
         if (strlen($this->names[$id]) > 1) {
             $det = $this->bot->core("colors")
@@ -2214,30 +2209,34 @@ class City extends BaseActiveModule
             if (strlen($this->bonuslist[$id]) > 1) {
                 $det .= " Benefit: " . $this->bonuslist[$id];
             }
+
             return $det;
         }
+
         return false;
     }
 
 
-    function buildnext()
+    public function buildnext()
     {
         //check progression and set next and timer, no reason to check prereqs as there is only one build order
         for ($i = 0; $i <= 29; $i++) {
             if ($this->progress[$i] == 0) {
                 $this->buildtimer = time();
                 $this->buildid = $i;
+
                 return "Preparing to build " . $this->bot->core("colors")
                     ->colorize("city_buildings", $this->names[$i]) . " using " . $this->bot
                     ->core("colors")
                     ->colorize("city_resources", $this->calcreqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
             }
         }
+
         return "City buildings are already complete!";
     }
 
 
-    function buildwall($name)
+    public function buildwall($name)
     {
         foreach ($this->names as $i => $n) {
             //check through name list to get id of wall
@@ -2255,25 +2254,23 @@ class City extends BaseActiveModule
                 ) {
                     $this->buildtimer = time();
                     $this->buildid = $i;
+
                     return "Preparing to build " . $this->bot->core("colors")
                         ->colorize("city_buildings", $this->names[$i]) . " using " . $this->bot
                         ->core("colors")
                         ->colorize("city_resources", $this->calcreqs($i)) . ". Type '!build confirm' within the next 30 seconds to build.";
-                }
-                else {
+                } else {
                     if ($this->progress[$i] == $this->max[$this->bot
                         ->core("settings")->get("City", "CityLocation")][$i]
                     ) {
                         return "All " . $this->bot->core("colors")
                             ->colorize("city_buildings", $this->names[$i]) . " have been built.";
-                    }
-                    elseif (($this->sequence[$i] == 0) || ($this->progress[$i] == 0)) {
+                    } elseif (($this->sequence[$i] == 0) || ($this->progress[$i] == 0)) {
                         return "You must build a " . $this->bot->core("colors")
                             ->colorize("city_buildings", $this->names[$this->sequence[$i]]) . " before you can build a " . $this->bot
                             ->core("colors")
                             ->colorize("city_buildings", $this->names[$i]) . ".";
-                    }
-                    else {
+                    } else {
                         return "You must build another " . $this->bot
                             ->core("colors")
                             ->colorize("city_buildings", $this->names[$this->sequence[$i]]) . " before you can build a " . $this->bot
@@ -2284,11 +2281,12 @@ class City extends BaseActiveModule
                 break;
             }
         }
+
         return "'$name' is not a valid wall type.";
     }
 
 
-    function dobuild()
+    public function dobuild()
     {
         //check timer to see if a build request was set recently, if so remove resources of building, raise progression and save to database
         if (($this->buildtimer < time()) && (($this->buildtimer + 30) > time())) {
@@ -2296,24 +2294,25 @@ class City extends BaseActiveModule
             foreach ($this->stock as $i => $q) {
                 if ($this->stock[$i] - $this->resources[$this->buildid][$i] > 0) {
                     $this->stock[$i] = $this->stock[$i] - $this->resources[$this->buildid][$i];
-                }
-                else {
+                } else {
                     $this->stock[$i] = 0;
                 }
             }
             $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('progress', '" . implode(",", $this->progress) . "')");
             $this->bot->db->query("REPLACE INTO #___city (`key`, `vark`) VALUES ('stock', '" . implode(",", $this->stock) . "')");
             $this->buildtimer = 0;
+
             return $this->bot->core("colors")
                 ->colorize("city_buildings", $this->names[$this->buildid]) . " has been built. Removed " . $this->bot
                 ->core("colors")
                 ->colorize("city_resources", $this->calcreqs($this->buildid)) . " from guild bank.";
         }
+
         return "No structure selected. Use '!build next' or '!build wall <name>' to start building.";
     }
 
 
-    function setmaterial($name, $qty)
+    public function setmaterial($name, $qty)
     {
         //update arrays and database with new quantiy
         $mat = ucwords(strtolower($name));
@@ -2339,16 +2338,14 @@ class City extends BaseActiveModule
                         ->colorize("city_resources", $this->refinednames[$i]) . " has been set to " . $this->bot
                         ->core("colors")
                         ->colorize("city_resources", $this->moneyformat($qty)) . ".";
-                }
-                elseif ($this->bot->core("settings")
+                } elseif ($this->bot->core("settings")
                     ->get("City", "UseRefinedNames")
                 ) {
                     return "Stock for " . $this->bot->core("colors")
                         ->colorize("city_resources", $this->refinednames[$i]) . " has been set to " . $this->bot
                         ->core("colors")
                         ->colorize("city_resources", $qty) . ".";
-                }
-                else {
+                } else {
                     return "Stock for " . $this->bot->core("colors")
                         ->colorize("city_resources", $this->gathernames[$i]) . " has been set to " . $this->bot
                         ->core("colors")
@@ -2357,22 +2354,22 @@ class City extends BaseActiveModule
                 break;
             }
         }
+
         return "Error: Unknown building material '$name'.";
     }
 
 
-    function calcreqs($id)
+    public function calcreqs($id)
     {
         if (is_array($this->resources[$id])) {
             return $this->reqs($this->resources[$id]);
-        }
-        else {
+        } else {
             return "Invalid building type to calculate requirements.";
         }
     }
 
 
-    function reqs($array, $userefinednames = "default", $showzeros = false)
+    public function reqs($array, $userefinednames = "default", $showzeros = false)
     {
         if (is_array($array)) {
             $reqs = "";
@@ -2384,34 +2381,31 @@ class City extends BaseActiveModule
                     if (!is_bool($userefinednames)) {
                         $refnames = $this->bot->core("settings")
                             ->get("City", "UseRefinedNames");
-                    }
-                    else {
+                    } else {
                         $refnames = $userefinednames;
                     }
                     if ($refnames || $i == 12) {
                         $reqs .= $q . " " . $this->refinednames[$i] . ", ";
-                    }
-                    else {
+                    } else {
                         $reqs .= $q * 10 . " " . $this->gathernames[$i] . ", ";
                     }
                 }
             }
+
             return substr($reqs, 0, -2);
-        }
-        else {
+        } else {
             return "Invalid data to generate requirements.";
         }
     }
 
 
-    function moneyformat($c)
+    public function moneyformat($c)
     {
         if ($c >= 100) {
             $m .= floor($c / 100) . "G ";
         }
         $m .= round(substr($c, -2)) . "S";
+
         return $m;
     }
 }
-
-?>

@@ -47,16 +47,15 @@ $chuck = new Chuck($bot);
   */
 class Chuck extends BaseActiveModule
 {
-    var $bot;
-    var $chuck;
-    var $returnstr;
-
+    public $bot;
+    public $chuck;
+    public $returnstr;
 
     /*
       Constructor:
         Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "chuck", "MEMBER");
@@ -64,32 +63,30 @@ class Chuck extends BaseActiveModule
         $this->help['command']['beer'] = "Pwnzors you!";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $output = "";
         if (preg_match("/^chuck$/i", $msg, $info)) {
             $output = $this->get_chuck($name);
         }
+
         return $output;
     }
-
 
     /*
       This gets called on a msg in the guildchat with the command
     */
-    function irc($name, $msg)
+    public function irc($name, $msg)
     {
         $returnstr = $this->get_chuck($name);
         $this->bot->send_gc($returnstr);
         $this->bot->send_irc("", "", "3" . $returnstr);
     }
 
-
     /*
       Build response
     */
-    function get_chuck($name)
+    public function get_chuck($name)
     {
         $chuck = array(
             "Guns don't kill people. Chuck Norris kills People.",
@@ -689,8 +686,7 @@ class Chuck extends BaseActiveModule
         $returnstr = str_replace("*name*", $name, $returnstr);
         $returnstr = str_replace("*dmg*", $dmg, $returnstr);
         $returnstr = str_replace("*creds*", $dmg, $returnstr);
+
         return $returnstr;
     }
 }
-
-?>

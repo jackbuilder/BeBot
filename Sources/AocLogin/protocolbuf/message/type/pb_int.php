@@ -4,8 +4,7 @@
  */
 class PBInt extends PBScalar
 {
-    var $wired_type = PBMessage::WIRED_VARINT;
-
+    public $wired_type = PBMessage::WIRED_VARINT;
 
     /**
      * Parses the message for this type
@@ -16,7 +15,6 @@ class PBInt extends PBScalar
     {
         $this->value = $this->reader->next();
     }
-
 
     /**
      * Serializes type
@@ -34,9 +32,6 @@ class PBInt extends PBScalar
         $string .= $value;
 
         //parent::hexdump("PBInt", $string, strlen($string) );
-
         return $string;
     }
 }
-
-?>

@@ -42,7 +42,7 @@ class About extends BaseActiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         //Sed default access control levels
@@ -52,11 +52,10 @@ class About extends BaseActiveModule
         $this->help['command']['about'] = "See description";
     }
 
-
     /*
     Unified message handler
     */
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $return = FALSE;
         /*
@@ -73,11 +72,10 @@ class About extends BaseActiveModule
         }
     }
 
-
     /*
     Makes the about-blob
     */
-    function about_blob()
+    public function about_blob()
     {
         $version = BOT_VERSION_NAME . " v." . BOT_VERSION;
         $inside .= "##blob_text##Bot Client:##end##\n";
@@ -111,8 +109,7 @@ class About extends BaseActiveModule
             ->chatcmd("http://bugs.launchpad.net/bebot", "BeBot bugtracker", "start") . "\n";
         $return = "$version ::: " . $this->bot->core("tools")
             ->make_blob('More details', $inside);
+
         return $return;
     }
 }
-
-?>

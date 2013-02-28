@@ -7,7 +7,6 @@ class Endpoints
     private $m_Instance;
     private $m_Token;
 
-
     public function Endpoints($type, $name, $instance, $token)
     {
         $this->m_Name = $name;
@@ -15,7 +14,6 @@ class Endpoints
         $this->m_Instance = $instance;
         $this->m_Token = $token;
     }
-
 
     /// GetName
     /// Returns the name of the endpoint. This is used in the normal
@@ -27,7 +25,6 @@ class Endpoints
         return $this->m_Name;
     }
 
-
     /// GetType
     /// Returns the type of the endpoint. This is used in the protobuf
     /// protocol only.
@@ -38,7 +35,6 @@ class Endpoints
         return $this->m_Type;
     }
 
-
     /// GetInstance
     /// Returns the instance of the endpoint.
     /// @return uint32 [return] instance of the endpoint
@@ -47,7 +43,6 @@ class Endpoints
     {
         return $this->m_Instance;
     }
-
 
     /// GetToken
     /// Returns the token of the endpoint.
@@ -59,5 +54,3 @@ class Endpoints
     }
 
 }
-
-?>

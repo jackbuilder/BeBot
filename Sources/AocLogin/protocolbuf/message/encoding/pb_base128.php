@@ -8,8 +8,7 @@
 class base128varint
 {
     // modus for output
-    var $modus = 1;
-
+    public $modus = 1;
 
     /**
      * @param int $modus - 1=Byte 2=String
@@ -18,7 +17,6 @@ class base128varint
     {
         $this->modus = $modus;
     }
-
 
     /**
      * @param $number - number as decimal
@@ -35,6 +33,7 @@ class base128varint
             if ($this->modus == 1) {
                 return $this->hex_to_str($hexstring);
             }
+
             return $hexstring;
         }
 
@@ -67,7 +66,6 @@ class base128varint
         return $hexstring;
     }
 
-
     /**
      * Returns the dec value of an base128
      *
@@ -91,7 +89,6 @@ class base128varint
         return bindec($valuestring);
     }
 
-
     /**
      * Converts hex 2 ascii
      *
@@ -104,9 +101,8 @@ class base128varint
         for ($i = 0; $i < strlen($hex); $i += 2) {
             $str .= chr(hexdec(substr($hex, $i, 2)));
         }
+
         return $str;
     }
 
 }
-
-?>

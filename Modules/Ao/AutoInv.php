@@ -42,7 +42,7 @@ class AutoInv extends BaseActiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->core("settings")
@@ -60,8 +60,7 @@ class AutoInv extends BaseActiveModule
         $this->help['notes'] = 'You can also change your status by using preferences.';
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $com = $this->parse_com(
             $msg, array(
@@ -84,32 +83,30 @@ class AutoInv extends BaseActiveModule
         }
     }
 
-
-    function get_status($name)
+    public function get_status($name)
     {
         return ($this->bot->core('prefs')
             ->get($name, 'AutoInv', 'receive_auto_invite'));
     }
 
-
-    function enable_invite($name)
+    public function enable_invite($name)
     {
         $this->bot->core('prefs')
             ->change($name, 'AutoInv', 'receive_auto_invite', 'On');
+
         return ('Autoinvite has been enabled');
     }
 
-
-    function disable_invite($name)
+    public function disable_invite($name)
     {
         $this->bot->core('prefs')
             ->change($name, 'AutoInv', 'receive_auto_invite', 'Off');
+
         return ('Autoinvite has been disabled');
     }
 
-
     // Compare the user level of $name with the setting for who should be autoinvited
-    function check_access($name)
+    public function check_access($name)
     {
         $userlevel = $this->bot->db->select("SELECT user_level FROM #___users WHERE nickname = '$name'", MYSQL_ASSOC);
         if (empty($userlevel)) {
@@ -146,14 +143,13 @@ class AutoInv extends BaseActiveModule
             }
             break;
         }
+
         return FALSE;
     }
 
-
-    function notify($user, $startup = FALSE)
+    public function notify($user, $startup = FALSE)
     {
-        if ($startup) // dont invite because of a bot restart, they will get invited if they were in PG before restart anyway
-        {
+        if ($startup) { // dont invite because of a bot restart, they will get invited if they were in PG before restart anyway
             Return;
         }
         if ($this->bot->core("settings")->get("Autoinv", "Activated")) {
@@ -177,5 +173,3 @@ class AutoInv extends BaseActiveModule
         }
     }
 }
-
-?>

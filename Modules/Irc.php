@@ -34,26 +34,25 @@
 /*
 Add a "_" at the beginning of the file (_IRC.php) if you do not want it to be loaded.
 */
-include_once ('Sources/SmartIRC.php');
+include_once 'Sources/SmartIRC.php';
 $irc = new IRC($bot);
 /*
 The Class itself...
 */
-class IRC extends BaseActiveModule
+class Irc extends BaseActiveModule
 {
-    var $bot;
-    var $last_log;
-    var $is;
-    var $whois;
-    var $target;
-    var $irc;
-
+    public $bot;
+    public $last_log;
+    public $is;
+    public $whois;
+    public $target;
+    public $irc;
 
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("irc");
@@ -77,8 +76,7 @@ class IRC extends BaseActiveModule
             $pgroupprefix = "[" . $this->bot->guildname . "'s Guestchannel]";
             $chatgroups = "gc";
             $announcewhat = "buddies";
-        }
-        else {
+        } else {
             $guildprefix = "[]";
             $pgroupprefix = "[" . $this->bot->botname . "]";
             $chatgroups = "pgroup";
@@ -138,8 +136,7 @@ class IRC extends BaseActiveModule
         $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . " - IRC'");
     }
 
-
-    function command_handler($name, $msg, $source)
+    public function command_handler($name, $msg, $source)
     {
         $com = $this->parse_com($msg);
         switch (strtolower($com['com'])) {
@@ -198,8 +195,7 @@ class IRC extends BaseActiveModule
         }
     }
 
-
-    function strip_formatting($msg)
+    public function strip_formatting($msg)
     {
         if (strtolower(
             $this->bot->core("settings")
@@ -207,8 +203,7 @@ class IRC extends BaseActiveModule
         ) == "auno"
         ) {
             $rep = "http://auno.org/ao/db.php?id=\\1&id2=\\2&ql=\\3";
-        }
-        else {
+        } else {
             $rep = "http://aomainframe.net/showitem.asp?LowID=\\1&HiID=\\2&QL=\\3";
         }
         $msg = preg_replace(
@@ -223,11 +218,11 @@ class IRC extends BaseActiveModule
         $msg = preg_replace("/<\/a>/iU", "[/link]", $msg);
         $msg = preg_replace("/<font(.+)>/iU", "", $msg);
         $msg = preg_replace("/<\/font>/iU", "", $msg);
+
         return $msg;
     }
 
-
-    function send_irc($prefix, $name, $msg)
+    public function send_irc($prefix, $name, $msg)
     {
         if (!$this->bot->core("settings")->get("irc", "connected")) {
             return FALSE;
@@ -252,14 +247,14 @@ class IRC extends BaseActiveModule
             SMARTIRC_TYPE_CHANNEL, $this->bot->core("settings")
                 ->get("Irc", "Channel"), $ircmsg
         );
+
         return TRUE;
     }
-
 
     /*
     This gets called on a msg in the group
     */
-    function gmsg($name, $group, $msg)
+    public function gmsg($name, $group, $msg)
     {
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
@@ -287,8 +282,7 @@ class IRC extends BaseActiveModule
                             $msg2 = "IRC Spam Detected, Disconnecting IRC";
                         }
                         $this->spam[0][2] = 0;
-                    }
-                    else {
+                    } else {
                         $this->spam[0][2]++;
                     }
                     $this->bot->send_gc($msg2);
@@ -297,11 +291,10 @@ class IRC extends BaseActiveModule
         }
     }
 
-
     /*
     This gets called on a msg in the privgroup without a command
     */
-    function privgroup($name, $msg)
+    public function privgroup($name, $msg)
     {
         $msg = str_replace("&gt;", ">", $msg);
         $msg = str_replace("&lt;", "<", $msg);
@@ -329,22 +322,21 @@ class IRC extends BaseActiveModule
                             $msg2 = "IRC Spam Detected, Turning Off AutoReconnect";
                         }
                         $this->spam[0][3] = 0;
-                    }
-                    else {
+                    } else {
                         $this->spam[0][3]++;
                     }
                     $this->bot->send_pgroup($msg2);
                 }
+
                 return;
             }
         }
     }
 
-
     /*
     This gets called on cron
     */
-    function cron()
+    public function cron()
     {
         if (($this->irc != NULL) && (!$this->irc->_rawreceive())) {
             $this->irc_disconnect();
@@ -356,8 +348,7 @@ class IRC extends BaseActiveModule
                     $this->bot->send_gc("IRC Spam Detected, Turning Off AutoReconnect");
                 }
                 $this->spam[0][1] = 0;
-            }
-            else {
+            } else {
                 $this->spam[0][1]++;
             }
             if ($this->bot->core("settings")->get("Irc", "Reconnect")) {
@@ -366,11 +357,10 @@ class IRC extends BaseActiveModule
         }
     }
 
-
     /*
     This gets when bot connects
     */
-    function connect()
+    public function connect()
     {
         if ($this->bot->core("settings")->get("Irc", "Reconnect")) {
             $res = $this->bot->core("timer")->list_timed_events("IRC");
@@ -384,30 +374,27 @@ class IRC extends BaseActiveModule
         }
     }
 
-
-    function timer($name, $prefix, $suffix, $delay)
+    public function timer($name, $prefix, $suffix, $delay)
     {
         if ($name == "IRC-Connect") {
             $this->irc_connect("c");
         }
     }
 
-
     /*
     This gets called when bot disconnects
     */
-    function disconnect()
+    public function disconnect()
     {
         if ($this->bot->core("settings")->get("irc", "connected")) {
             $this->irc_disconnect();
         }
     }
 
-
     /*
     This gets called if a buddy logs on/off
     */
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
         if ($msg == 1 || $msg == 0) {
             // Only handle this if connected to IRC server
@@ -421,14 +408,12 @@ class IRC extends BaseActiveModule
             ) {
                 if ($msg == 1) {
                     $msg = $name . " is online.";
-                }
-                else {
+                } else {
                     $msg = $name . " is offline.";
                 }
                 $this->irc->message(SMARTIRC_TYPE_CHANNEL, $this->is[$name], $msg);
                 unset($this->is[$name]);
-            }
-            else {
+            } else {
                 if ((!$this->bot->core("notify")
                     ->check($name))
                     && isset($this->whois[$name])
@@ -441,8 +426,7 @@ class IRC extends BaseActiveModule
         }
     }
 
-
-    function pgjoin($name)
+    public function pgjoin($name)
     {
         // Only handle this if connected to IRC server
         if (!$this->bot->core("settings")->get("irc", "connected")) {
@@ -464,8 +448,7 @@ class IRC extends BaseActiveModule
         }
     }
 
-
-    function pgleave($name)
+    public function pgleave($name)
     {
         // Only handle this if connected to IRC server
         if (!$this->bot->core("settings")->get("irc", "connected")) {
@@ -487,41 +470,36 @@ class IRC extends BaseActiveModule
         }
     }
 
-
     /*
     * Change server to connect to
     */
-    function change_server($new)
+    public function change_server($new)
     {
         $this->bot->core("settings")->save("Irc", "Server", $new);
         if ($this->irc == NULL) {
             return "Server has been changed to ##highlight##$new##end##.";
-        }
-        else {
+        } else {
             return "Server has been changed to ##highlight##$new##end##. You must reconnect to the IRC server.";
         }
     }
 
-
     /*
     * Change port to connect to
     */
-    function change_port($new)
+    public function change_port($new)
     {
         $this->bot->core("settings")->save("Irc", "Port", $new);
         if ($this->irc == NULL) {
             return "Port has been changed to ##highlight##$new##end##.";
-        }
-        else {
+        } else {
             return "Port has been changed to ##highlight##$new##end##. You must reconnect to the IRC server.";
         }
     }
 
-
     /*
     * Change channel to connect to
     */
-    function change_chan($new)
+    public function change_chan($new)
     {
         //Make sure the channel has a leading #
         if (substr($new, 0, 1) !== '#') {
@@ -530,84 +508,79 @@ class IRC extends BaseActiveModule
         $this->bot->core("settings")->save("Irc", "Channel", $new);
         if ($this->irc == NULL) {
             return "Channel has been changed to ##highlight##$new##end##.";
-        }
-        else {
+        } else {
             return "Channel has been changed to ##highlight##$new##end##. You must reconnect to the IRC server.";
         }
     }
 
-
     /*
     * Change channel key for the channel
     */
-    function change_chankey($new)
+    public function change_chankey($new)
     {
         $this->bot->core("settings")->save("Irc", "Channelkey", $new);
+
         return "Channelkey has been changed.";
     }
-
 
     /*
     * Change channel to connect to
     */
-    function change_nick($new)
+    public function change_nick($new)
     {
         $this->bot->core("settings")->save("Irc", "Nick", $new);
         if ($this->irc == NULL) {
             return "Nick has been changed to ##highlight##$new##end##.";
-        }
-        else {
+        } else {
             return "Nick has been changed to ##highlight##$new##end##. You must reconnect to the IRC server.";
         }
     }
 
-
     /*
     * Change guildprefix
     */
-    function change_guildprefix($new)
+    public function change_guildprefix($new)
     {
         if ($new == "\"\"") {
             $new = "";
         }
         $this->bot->core("settings")->save("Irc", "Guildprefix", $new);
+
         return "Guild prefix has been changed.";
     }
-
 
     /*
     * Change ircprefix
     */
-    function change_ircprefix($new)
+    public function change_ircprefix($new)
     {
         if ($new == "\"\"") {
             $new = "";
         }
         $this->bot->core("settings")->save("Irc", "Ircguildprefix", $new);
+
         return "IRC prefix has been changed.";
     }
-
 
     /*
     * Change announce
     */
-    function change_announce($new)
+    public function change_announce($new)
     {
         if (strtolower($new) == "on") {
             $tmp = TRUE;
-        }
-        else {
+        } else {
             $tmp = FALSE;
         }
         $this->bot->core("settings")->save("Irc", "Announce", $tmp);
+
         return "Announce has been switched " . $new . ".";
     }
-
 
     /*
     * Change reconnect
     */
-    function change_reconnect($new)
+    public function change_reconnect($new)
     {
         $tmp = 0;
         $stmp = FALSE;
@@ -619,49 +592,49 @@ class IRC extends BaseActiveModule
         if ($this->irc != NULL) {
             $this->irc->setAutoReconnect($tmp);
         }
+
         return "Reconnect has been switched " . $new . ".";
     }
-
 
     /*
     * Change guildprefix
     */
-    function change_relayguildname($new)
+    public function change_relayguildname($new)
     {
         $this->bot->core("settings")->save("Irc", "Relayguildname", $new);
+
         return "Guildname for GC-Relay has been changed.";
     }
-
 
     /*
     * Change itemref
     */
-    function change_itemref($new)
+    public function change_itemref($new)
     {
         $tmp = "AOMainframe";
         if (strtolower($new) == "auno") {
             $tmp = "AUNO";
         }
         $this->bot->core("settings")->save("Irc", "Itemref", $tmp);
+
         return "Itemref has been switched to " . $new . ".";
     }
-
 
     /*
     * Change chat
     */
-    function change_chat($new)
+    public function change_chat($new)
     {
         $tmp = strtolower($new);
         $this->bot->core("settings")->save("Irc", "Chat", $tmp);
+
         return "Chat has been switched to " . $new . ".";
     }
-
 
     /*
     * Connect(!!!)
     */
-    function irc_connect($name = "")
+    public function irc_connect($name = "")
     {
         $server = $this->bot->core('settings')->get('Irc', 'Server');
         $channel = $this->bot->core('settings')->get('Irc', 'Channel');
@@ -669,14 +642,17 @@ class IRC extends BaseActiveModule
         //Sanity check some values.
         if (empty($server)) {
             $this->error->set("An IRC server was not defined. Please see <pre>settings irc");
+
             return $this->error;
         }
         if ((empty($channel)) || ($channel === '#')) {
             $this->error->set("An IRC channel was not defined. Please see <pre>settings irc");
+
             return $this->error;
         }
         if (empty($nick)) {
             $this->error->set("A Nickname was not defined. Please see <pre>settings irc");
+
             return $this->error;
         }
         //Make sure that the channel name is prefixed with a '#'
@@ -689,8 +665,7 @@ class IRC extends BaseActiveModule
                 $name, "Connecting to IRC server: " . $this->bot
                 ->core("settings")->get("Irc", "Server")
             );
-        }
-        else {
+        } else {
             if ($name == "") {
                 $this->bot->send_gc(
                     "Connecting to IRC server: " . $this->bot
@@ -747,14 +722,14 @@ class IRC extends BaseActiveModule
         $this->register_event("cron", "1sec");
         $this->bot->core("settings")->save("irc", "connected", TRUE);
         $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . " - IRC'");
+
         return "Done connecting...";
     }
-
 
     /*
     * Disconnect(!!!)
     */
-    function irc_disconnect()
+    public function irc_disconnect()
     {
         if ($this->irc != NULL) {
             $this->irc->disconnect();
@@ -762,18 +737,17 @@ class IRC extends BaseActiveModule
             $this->unregister_event("cron", "1sec");
             $this->bot->core("settings")->save("irc", "connected", FALSE);
             $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE botname = '" . $this->bot->botname . " - IRC'");
+
             return "Disconnected from IRC server.";
-        }
-        else {
+        } else {
             return "IRC already disconnected.";
         }
     }
 
-
     /*
     * Gets called for an inc IRC message
     */
-    function irc_receive(&$irc, &$data)
+    public function irc_receive(&$irc, &$data)
     {
         if ((strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'online')))
             && (strtolower($data->message) != strtolower(str_replace("\\", "", $this->bot->commpre . 'is')))
@@ -793,8 +767,7 @@ class IRC extends BaseActiveModule
             // Check if it's relayed chat of another bot
             if (preg_match("/" . chr(2) . chr(2) . chr(2) . "(.+)" . chr(2) . "(.+)/i", $msg, $info)) {
                 $txt = "##irc_group##" . $info[1] . "##end## ##irc_text##" . $info[2] . "##end##";
-            }
-            else {
+            } else {
                 $txt = "##irc_group##" . $this->bot->core("settings")
                     ->get("Irc", "Guildprefix") . "##end## ##irc_user##" . $data->nick . ":##end####irc_text## " . $msg . "##end##";
             }
@@ -821,7 +794,7 @@ class IRC extends BaseActiveModule
     /*
     * Gets called when someone joins IRC chan
     */
-    function irc_join(&$irc, &$data)
+    public function irc_join(&$irc, &$data)
     {
         if (($data->nick != $this->bot->core("settings")
             ->get("Irc", "Nick"))
@@ -861,7 +834,7 @@ class IRC extends BaseActiveModule
     /*
     * Gets called when someone leaves IRC chan
     */
-    function irc_part(&$irc, &$data)
+    public function irc_part(&$irc, &$data)
     {
         if (($data->nick != $this->bot->core("settings")
             ->get("Irc", "Nick"))
@@ -899,37 +872,31 @@ class IRC extends BaseActiveModule
     /*
     * Gets called when someone does !is
     */
-    function irc_is(&$irc, &$data)
+    public function irc_is(&$irc, &$data)
     {
         if ($data->type == SMARTIRC_TYPE_QUERY) {
             $target = $data->nick;
-        }
-        else {
+        } else {
             $target = $this->bot->core("settings")->get("Irc", "Channel");
         }
         if (!preg_match("/^" . $this->bot->commpre . "is ([a-zA-Z0-9]{4,25})$/i", $data->message, $info)) {
             $msg = "Please enter a valid name.";
-        }
-        else {
+        } else {
             $info[1] = ucfirst(strtolower($info[1]));
             $msg = "";
             if (!$this->bot->core('player')->id($info[1])) {
                 $msg = "Player " . $info[1] . " does not exist.";
-            }
-            else {
+            } else {
                 if ($info[1] == ucfirst(strtolower($this->bot->botname))) {
                     $msg = "I'm online!";
-                }
-                else {
+                } else {
                     if ($this->bot->core("chat")->buddy_exists($info[1])) {
                         if ($this->bot->core("chat")->buddy_online($info[1])) {
                             $msg = $info[1] . " is online.";
-                        }
-                        else {
+                        } else {
                             $msg = $info[1] . " is offline.";
                         }
-                    }
-                    else {
+                    } else {
                         $this->is[$info[1]] = $target;
                         $this->bot->core("chat")->buddy_add($info[1]);
                     }
@@ -945,18 +912,16 @@ class IRC extends BaseActiveModule
     /*
     * Gets called when someone does !uid
     */
-    function irc_uid(&$irc, &$data)
+    public function irc_uid(&$irc, &$data)
     {
         if ($data->type == SMARTIRC_TYPE_QUERY) {
             $target = $data->nick;
-        }
-        else {
+        } else {
             $target = $this->bot->core("settings")->get("Irc", "Channel");
         }
         if (!preg_match("/^" . $this->bot->commpre . "uid ([a-zA-Z0-9]{4,25})$/i", $data->message, $info)) {
             $msg = "Please enter a valid name.";
-        }
-        else {
+        } else {
             $info[1] = ucfirst(strtolower($info[1]));
             $msg = $info[1] . ": " . $this->bot->core('player')
                 ->id($info[1]);
@@ -970,12 +935,11 @@ class IRC extends BaseActiveModule
     /*
     * Gets called when someone does !online
     */
-    function irc_online(&$irc, &$data)
+    public function irc_online(&$irc, &$data)
     {
         if ($data->type == SMARTIRC_TYPE_QUERY) {
             $target = $data->nick;
-        }
-        else {
+        } else {
             $target = $this->bot->core("settings")->get("Irc", "Channel");
         }
         $channels = "";
@@ -985,15 +949,13 @@ class IRC extends BaseActiveModule
         ) == "both"
         ) {
             $channels = "(status_pg = 1 OR status_gc = 1)";
-        }
-        elseif (strtolower(
+        } elseif (strtolower(
             $this->bot->core("settings")
                 ->get("Irc", "Chat")
         ) == "gc"
         ) {
             $channels = "status_gc = 1";
-        }
-        elseif (strtolower(
+        } elseif (strtolower(
             $this->bot->core("settings")
                 ->get("Irc", "Chat")
         ) == "pgroup"
@@ -1007,8 +969,7 @@ class IRC extends BaseActiveModule
         );
         if (empty($online)) {
             $msg = "Nobody online on notify!";
-        }
-        else {
+        } else {
             $msg = count($online) . " players online: ";
             $msgs = array();
             foreach ($online as $name) {
@@ -1020,7 +981,7 @@ class IRC extends BaseActiveModule
     }
 
 
-    function irc_send_local($msg)
+    public function irc_send_local($msg)
     {
         if ($msg) {
             $this->irc->message(
@@ -1031,13 +992,12 @@ class IRC extends BaseActiveModule
     }
 
 
-    function whois_player($name)
+    public function whois_player($name)
     {
         $who = $this->bot->core("whois")->lookup($name);
         if (!$who) {
             $this->whois[$name] = $this->target;
-        }
-        elseif (!($who instanceof BotError)) {
+        } elseif (!($who instanceof BotError)) {
             $at = "(AT " . $who["at_id"] . " - " . $who["at"] . ") ";
             $result = "\"" . $who["nickname"] . "\"";
             if (!empty($who["firstname"]) && ($who["firstname"] != "Unknown")) {
@@ -1049,8 +1009,7 @@ class IRC extends BaseActiveModule
             if ($this->bot->game == "ao") {
                 $result .= " is a level " . $who["level"] . " " . $at . "" . $who["gender"] . " " . $who["breed"] . " ";
                 $result .= $who["profession"] . ", " . $who["faction"];
-            }
-            else {
+            } else {
                 $result .= " is a level " . $who["level"] . " ";
                 $result .= $who["class"];
             }
@@ -1067,20 +1026,18 @@ class IRC extends BaseActiveModule
                     }
                 }
             }
-        }
-        else {
+        } else {
             $result = $who;
         }
+
         return $result;
     }
 
-
-    function irc_whois(&$irc, &$data)
+    public function irc_whois(&$irc, &$data)
     {
         if ($data->type == SMARTIRC_TYPE_QUERY) {
             $target = $data->nick;
-        }
-        else {
+        } else {
             $target = $this->bot->core("settings")->get("Irc", "Channel");
         }
         $this->target = $target;
@@ -1088,12 +1045,10 @@ class IRC extends BaseActiveModule
         $info[1] = ucfirst(strtolower($info[1]));
         if (!$this->bot->core('player')->id($info[1])) {
             $msg = "Player " . $info[1] . " does not exist.";
-        }
-        else {
+        } else {
             if ($this->bot->core("chat")->buddy_exists($info[1])) {
                 $msg = $this->whois_player($info[1]);
-            }
-            else {
+            } else {
                 $this->whois[$info[1]] = $target;
                 $this->bot->core("chat")->buddy_add($info[1]);
             }
@@ -1101,8 +1056,7 @@ class IRC extends BaseActiveModule
         $this->irc->message(SMARTIRC_TYPE_CHANNEL, $target, $msg);
     }
 
-
-    function irc_nick(&$irc, &$data)
+    public function irc_nick(&$irc, &$data)
     {
         if ($data->nick != $this->bot->core("settings")->get("Irc", "Nick")) {
             unset($this->irconline[strtolower($data->nick)]);
@@ -1130,9 +1084,8 @@ class IRC extends BaseActiveModule
         $this->bot->db->query("UPDATE #___online SET nickname = '" . $data->message . "' WHERE botname = '" . $this->bot->botname . " - IRC' AND nickname = '" . $data->nick . "'");
     }
 
-
     // gets the names list on connection
-    function irc_query(&$irc, &$data)
+    public function irc_query(&$irc, &$data)
     {
         if (strcasecmp(
             $data->channel, $this->bot->core("settings")
@@ -1157,19 +1110,17 @@ class IRC extends BaseActiveModule
         }
     }
 
-
     /*
     This should show the names of everyone in the IRC Channel
     */
-    function names()
+    public function names()
     {
         if ($this->bot->core("settings")->get("irc", "connected")) {
             $names = $this->irconline;
             if (empty($names)) {
                 $msg = 'Nobody online in ##highlight##' . $this->bot
                     ->core("settings")->get("Irc", "Channel") . '##end##!';
-            }
-            else {
+            } else {
                 $msg = '##highlight##' . count($names) . '##end## users in ##highlight##' . $this->bot
                     ->core("settings")->get("Irc", "Channel") . '##end##: ';
                 foreach ($names as $name) {
@@ -1177,23 +1128,21 @@ class IRC extends BaseActiveModule
                 }
                 $msg = substr($msg, 0, -2);
             }
+
             return $msg;
-        }
-        else {
+        } else {
             return 'Not connected to IRC';
         }
     }
 
-
     /*
     Level command for irc
     */
-    function irc_level(&$irc, &$data)
+    public function irc_level(&$irc, &$data)
     {
         if ($data->type == SMARTIRC_TYPE_QUERY) {
             $target = $data->nick;
-        }
-        else {
+        } else {
             $target = $this->bot->core("settings")->get("Irc", "Channel");
         }
         $msg = explode(" ", $data->message, 2);
@@ -1204,8 +1153,7 @@ class IRC extends BaseActiveModule
         }
     }
 
-
-    function irc_receive_msg(&$irc, &$data)
+    public function irc_receive_msg(&$irc, &$data)
     {
         $msg = explode(" ", $data->message, 2);
         Switch ($msg[0]) {
@@ -1242,8 +1190,7 @@ class IRC extends BaseActiveModule
         Default:
             if ($data->type == SMARTIRC_TYPE_QUERY) {
                 $target = $data->nick;
-            }
-            else {
+            } else {
                 $target = $this->bot->core("settings")
                     ->get("Irc", "Channel");
             }
@@ -1252,5 +1199,3 @@ class IRC extends BaseActiveModule
         }
     }
 }
-
-?>

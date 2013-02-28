@@ -29,29 +29,28 @@
 /*class ConfigMagik extends BasePassiveModule*/
 class ConfigMagik
 {
-    var $PATH = NULL;
-    var $VARS = array();
-    var $SYNCHRONIZE = FALSE;
-    var $PROCESS_SECTIONS = TRUE;
-    var $PROTECTED_MODE = TRUE;
-    var $ERRORS = array();
+    public $PATH = NULL;
+    public $VARS = array();
+    public $SYNCHRONIZE = FALSE;
+    public $PROCESS_SECTIONS = TRUE;
+    public $PROTECTED_MODE = TRUE;
+    public $ERRORS = array();
     public static $instance = array();
-
 
     /**
      * @desc   Constructor of this class.
      *
-     * @param  string $path             Path to ini-file to load at startup.
+     * @param string $path Path to ini-file to load at startup.
      *                                  NOTE:   If the ini-file can not be found, it will try to generate a
      *                                  new empty one at the location indicated by path passed to
      *                                  constructor-method of this class.
-     * @param  bool   $synchronize      TRUE for constant synchronisation of memory and file (disabled by default).
-     * @param  bool   $process_sections TRUE or FALSE to enable or disable sections in your ini-file (enabled by default).
+     * @param bool $synchronize      TRUE for constant synchronisation of memory and file (disabled by default).
+     * @param bool $process_sections TRUE or FALSE to enable or disable sections in your ini-file (enabled by default).
      *
      * @return void Returns nothing, like any other constructor-method ��] .
      */
     /*	function __construct(&$bot, $path=null, $synchronize=false, $process_sections=true)*/
-    function __construct(
+    public function __construct(
         $path = NULL, $synchronize = FALSE,
         $process_sections = TRUE
     )
@@ -64,7 +63,6 @@ class ConfigMagik
         $this->create_ini($path, $synchronize, $process_sections);
     }
 
-
     public static function get_instance(
         $bothandle, $path = NULL, $synchronize = FALSE,
         $process_sections = TRUE
@@ -74,9 +72,9 @@ class ConfigMagik
             $class = __CLASS__;
             self::$instance[$bothandle] = new $class($path, $synchronize, $process_sections);
         }
+
         return self::$instance[$bothandle];
     }
-
 
     /**
      * @desc                       Attempts to create an INI file and load it. (NOT tested!)
@@ -85,7 +83,7 @@ class ConfigMagik
      * @param  synchronize      Maintain file sychronization.
      * @param  process_sections Process sections (false if there are no sections in the ini.
      */
-    function create_ini(
+    public function create_ini(
         $path = NULL, $synchronize = FALSE,
         $process_sections = TRUE
     )
@@ -109,12 +107,10 @@ class ConfigMagik
                     $err = "ConfigMagik::ConfigMagik() - Could not create new config-file('$path'), error.";
                     array_push($this->ERRORS, $err);
                     die($err);
-                }
-                else {
+                } else {
                     fclose($fp_new);
                 }
-            }
-            else {
+            } else {
                 // try to load and parse ini-file at specified path
                 $loaded = $this->load($path);
                 if (!$loaded) {
@@ -124,42 +120,37 @@ class ConfigMagik
         }
     }
 
-
     /**
      * @desc                      Retrieves the value for a given key.
      *
-     * @param  string $key     Key or name of directive to set in current config.
-     * @param  string $section Name of section to set key/value-pair therein.
+     * @param string $key     Key or name of directive to set in current config.
+     * @param string $section Name of section to set key/value-pair therein.
      *                         NOTE:                   Section must only be specified when sections are used in your ini-file.
      *
-     * @return mixed           Returns the value or NULL on failure.
+     * @return mixed Returns the value or NULL on failure.
      *                            NOTE:                   An empty directive will always return an empty string.
      *                            Only when directive can not be found, NULL is returned.
      */
-    function get($key = NULL, $section = NULL)
+    public function get($key = NULL, $section = NULL)
     {
         // if section was passed, change the PROCESS_SECTION-switch (FIX: 11/08/2004 BennyZaminga)
         if ($section) {
             $this->PROCESS_SECTIONS = TRUE;
-        }
-        else {
+        } else {
             $this->PROCESS_SECTIONS = FALSE;
         }
         // get requested value
         if ($this->PROCESS_SECTIONS) {
             if (isset($this->VARS[$section][$key])) {
                 $value = $this->VARS[$section][$key];
-            }
-            else {
+            } else {
                 if (isset($this->VARS[$key])) {
                     $value = $this->VARS[$key];
-                }
-                else {
+                } else {
                     return NULL;
                 }
             }
-        }
-        else {
+        } else {
             $value = $this->VARS[$key];
         }
         // if value was not found (false), return NULL (FIX: 11/08/2004 BennyZaminga)
@@ -170,24 +161,24 @@ class ConfigMagik
         return $value;
     }
 
-
     /**
      * @desc   Sets the value for a given key (in given section, if any specified).
      *
-     * @param  string $key     Key or name of directive to set in current config.
-     * @param  mixed  $value   Value of directive to set in current config.
-     * @param  string $section Name of section to set key/value-pair therein.
+     * @param string $key     Key or name of directive to set in current config.
+     * @param mixed  $value   Value of directive to set in current config.
+     * @param string $section Name of section to set key/value-pair therein.
      *                         NOTE:   Section must only be specified when sections are enabled in your ini-file.
      *
-     * @return bool            Returns TRUE on success, FALSE on failure.
+     * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function set($key, $value, $section = NULL)
+    public function set($key, $value, $section = NULL)
     {
         // when sections are enabled and user tries to genarate non-sectioned vars,
         // throw an error, this is definitely not allowed.
         if ($this->PROCESS_SECTIONS and !$section) {
             $err = "ConfigMagik::set() - Passed no section when in section-mode, nothing was set.";
             array_push($this->ERRORS, $err);
+
             return FALSE;
         }
         // check if section was passed
@@ -197,51 +188,53 @@ class ConfigMagik
         // set key with given value in given section (if enabled)
         if ($this->PROCESS_SECTIONS) {
             $this->VARS[$section][$key] = $value;
-        }
-        else {
+        } else {
             $this->VARS[$key] = $value;
         }
         // synchronize memory with file when enabled
         if ($this->SYNCHRONIZE) {
             $this->save();
         }
+
         return TRUE;
     }
-
 
     /**
      * @desc   Remove a directive (key and it's value) from current config.
      *
-     * @param  string $key     Name of key to remove form current config.
-     * @param  string $section Optional name of section (if used).
+     * @param string $key     Name of key to remove form current config.
+     * @param string $section Optional name of section (if used).
      *
-     * @return bool            Returns TRUE on success, FALSE on failure.
+     * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function removeKey($key, $section = NULL)
+    public function removeKey($key, $section = NULL)
     {
         // check if section was passed and it's valid
         if ($section != NULL) {
             if (in_array($section, array_keys($this->VARS)) == FALSE) {
                 $err = "ConfigMagik::removeKey() - Could not find section('$section'), nothing was removed.";
                 array_push($this->ERRORS, $err);
+
                 return FALSE;
             }
             // look if given key exists in given section
             if (in_array($key, array_keys($this->VARS[$section])) === FALSE) {
                 $err = "ConfigMagik::removeKey() - Could not find key('$key'), nothing was removed.";
                 array_push($this->ERRORS, $err);
+
                 return FALSE;
             }
             // remove key from section
             $pos = array_search($key, array_keys($this->VARS[$section]), TRUE);
             array_splice($this->VARS[$section], $pos, 1);
+
             return TRUE;
-        }
-        else {
+        } else {
             // look if given key exists
             if (in_array($key, array_keys($this->VARS)) === FALSE) {
                 $err = "ConfigMagik::removeKey() - Could not find key('$key'), nothing was removed.";
                 array_push($this->ERRORS, $err);
+
                 return FALSE;
             }
             // remove key (sections disabled)
@@ -256,20 +249,20 @@ class ConfigMagik
         }
     }
 
-
     /**
      * @desc   Remove entire section from current config.
      *
-     * @param  string $section Name of section to remove.
+     * @param string $section Name of section to remove.
      *
-     * @return bool            Returns TRUE on success, FALSE on failure.
+     * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function removeSection($section)
+    public function removeSection($section)
     {
         // check if section exists
         if (in_array($section, array_keys($this->VARS), TRUE) === FALSE) {
             $err = "ConfigMagik::removeSection() - Section('$section') could not be found, nothing removed.";
             array_push($this->ERRORS, $err);
+
             return FALSE;
         }
         // find position of $section in current config
@@ -284,25 +277,24 @@ class ConfigMagik
         return TRUE;
     }
 
-
     /**
      * @desc   Loads and parses ini-file from filesystem.
      *
-     * @param  string $path Optional path to ini-file to load.
+     * @param string $path Optional path to ini-file to load.
      *                      NOTE:   When not provided, path passed to constructor will be used.
      *
      * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function load($path = NULL)
+    public function load($path = NULL)
     {
         // if path was specified, check if valid else abort
         if ($path != NULL and !is_file($path)) {
             $err = "ConfigMagik::load() - Path('$path') is invalid, nothing loaded.";
             array_push($this->ERRORS, $err);
             echo $err;
+
             return FALSE;
-        }
-        elseif ($path == NULL) {
+        } elseif ($path == NULL) {
             // no path was specified, fall back to class-var
             $path = $this->PATH;
         }
@@ -311,19 +303,19 @@ class ConfigMagik
         * It's robust enough ;-)
         */
         $this->VARS = @parse_ini_file($path, $this->PROCESS_SECTIONS);
+
         return TRUE;
     }
-
 
     /**
      * @desc   Writes ini-file to filesystem as file.
      *
-     * @param  string $path Optional path to write ini-file to.
+     * @param string $path Optional path to write ini-file to.
      *                      NOTE:   When not provided, path passed to constructor will be used.
      *
      * @return bool Returns TRUE on success, FALSE on failure.
      */
-    function save($path = NULL)
+    public function save($path = NULL)
     {
         // if no path was specified, fall back to class-var
         if ($path == NULL) {
@@ -348,8 +340,7 @@ class ConfigMagik
                     $content .= $key2 . " = \"" . $elem2 . "\"\n";
                 }
             }
-        }
-        else {
+        } else {
             foreach ($this->VARS as $key => $elem) {
                 $content .= $key . " = \"" . $elem . "\"\n";
             }
@@ -362,31 +353,32 @@ class ConfigMagik
         if (!$handle = @fopen($path, 'w')) {
             $err = "ConfigMagik::save() - Could not open file('$path') for writing, error.";
             array_push($this->ERRORS, $err);
+
             return FALSE;
         }
         if (!fwrite($handle, $content)) {
             $err = "ConfigMagik::save() - Could not write to open file('$path'), error.";
             array_push($this->ERRORS, $err);
+
             return FALSE;
-        }
-        else {
+        } else {
             // push a message onto error-stack
             $err = "ConfigMagik::save() - Sucessfully saved to file('$path').";
             array_push($this->ERRORS, $err);
         }
         fclose($handle);
+
         return TRUE;
     }
-
 
     /**
      * @desc   Renders this Object as formatted string (TEXT or HTML).
      *
-     * @param  string $output_type Type of desired output. Can be 'TEXT' or 'HTML'.
+     * @param string $output_type Type of desired output. Can be 'TEXT' or 'HTML'.
      *
      * @return string Returns a formatted string according to chosen output-type.
      */
-    function toString($output_type = 'TEXT')
+    public function toString($output_type = 'TEXT')
     {
         // check requested output-type
         if (strtoupper($output_type) !== 'TEXT' and strtoupper($output_type) !== 'HTML') {
@@ -400,9 +392,9 @@ class ConfigMagik
             ob_start();
             print_r($this->VARS);
             $out .= ob_get_clean();
+
             return $out;
-        }
-        elseif (strtoupper($output_type) === 'HTML') {
+        } elseif (strtoupper($output_type) === 'HTML') {
             // render object as HTML
             $out = "<table style='background:#FFEECC;border:1px solid black;' width=60%>\n";
             if ($this->PROCESS_SECTIONS) {
@@ -423,8 +415,7 @@ class ConfigMagik
                 }
                 // summary of table (with sections)
                 $out .= "\t<tr><td style='border:1px solid white;' colspan=3 align=right><code>There are <b>$num_keys keys</b> in <b>$num_sections sections</b>.</code></td></tr>\n";
-            }
-            else {
+            } else {
                 // render without sections
                 $keys = $this->listKeys();
                 $num_keys = 0;
@@ -439,19 +430,19 @@ class ConfigMagik
             }
             // close table
             $out .= "</table>";
+
             return $out;
         }
     }
 
-
     /**
      * @desc                   Lists all keys.
      *
-     * @param  string $section Optional section (needed only when using sections).
+     * @param string $section Optional section (needed only when using sections).
      *
-     * @return array           Returns a numeric array containing the keys as string.
+     * @return array Returns a numeric array containing the keys as string.
      */
-    function listKeys($section = NULL)
+    public function listKeys($section = NULL)
     {
         // check if section was passed
         if ($section !== NULL) {
@@ -460,6 +451,7 @@ class ConfigMagik
             if (in_array($section, $sections) === FALSE) {
                 $err = "ConfigMagik::listKeys() - Section('$section') could not be found.";
                 array_push($this->ERRORS, $err);
+
                 return FALSE;
             }
             // list all keys in given section
@@ -470,14 +462,13 @@ class ConfigMagik
                     array_push($list, $possible_key);
                 }
             }
+
             return $list;
-        }
-        else {
+        } else {
             // list all keys (section-less)
             return array_keys($this->VARS);
         }
     }
-
 
     /**
      * @desc   List all sections (if any).
@@ -486,7 +477,7 @@ class ConfigMagik
      *
      * @return array Returns a numeric array with all section-names as stings therein.
      */
-    function listSections()
+    public function listSections()
     {
         $list = array();
         // separate sections from normal keys
@@ -496,8 +487,7 @@ class ConfigMagik
                 array_push($list, $possible_section);
             }
         }
+
         return $list;
     }
 }
-
-?>

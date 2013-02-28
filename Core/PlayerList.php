@@ -35,7 +35,6 @@ class PlayerList extends BasePassiveModule
     private $namecache = array();
     private $uidcache = array();
 
-
     public function __construct($bot)
     {
         parent::__construct($bot, get_class($this));
@@ -56,7 +55,6 @@ class PlayerList extends BasePassiveModule
         );
     }
 
-
     public function signal_handle($data)
     {
         //$data = $signal->getNotificationObject();
@@ -70,14 +68,12 @@ class PlayerList extends BasePassiveModule
         */
         if ((!$data['id'] < 1) && !empty($data['name'])) {
             $this->add($data['id'], $data['name']);
-        }
-        else {
+        } else {
             echo "Was NOT added due to invalid userID\n";
         }
 
         return TRUE;
     }
-
 
     public function add($id, $name)
     {
@@ -99,13 +95,13 @@ class PlayerList extends BasePassiveModule
         );
     }
 
-
     public function id($uname)
     {
         if ($uname instanceof BotError) {
 
             $this->bot->log("DEBUG", "PlayerList", "FIXME: core/PlayerList.php function id recieving BotError as " . $uname . "\nError is: " . $uname->get() . "\n");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
+
             return $uname;
         }
 
@@ -114,11 +110,13 @@ class PlayerList extends BasePassiveModule
             $this->error->set("Tried to get user id for an empty user name.");
             $this->bit->log("DEBUG", "PlayerList", "Tried to get user id for an empty user name.");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
+
             return $this->error;
         }
         $uname = ucfirst(strtolower($uname));
         if (is_numeric($uname)) {
             $this->debug_output("Attempting to look up an id for an id ($uname)");
+
             return $uname;
         }
         // Check if we have not the player in cache.
@@ -128,8 +126,7 @@ class PlayerList extends BasePassiveModule
             // We should have the user in cache if we got a response from FC server
             if (isset($this->namecache[$uname])) {
                 return $this->namecache[$uname]['id'];
-            }
-            else {
+            } else {
                 // If we we didn't get a response from funcom, it's possible it was just a fluke, so try to get userid from whois
                 // table if the information there isn't stale.
                 $query = "SELECT ID,UPDATED FROM #___whois WHERE nickname = '$uname' LIMIT 1";
@@ -141,19 +138,20 @@ class PlayerList extends BasePassiveModule
                         $age = $age / 60 / 60;
                         // cache in memory for future reference.
                         $this->add($result[0]['ID'], $uname);
+
                         return $result[0]['ID'];
                     }
                 }
             }
-        }
-        else {
-            if (isset($this->namecache[$uname])) // so we HAVE the player in cache...
-            {
+        } else {
+            if (isset($this->namecache[$uname])) { // so we HAVE the player in cache...
+
                 return $this->namecache[$uname]['id'];
             }
         }
 
         $this->error->set("Unable to find player '$uname' and all lookups have failed. The player might have been deleted.");
+
         return $this->error;
     }
 
@@ -168,12 +166,14 @@ class PlayerList extends BasePassiveModule
         if (!is_numeric($uid)) {
             $this->bot->log("DEBUG", "PlayerList", "Attempting to look up a username for a username (" . $uid . ")");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
+
             return $uid;
         }
         if (empty($uid)) {
             $this->error->set("name() called with empty string");
             $this->bot->log("DEBUG", "PlayerList", "name() called with empty string");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
+
             return ($this->error);
         }
         //Check if we need to ask the server about the user
@@ -182,9 +182,9 @@ class PlayerList extends BasePassiveModule
             //The user should now definitively be in the cache if it exists.
             if (isset($this->uidcache[$uid])) {
                 $return = $this->uidcache[$uid]['name'];
+
                 return $return;
-            }
-            else {
+            } else {
                 // If we we didn't get a responce from funcom, it's possible it was just a fluke, so try to get nickname from whois
                 // table if the information there isn't stale.
                 $query = "SELECT NICKNAME,UPDATED FROM #___whois WHERE id = '$uid' LIMIT 1";
@@ -197,22 +197,23 @@ class PlayerList extends BasePassiveModule
                         $this->bot->log("PLAYERLIST", "WARN", "Username lookup for $uid failed, but using whois info that is $age hours old.");
                         //cache in memory for future reference.
                         $this->add($uid, $result[0]['NICKNAME']);
+
                         return $result[0]['NICKNAME'];
                     }
                 }
             }
-        }
-        else {
+        } else {
             if (isset($this->uidcache[$uid])) {
                 $return = $this->uidcache[$uid]['name'];
+
                 return $return;
             }
         }
 
         $this->error->set("name() unable to find player '$uid'");
+
         return ($this->error);
     }
-
 
     public function exists($user)
     {
@@ -221,31 +222,29 @@ class PlayerList extends BasePassiveModule
             $this->error->set("exist() called with empty string.");
             $this->bot->log("DEBUG", "PlayerList", "exist() called with empty string.");
             $this->bot->log("DEBUG", "PlayerList", $this->bot->debug_bt());
+
             return $this->error;
         }
         if (is_numeric($user)) {
             // Looking for Name
             $return = isset($this->uidcache[$user]);
-        }
-        else {
+        } else {
             // Looking for ID
             $return = isset($this->namecache[$user]);
         }
+
         return $return;
     }
-
 
     public function get_namecache()
     {
         return $this->namecache;
     }
 
-
     public function get_uidcache()
     {
         return $this->uidcache;
     }
-
 
     public function dump()
     {
@@ -253,5 +252,3 @@ class PlayerList extends BasePassiveModule
         var_dump($this->uidcache);
     }
 }
-
-?>

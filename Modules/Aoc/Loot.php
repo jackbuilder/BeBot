@@ -43,7 +43,7 @@ The Class itself...
 class Rolls extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->count = 0;
@@ -81,13 +81,12 @@ class Rolls extends BaseActiveModule
         $this->help['command']['loot reroll'] = "Adds any unwon items from the last roll to a new roll.";
     }
 
-
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
     sutible for output via send_tell, send_gc, and send_pgroup.
     */
-    function command_handler($name, $msg, $source)
+    public function command_handler($name, $msg, $source)
     { // Start function handler()
         $this->error->reset(); //Reset the error message so we don't trigger the handler by old error messages.
         $com = $this->parse_com(
@@ -117,26 +116,24 @@ class Rolls extends BaseActiveModule
             $this->reroll($name);
             break;
         case 'rem':
-            if (is_numeric($com['args']) && (int)$com['args'] == (real)$com['args'] && array_key_exists($name, $this->loot[$com['args']])) {
+            if (is_numeric($com['args']) && (int) $com['args'] == (real) $com['args'] && array_key_exists($name, $this->loot[$com['args']])) {
                 unset($this->loot[$com['args']][$name]);
                 $this->bot->send_gc("##loot_highlight##" . $name . "##end## removed from rolls in slot##loot_highlight## #" . $com['args']);
-            }
-            else {
+            } else {
                 $this->bot->send_help($name);
             }
             break;
         default:
             if (!empty($com['sub']) || !empty($com['args'])) {
                 $this->loot($com['sub'] . ' ' . $com['args'], $name);
-            }
-            else {
+            } else {
                 $this->bot->send_help($name);
             }
         }
     } // End function handler()
 
     /***********************************************************************************************************/
-    function add($name, $slot)
+    public function add($name, $slot)
     {
         if ($slot == 0) {
             $slots = array_keys($this->loot);
@@ -149,8 +146,7 @@ class Rolls extends BaseActiveModule
                 }
             }
             $this->addmsg = "##loot_highlight##" . $name . "##end## removed from all slots.";
-        }
-        else {
+        } else {
             $present = FALSE;
             if ($this->loot[$slot]) {
                 if ($this->bot->core("settings")
@@ -168,18 +164,15 @@ class Rolls extends BaseActiveModule
                     }
                     if ($present == TRUE) {
                         $this->addmsg = "##loot_highlight##" . $name . "##end## changed to slot##loot_highlight## #" . $slot . "##end##";
-                    }
-                    else {
+                    } else {
                         $this->addmsg = "##loot_highlight##" . $name . "##end## assigned to slot##loot_highlight## #" . $slot . "##end##";
                     }
                     $this->loot[$slot][$name] = 1;
-                }
-                else {
+                } else {
                     $this->loot[$slot][$name] = 1;
                     $this->addmsg = "##loot_highlight##" . $name . "##end## assiged to slot##loot_highlight## #" . $slot . "##end##";
                 }
-            }
-            else {
+            } else {
                 $this->addmsg = "There is currently no roll in slot $slot";
             }
         }
@@ -187,7 +180,7 @@ class Rolls extends BaseActiveModule
     }
 
 
-    function loot($msg, $name)
+    public function loot($msg, $name)
     {
         $notyet = TRUE;
         for ($i = 1; $i <= $this->count; $i++) {
@@ -211,8 +204,7 @@ class Rolls extends BaseActiveModule
         }
     }
 
-
-    function roll($name)
+    public function roll($name)
     {
         $num = 1;
         $lcount = 0;
@@ -239,8 +231,7 @@ class Rolls extends BaseActiveModule
                     $winner = Nobody;
                     $lcount = count($this->leftovers) + 1;
                     $this->leftovers[$lcount] = $item;
-                }
-                else {
+                } else {
                     unset($slot[$winner]);
                 }
                 $msg .= "##loot_highlight##Item: ##end##" . $item . "  (Slot##loot_highlight## #" . $num . "##end##)\n";
@@ -258,14 +249,12 @@ class Rolls extends BaseActiveModule
         $this->count = 0;
     }
 
-
-    function reroll($name)
+    public function reroll($name)
     {
         $lcount = count($this->leftovers);
         if ($lcount == 0) {
             $this->bot->send_gc("##loot_highlight##No leftovers from last roll.##end##");
-        }
-        else {
+        } else {
             $this->count = 0;
             foreach ($this->leftovers as $item) {
                 $notyet = TRUE;
@@ -293,8 +282,7 @@ class Rolls extends BaseActiveModule
         }
     }
 
-
-    function rlist()
+    public function rlist()
     {
         $num = 0;
         unset($msg);
@@ -307,8 +295,7 @@ class Rolls extends BaseActiveModule
             $msg .= "Item: ##loot_highlight##" . $slot[item] . "##end## (##loot_highlight##" . $slot[num] . "x##end##)\n";
             if (count($slot) == 1) {
                 $msg .= "";
-            }
-            else {
+            } else {
                 $list = array_keys($slot);
                 foreach ($list as $key => $player) {
                     if (($player != "item") && ($player != "num") && ($slot[$player] == 2)) {
@@ -328,5 +315,3 @@ class Rolls extends BaseActiveModule
         $this->bot->send_gc($blob);
     }
 }
-
-?>

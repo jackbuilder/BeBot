@@ -39,11 +39,10 @@ For: Bebot
 $trickle = new Trickle($bot);
 class Trickle extends BaseActiveModule
 {
-    var $skill;
-    var $help;
+    public $skill;
+    public $help;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'trickle', 'GUEST');
@@ -309,8 +308,7 @@ class Trickle extends BaseActiveModule
         );
     }
 
-
-    function command_handler($source, $msg, $type)
+    public function command_handler($source, $msg, $type)
     {
         $this->error->reset();
         $msg = strtolower($msg);
@@ -333,6 +331,7 @@ class Trickle extends BaseActiveModule
         );
         if (empty($com['stat1'])) {
             $this->error->set('You need to specify which stats to trickle from.');
+
             return ($this->error);
         }
         $stats = array(
@@ -361,11 +360,11 @@ class Trickle extends BaseActiveModule
             }
         }
         $trickle = $this->Calc_trickle($stats);
+
         return ($this->CreateBlob($stats, $trickle));
     }
 
-
-    function Calc_trickle($upgrade)
+    public function Calc_trickle($upgrade)
     {
         foreach ($this->skill as $group_name => $group) {
             foreach ($group as $item_name => $item) {
@@ -374,11 +373,11 @@ class Trickle extends BaseActiveModule
                 }
             }
         }
+
         return ($increase);
     }
 
-
-    function CreateBlob($stats, $trickle)
+    public function CreateBlob($stats, $trickle)
     {
         $msg = "##ao_infoheadline##::: Ability Trickle-down :::##end##\n\n";
         $msg2 = "";
@@ -410,8 +409,7 @@ class Trickle extends BaseActiveModule
             }
             $msg .= "\n";
         }
+
         return $this->bot->core("tools")->make_blob("Ability trickles", $msg);
     }
 }
-
-?>

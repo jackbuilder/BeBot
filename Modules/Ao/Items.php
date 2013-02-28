@@ -38,15 +38,14 @@
 $VhItems = new VhItems($bot);
 class VhItems extends BaseActiveModule
 {
-    var $icons = 'true';
-    var $color_header = 'DFDF00';
-    var $color_highlight = '97BE37';
-    var $color_normal = 'CCF0AD';
-    var $server = 'http://cidb.xyphos.com/';
-    var $max = 50;
+    public $icons = 'true';
+    public $color_header = 'DFDF00';
+    public $color_highlight = '97BE37';
+    public $color_normal = 'CCF0AD';
+    public $server = 'http://cidb.xyphos.com/';
+    public $max = 50;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'items', 'GUEST');
@@ -55,8 +54,7 @@ class VhItems extends BaseActiveModule
         $this->help['notes'] = "This module uses the Xyphos Items Database .";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match('/^items/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('items')));
@@ -66,8 +64,7 @@ class VhItems extends BaseActiveModule
                     $ql = $parts[0];
                     unset($parts[0]);
                     $search = implode(' ', $parts);
-                }
-                else {
+                } else {
                     $ql = 0;
                     $search = $words;
                 }
@@ -92,16 +89,13 @@ class VhItems extends BaseActiveModule
                 if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
                     return ("received garbled reply from vhabot!");
                 }
+
                 return $result;
-            }
-            else {
+            } else {
                 return "Usage: items [quality] [item]";
             }
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
         }
     }
 }
-
-?>

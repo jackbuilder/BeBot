@@ -38,7 +38,7 @@ $oe = new Oe($bot);
 class Oe extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "oe", "GUEST");
@@ -47,27 +47,23 @@ class Oe extends BaseActiveModule
         $this->help['command']['oe <level>'] .= "shows the maximum skill level requirement an item can have if your skill level is <level>";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^oe (.+)$/i", $msg, $info)) {
             return $this->calc_oe($info[1]);
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
         }
+
         return FALSE;
     }
-
 
     /*
     Calculate OE reqs
     */
-    function calc_oe($oe)
+    public function calc_oe($oe)
     {
-        return "With a skill of <font color=#ffff00>" . (int)$oe . "</font>, you will be OE above <font color=#ffff00>" . (int)($oe / 0.8) . "</font> skill. "
-            . "With a requirement of <font color=#ffff00>" . (int)$oe . "</font> skill, you can have <font color=#ffff00>" . (int)($oe * 0.8) . "</font> without being OE.";
+        return "With a skill of <font color=#ffff00>" . (int) $oe . "</font>, you will be OE above <font color=#ffff00>" . (int) ($oe / 0.8) . "</font> skill. "
+            . "With a requirement of <font color=#ffff00>" . (int) $oe . "</font> skill, you can have <font color=#ffff00>" . (int) ($oe * 0.8) . "</font> without being OE.";
     }
 }
-
-?>

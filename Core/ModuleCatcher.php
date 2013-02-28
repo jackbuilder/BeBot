@@ -37,15 +37,14 @@ The Class itself...
 */
 class ModuleCatcher_Core extends BasePassiveModule
 {
-    var $core_directories;
-    var $module_directories;
-
+    public $core_directories;
+    public $module_directories;
 
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot, $core, $mod)
+    public function __construct(&$bot, $core, $mod)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("module_core");
@@ -54,11 +53,10 @@ class ModuleCatcher_Core extends BasePassiveModule
         $this->module_directories = $mod;
     }
 
-
     /*
     This gets called when bot connects
     */
-    function connect()
+    public function connect()
     { // Start function connect()
         // Load up core-modules
         $folder = dir("./core/");
@@ -171,5 +169,3 @@ class ModuleCatcher_Core extends BasePassiveModule
         }
     } // End function connect()
 }
-
-?>

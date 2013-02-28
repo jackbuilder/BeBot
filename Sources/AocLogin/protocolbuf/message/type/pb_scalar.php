@@ -12,7 +12,6 @@ class PBScalar extends PBMessage
         $this->value = $value;
     }
 
-
     /**
      * Get the scalar value
      */
@@ -21,5 +20,3 @@ class PBScalar extends PBMessage
         return $this->value;
     }
 }
-
-?>

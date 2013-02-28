@@ -36,7 +36,7 @@ $admins = new admins($bot);
 
 class admins extends BaseActiveModule
 {
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
 
@@ -47,14 +47,12 @@ class admins extends BaseActiveModule
         //$this -> help['command']['admins all'] = "Shows all the bot admins by org.";
     }
 
-
-    function command_handler($name, $msg, $channel)
+    public function command_handler($name, $msg, $channel)
     {
         Return ($this->admins_blob($msg));
     }
 
-
-    function admins_blob($msg)
+    public function admins_blob($msg)
     {
         if (preg_match("/^admins all$/i", $msg, $info)) {
             $all = TRUE;
@@ -133,8 +131,7 @@ class admins extends BaseActiveModule
                         }
                     }
                 }
-            }
-            elseif ($group['access_level'] == ADMIN) {
+            } elseif ($group['access_level'] == ADMIN) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
                 if (!empty($users)) {
                     foreach ($users as $user) {
@@ -171,8 +168,7 @@ class admins extends BaseActiveModule
                         }
                     }
                 }
-            }
-            elseif ($group['access_level'] == LEADER) {
+            } elseif ($group['access_level'] == LEADER) {
                 $users = $this->bot->core("security")->cache['groups'][$group['gid']]['members'];
                 if (!empty($users)) {
                     foreach ($users as $user) {
@@ -210,22 +206,17 @@ class admins extends BaseActiveModule
                     }
                 }
             }
-            /*elseif ($group['access_level'] == MEMBER)
-            {
+            /*elseif ($group['access_level'] == MEMBER) {
                 $members .= " + ".$group['name']." (".stripslashes($group['description']).") ";
                 $members .= "\n";
                 $members .= "        ".$this -> make_group_member_list($group['gid']);
                 $members .= "\n";
-            }
-            elseif ($group['access_level'] == GUEST)
-            {
+            } elseif ($group['access_level'] == GUEST) {
                 $guests .= " + ".$group['name']." (".stripslashes($group['description']).") ";
                 $guests .= "\n";
                 $guests .= "        ".$this -> make_group_member_list($group['gid']);
                 $guests .= "\n";
-            }
-            elseif ($group['access_level'] == ANONYMOUS)
-            {
+            } elseif ($group['access_level'] == ANONYMOUS) {
                 $anon .= " + ".$group['name']." (".stripslashes($group['description']).") ";
                 $anon .= "\n";
                 $anon .= "        ".$this -> make_group_member_list($group['gid']);
@@ -245,6 +236,7 @@ class admins extends BaseActiveModule
                 ->chatcmd("admins all", "View all bot admins");
         }
         $inside .= "##end##";
+
         return "Admins list " . $this->bot->core("tools")
             ->make_blob("click to view", $inside);
         //else
@@ -253,8 +245,7 @@ class admins extends BaseActiveModule
         //	$end = "\n" . $this -> bot -> core("tools") -> chatcmd("admins all", "View all bot admins");
         //	$result = $this -> bot -> db -> select("SELECT * FROM admins_list where status_gc=1");
         //}
-        /*foreach ($result as $row)
-{
+        /*foreach ($result as $row) {
 $player = $row[0];
 $level	= $row[3];
 $prof	= $row[4];
@@ -273,5 +264,3 @@ $blob .= $end . "\n";
 return "Admins list " . $this -> bot -> core("tools") -> make_blob("click to view", $blob);*/
     }
 }
-
-?>

@@ -36,12 +36,11 @@
 Add a "_" at the beginning of the file (_AFK.php) if you do not want it to be loaded.
 */
 $afk = new AFK($bot);
-class AFK extends BaseActiveModule
+class Afk extends BaseActiveModule
 {
-    var $afk;
+    public $afk;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->afk = array();
@@ -63,8 +62,7 @@ class AFK extends BaseActiveModule
         $this->bot->core("command_alias")->register("afk", "brb");
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $this->error->reset();
         $com = $this->parse_com(
@@ -74,14 +72,14 @@ class AFK extends BaseActiveModule
             )
         );
         $this->gone($name, $com['args']);
+
         return ("##highlight##$name##end## is now AFK.");
     }
-
 
     /*
     Check if the line in privgroup was meant for someone afk or if someone afk is back
     */
-    function privgroup($name, $msg)
+    public function privgroup($name, $msg)
     {
         if ($this->acheck($name)) {
             $timegone = $this->afk_time($name);
@@ -93,18 +91,15 @@ class AFK extends BaseActiveModule
             if (preg_match("/^afk (.*)/i", $msg, $afkmsg)) {
                 $this->gone($name, $afkmsg[1]);
                 $this->bot->send_output($name, $name . " is now AFK.", "both");
-            }
-            elseif (preg_match("/^afk/i", $msg)) {
+            } elseif (preg_match("/^afk/i", $msg)) {
                 $this->gone($name);
                 $this->bot->send_output($name, $name . " is now AFK.", "both");
             }
-        }
-        elseif ($this->bot->core("settings")->get("Afk", "brb_noprefix")) {
+        } elseif ($this->bot->core("settings")->get("Afk", "brb_noprefix")) {
             if (preg_match("/^brb (.*)/i", $msg, $afkmsg)) {
                 $this->gone($name, $afkmsg[1]);
                 $this->bot->send_output($name, $name . " is now AFK.", "both");
-            }
-            elseif (preg_match("/^brb/i", $msg)) {
+            } elseif (preg_match("/^brb/i", $msg)) {
                 $this->gone($name, "");
                 $this->bot->send_output($name, $name . " is now AFK.", "both");
             }
@@ -117,8 +112,7 @@ class AFK extends BaseActiveModule
         }
     }
 
-
-    function gmsg($name, $group, $msg)
+    public function gmsg($name, $group, $msg)
     {
         if ($this->acheck($name)) {
             $timegone = $this->afk_time($name);
@@ -131,19 +125,16 @@ class AFK extends BaseActiveModule
                 $this->gone($name, $afkmsg[1]);
                 $this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
                 Return;
-            }
-            elseif (preg_match("/^afk/i", $msg)) {
+            } elseif (preg_match("/^afk/i", $msg)) {
                 $this->gone($name);
                 $this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
                 Return;
             }
-        }
-        elseif ($this->bot->core("settings")->get("Afk", "brb_noprefix")) {
+        } elseif ($this->bot->core("settings")->get("Afk", "brb_noprefix")) {
             if (preg_match("/^brb (.*)/i", $msg, $afkmsg)) {
                 $this->gone($name, $afkmsg[1]);
                 $this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
-            }
-            elseif (preg_match("/^brb/i", $msg)) {
+            } elseif (preg_match("/^brb/i", $msg)) {
                 $this->gone($name, "");
                 $this->bot->send_output($name, "##highlight##$name##end## is now AFK.", "both");
             }
@@ -156,8 +147,7 @@ class AFK extends BaseActiveModule
         }
     }
 
-
-    function msg_check($name, $group, $msg)
+    public function msg_check($name, $group, $msg)
     {
         $found = FALSE;
         foreach ($this->afk as $key => $value) {
@@ -167,6 +157,7 @@ class AFK extends BaseActiveModule
                     $name,
                     $msg
                 );
+
                 return ($key . " has been AFK for " . $this->afk_time($key) . " (" . $value[$msg] . ").");
             }
         }
@@ -181,6 +172,7 @@ class AFK extends BaseActiveModule
                                 $msg
                             );
                             $this->afkmsgid++;
+
                             return ($value . " has been AFK for " . $this->afk_time($value) . " (" . $this->afk[$value][msg] . ").");
                         }
                     }
@@ -190,20 +182,17 @@ class AFK extends BaseActiveModule
         Return FALSE;
     }
 
-
-    function afk_time($name)
+    public function afk_time($name)
     {
         $timenow = "" . time() . "";
         $timeafk = $this->afk[$name]['time'];
         $dif = $timenow - $timeafk;
         if ($dif < 60) {
             Return $dif . " Seconds";
-        }
-        elseif ($dif < 3600) {
+        } elseif ($dif < 3600) {
             $mins = floor($dif / 60);
             Return $mins . " Minutes";
-        }
-        else {
+        } else {
             $mins = floor($dif / 60);
             $hours = floor($mins / 60);
             $minstorem = $hours * 60;
@@ -212,8 +201,7 @@ class AFK extends BaseActiveModule
         }
     }
 
-
-    function gone($name, $msg = FALSE)
+    public function gone($name, $msg = FALSE)
     {
         if (empty($msg)) {
             $msg = "Away from keyboard";
@@ -242,8 +230,7 @@ class AFK extends BaseActiveModule
         }
     }
 
-
-    function back($name)
+    public function back($name)
     {
         if ($this->afk[$name]) {
             unset($this->afk[$name]);
@@ -255,19 +242,16 @@ class AFK extends BaseActiveModule
         }
     }
 
-
-    function acheck($name)
+    public function acheck($name)
     {
         if (isset($this->afk[$name])) {
             return TRUE;
-        }
-        else {
+        } else {
             return FALSE;
         }
     }
 
-
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
         $access = $this->bot->core("security")->get_access_level($name);
         if (($msg == 5) && ($access > 1)) {
@@ -278,8 +262,7 @@ class AFK extends BaseActiveModule
                     $this->bot->send_tell($name, "you have been set as back. " . $msgs . "");
                 }
             }
-        }
-        else {
+        } else {
             if (($msg == 3) && ($access > 1)) {
                 if (!$this->acheck($name)) {
                     $this->gone($name);
@@ -288,8 +271,7 @@ class AFK extends BaseActiveModule
                         $this->bot->send_tell($name, "you have been set as AFK. " . $msgs . "");
                     }
                 }
-            }
-            elseif ($msg == 0) {
+            } elseif ($msg == 0) {
                 if ($this->acheck($name)) {
                     $this->back($name);
                     $msgs = $this->msgs($name);
@@ -299,8 +281,7 @@ class AFK extends BaseActiveModule
         }
     }
 
-
-    function msgs($name)
+    public function msgs($name)
     {
         if (!empty($this->afkmsgs[$name])) {
             $inside = "##blob_title##..:: AFK Messages ::..##end##\n\n";
@@ -320,5 +301,3 @@ class AFK extends BaseActiveModule
         Return FALSE;
     }
 }
-
-?>

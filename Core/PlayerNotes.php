@@ -37,34 +37,32 @@ The Class itself...
 */
 class PlayerNotes_Core extends BasePassiveModule
 { // Start Class
-    var $schema_version;
-
+    public $schema_version;
 
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("player_notes", "false") . "
-			(pnid INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-				player VARCHAR(30) NOT NULL,
-				author VARCHAR(30) NOT NULL,
-				note VARCHAR(255) NOT NULL,
-				class TINYINT NOT NULL DEFAULT 0,
-				timestamp INT UNSIGNED NOT NULL)"
+            (pnid INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                player VARCHAR(30) NOT NULL,
+                author VARCHAR(30) NOT NULL,
+                note VARCHAR(255) NOT NULL,
+                class TINYINT NOT NULL DEFAULT 0,
+                timestamp INT UNSIGNED NOT NULL)"
         );
         $this->register_module("player_notes");
         $this->update_schema();
     }
 
-
     /*
     Adds a player note.
     */
-    function add($player, $author, $note, $class)
+    public function add($player, $author, $note, $class)
     { // Start function add()
         $author = ucfirst(strtolower($author));
         $player = ucfirst(strtolower($player));
@@ -97,10 +95,11 @@ class PlayerNotes_Core extends BasePassiveModule
             $sql = "SELECT pnid FROM #___player_notes WHERE player = '" . $player . "' ORDER BY pnid DESC LIMIT 1";
             $result = $this->bot->db->select($sql);
             $return["pnid"] = $result[0][0];
+
             return ("Successfully added &quot;" . $note . "&quot; note to " . $player . " as note id " . $return["pnid"]);
-        }
-        else {
+        } else {
             $this->error->set("An unknown error occurred. Check your bot console for more information.");
+
             return ($this->error);
         }
     } // End function add()
@@ -108,15 +107,15 @@ class PlayerNotes_Core extends BasePassiveModule
     /*
     Deletes player notes.
     */
-    function del($pnid)
+    public function del($pnid)
     { // Start function del()
         $sql = "DELETE FROM #___player_notes WHERE pnid = " . $pnid;
         $result = $this->bot->db->returnQuery($sql);
         if ($result) {
             return ("Deleted player note $pnid");
-        }
-        else {
+        } else {
             $this->error->set("Could not delete player note " . $pnid . ". No note with that ID could be found.");
+
             return ($this->error);
         }
     } // End function del()
@@ -124,10 +123,11 @@ class PlayerNotes_Core extends BasePassiveModule
     /*
     Updates player notes.
     */
-    function update($pnid, $what, $newvalue)
+    public function update($pnid, $what, $newvalue)
     { // Start function update()
         if (!is_int($pnid)) {
             $this->error->set("Only integers can be player note ID numbers.");
+
             return ($this->error);
         }
         $what = mysql_real_escape_string($what);
@@ -135,6 +135,7 @@ class PlayerNotes_Core extends BasePassiveModule
         $sql = "UPDATE #___player_notes SET " . $what . " = " . $newvalue . " WHERE pnid = " . $pnid;
         if (!$this->bot->db->query($sql)) {
             $this->error->set("There was a MySQL error when updating '$what' to '$newvalue'.");
+
             return ($this->error);
         }
     } // End function update()
@@ -143,7 +144,7 @@ class PlayerNotes_Core extends BasePassiveModule
     Retrives player notes.
     $order can be ASC (ascending) or DESC (descending).
     */
-    function get_notes($name, $player = "All", $pnid = "all", $order = "ASC")
+    public function get_notes($name, $player = "All", $pnid = "all", $order = "ASC")
     { // Start function get_notes()
         $name = ucfirst(strtolower($name)); // Name of person requesting notes.
         $player = ucfirst(strtolower($player)); // Notes attached to this player.
@@ -154,8 +155,7 @@ class PlayerNotes_Core extends BasePassiveModule
             $where = "AND";
         }
         $leader = $this->bot->core("security")->check_access($name, "LEADER");
-        if (!$leader) // Only show general notes to non leaders.
-        {
+        if (!$leader) { // Only show general notes to non leaders.
             $sql .= " " . $where . " class = 0";
             $where = "AND";
         }
@@ -166,15 +166,17 @@ class PlayerNotes_Core extends BasePassiveModule
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
         if (empty($result)) {
             $this->error->set("No notes found for '$player'", FALSE);
+
             return ($this->error);
         }
+
         return $result;
     } // End function get_notes()
 
     /*
     Updates the player_notes table schema.
     */
-    function update_schema()
+    public function update_schema()
     {
         if ($this->bot->core("settings")
             ->exists('Playernotes', 'Schema_version')
@@ -201,4 +203,3 @@ class PlayerNotes_Core extends BasePassiveModule
         $this->bot->db->set_version('player_notes', 3);
     }
 } // End of Class
-?>

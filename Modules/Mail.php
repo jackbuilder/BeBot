@@ -45,20 +45,20 @@ The Class itself...
 class Mail extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         //$this -> register_event("cron", "12hour");
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("mail_message", "true") . "
-						(id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-						received TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-						expires TIMESTAMP,
-						is_read BOOL DEFAULT false,
-						mailbox VARCHAR(13),
-						recipient VARCHAR(13),
-						sender VARCHAR(13),
-						message TEXT)"
+                        (id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                        received TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        expires TIMESTAMP,
+                        is_read BOOL DEFAULT false,
+                        mailbox VARCHAR(13),
+                        recipient VARCHAR(13),
+                        sender VARCHAR(13),
+                        message TEXT)"
         );
         //Register commands for this module
         $this->register_command('all', 'mail', 'GUEST');
@@ -83,8 +83,7 @@ class Mail extends BaseActiveModule
         $this->help['notes'] = "Mail is delivered to any registered alt of the player <name>";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $this->error->reset();
         $com = $this->parse_com(
@@ -106,8 +105,7 @@ class Mail extends BaseActiveModule
         case 'Read':
             if ((isset($com['target'])) && (is_int(intval($com['target'])))) {
                 return ($this->make_item_blob("Mail item {$com['target']}", $this->mail_read($name, $com['target'])));
-            }
-            else {
+            } else {
                 return ($this->make_item_blob('Mail list', $this->mail_list($name)));
             }
             break;
@@ -117,6 +115,7 @@ class Mail extends BaseActiveModule
         default:
             //No matches. Sending usage information (Another useless comment)
             $this->error->set("Unknown sub command '##highlight##{$com['sub']}##end##'. ");
+
             return ($this->error->message());
             break;
         }
@@ -124,20 +123,19 @@ class Mail extends BaseActiveModule
 
 
     //Re-declaring gc() so that users always get a reply in tells (We don't want to share all our mail with everyone)
-    function gc($name, $msg)
+    public function gc($name, $msg)
     {
         $this->tell($name, $msg);
     }
-
 
     //Re-declaring pgmsg() so that users always get a reply in tells (We don't want to share all our mail with everyone)
-    function pgmsg($name, $msg)
+    public function pgmsg($name, $msg)
     {
         $this->tell($name, $msg);
     }
 
 
-    function notify($name, $startup = FALSE)
+    public function notify($name, $startup = FALSE)
     {
         //Notify people that are logging on if they've got new mail
         if ((!$startup)
@@ -152,34 +150,29 @@ class Mail extends BaseActiveModule
         }
     }
 
-
-    function connect()
+    public function connect()
     {
         $this->start = time() + $this->bot->crondelay;
     }
 
-
-    function cron()
+    public function cron()
     {
         //TO DO: Check for messages that are older than "max life" and discard them.
     }
 
-
-    function new_mail_count($mailbox)
+    public function new_mail_count($mailbox)
     {
         //Getting the number of new mail (obviously)
         $query = "SELECT COUNT(id) AS no_of_messages FROM #___mail_message WHERE mailbox='$mailbox' AND is_read=0";
         $result = $this->bot->db->select($query, MYSQL_ASSOC);
         if (empty($result)) {
             return 0;
-        }
-        else {
+        } else {
             return ($result[0]['no_of_messages']);
         }
     }
 
-
-    function mail_list($user)
+    public function mail_list($user)
     {
         //Returns a window containing new and read mail
         $mailbox = $this->bot->core("alts")->main($user);
@@ -211,15 +204,14 @@ class Mail extends BaseActiveModule
                 $window .= $this->bot->core("tools")
                     ->chatcmd("mail read " . $message['id'], $message['message']) . "<br>";
             }
-        }
-        else {
+        } else {
             $window .= "No mail for you.";
         }
+
         return ($window);
     }
 
-
-    function mail_read($user, $id)
+    public function mail_read($user, $id)
     {
         $mailbox = $this->bot->core("alts")->main($user);
         $window = "##yellow##:::##end## Mail for ##highlight##$user##end## ($mailbox) ##yellow##:::##end##<br><br>";
@@ -243,15 +235,14 @@ class Mail extends BaseActiveModule
             );
             $query = "UPDATE #___mail_message SET is_read=true, expires=FROM_UNIXTIME('$time') WHERE id=$id AND is_read=false";
             $this->bot->db->query($query);
-        }
-        else {
+        } else {
             $window .= "<br>Message $id was not found.";
         }
+
         return ($window);
     }
 
-
-    function mail_send($sender, $recipient, $message)
+    public function mail_send($sender, $recipient, $message)
     {
         $recipient = ucfirst(strtolower($recipient));
         $mailbox = $this->bot->core("alts")->main($recipient);
@@ -262,12 +253,11 @@ class Mail extends BaseActiveModule
         $expires = strtotime("+$time");
         if (!$this->bot->core("security")->check_access($recipient, "GUEST")) {
             $this->error->set("The recipient ($recipient) is not a known member or guest of this bot. Please check spelling.");
+
             return ($this->error->message());
-        }
-        elseif (empty($message)) {
+        } elseif (empty($message)) {
             return ("There is no point in sending empty messages. Usage: <pre>mail send &lt;recipient&gt; &lt;message&gt;");
-        }
-        else {
+        } else {
             $mail_message = mysql_real_escape_string($message);
             $mail_message = str_replace('<', '&lt;', $mail_message);
             $mail_message = base64_encode($mail_message);
@@ -288,34 +278,32 @@ class Mail extends BaseActiveModule
                     $this->bot->send_tell($send, $this->make_item_blob("You've just received a new message.", $this->mail_list($send)));
                 }
             }
+
             return ("Message sent to $recipient ($mailbox).");
         }
     }
 
-
-    function mail_delete($name, $id)
+    public function mail_delete($name, $id)
     {
         $mailbox = $this->bot->core("alts")->main($name);
         $query = "DELETE FROM #___mail_message WHERE id=$id AND mailbox='$mailbox'";
         $this->bot->db->query($query);
         if (mysql_affected_rows($this->bot->db->CONN) == 1) {
             return ("Mail $id has been deleted.");
-        }
-        else {
+        } else {
             $this->error->set("Mail message '$id' was either not found or did not belong to $name.");
+
             return ($this->error->message());
         }
     }
 
-
     //Specialized make_blob to make ITEMREFs clickable.
-    function make_item_blob($title, $content)
+    public function make_item_blob($title, $content)
     {
         $content = str_replace("<botname>", $this->bot->botname, $content);
         $content = str_replace("<pre>", str_replace("\\", "", $this->bot->commpre), $content);
         $content = str_replace("\"", "'", $content);
+
         return "<a href=\"text://" . $content . "\">" . $title . "</a>";
     }
 }
-
-?>

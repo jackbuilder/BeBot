@@ -39,13 +39,12 @@
 $Gemcut = new Gemcut($bot);
 class Gemcut extends BaseActiveModule
 {
-    var $server = 'http://aocdb.lunevo.net/';
-    var $gem_types = array();
-    var $gem_array = array();
-    var $tier_info = array();
+    public $server = 'http://aocdb.lunevo.net/';
+    public $gem_types = array();
+    public $gem_array = array();
+    public $tier_info = array();
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'gem', 'GUEST');
@@ -284,48 +283,40 @@ class Gemcut extends BaseActiveModule
         }
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match('/^gemcut/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('gemcut')));
             if (!empty($words)) {
                 return $this->gemtiers($words);
-            }
-            else {
+            } else {
                 return "Usage: gemcut [tier]";
             }
-        }
-        elseif (preg_match('/^geminfo/i', $msg, $info)) {
+        } elseif (preg_match('/^geminfo/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('geminfo')));
             if (!empty($words)) {
                 return $this->gem_info($words);
-            }
-            else {
+            } else {
                 return "Usage: geminfo [Gem Name]";
             }
-        }
-        elseif (preg_match('/^gems/i', $msg, $info)) {
+        } elseif (preg_match('/^gems/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('gems')));
+
             return $this->gems($words);
-        }
-        elseif (preg_match('/^gem/i', $msg, $info)) {
+        } elseif (preg_match('/^gem/i', $msg, $info)) {
             $words = trim(substr($msg, strlen('item')));
             if (!empty($words)) {
                 return $this->identify($words);
-            }
-            else {
+            } else {
                 return "Usage: gem [itemref]";
             }
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
         }
     }
 
-
     /* Identifies a gem. */
-    function identify($msg)
+    public function identify($msg)
     {
         $items = $this->bot->core('items')->parse_items($msg);
         if (empty($items)) {
@@ -337,16 +328,14 @@ class Gemcut extends BaseActiveModule
             preg_match("/(Flawless|Uncut)\s(.*)/", $item['name'], $matches);
             if ($matches[1] == "Flawless") {
                 $rare = true;
-            }
-            else {
+            } else {
                 $rare = false;
             }
             $gem_info = $this->gem_array[$matches[2]];
             if (count($gem_info) == 2) {
                 $tier = $gem_info[0];
                 $type = $gem_info[1];
-            }
-            else {
+            } else {
                 $tier = 0;
                 $type = 'unknown';
             }
@@ -355,8 +344,7 @@ class Gemcut extends BaseActiveModule
                 $txt .= "##gemcut_normal##";
                 if ($rare) {
                     $txt .= "Quality: ##gemcut_highlight##Rare : Trillion/Teardrop/Cabochon (fits in size 2 sockets - shape 10)##end##\n";
-                }
-                else {
+                } else {
                     $txt .= "Quality: ##gemcut_highlight##Common : Rhombic/Oval/Oblique (fits in size 1 sockets - shape 5)##end##\n";
                 }
                 $txt .= "Tier: ##gemcut_highlight##" . $tier . " (lvl " . (($tier + 3) * 10) . ")##end##\n";
@@ -390,8 +378,7 @@ class Gemcut extends BaseActiveModule
                 $txt .= "##end##\n\n##gemcut_info##The gem effect is randomly determined when the gem is cut.##end##\n\n";
                 if ($rare) {
                     $txt .= "Shapes: ##gemcut_highlight##Trillion(1 handed), Teardrop(2 handed) and Cabochon(Armor). Can be used in blue crafted armor and weapons .##end##\n\n";
-                }
-                else {
+                } else {
                     $txt .= "Shapes: ##gemcut_highlight##Rhombic(1 handed), Oval(2 handed) and Oblique(Armor). Can be used in green crafted armor and weapons.##end##\n\n";
                 }
                 $txt .= "\n\n";
@@ -399,20 +386,19 @@ class Gemcut extends BaseActiveModule
         }
         if (empty($txt)) {
             return "The gem could not be identified.";
-        }
-        else {
+        } else {
             $txt .= "##gemcut_info##Socketing:\n";
             $txt .= "- Make sure both the item and the gem are in your inventory and NOT equipped.\n";
             $txt .= "- Select the gem, the items that the gem can be added to will be surrounded with a green border.\n";
             $txt .= "- Drag and drop the gem onto the selected item.##end##";
             $txt .= "##end##";
+
             return "Result: " . $this->bot->core("tools")
                 ->make_blob("identification", $txt);
         }
     }
 
-
-    function gemtiers($msg)
+    public function gemtiers($msg)
     {
         switch ($msg) {
         case 1:
@@ -439,11 +425,11 @@ class Gemcut extends BaseActiveModule
             $txt = "Valid tiers are: 1-6";
             break;
         }
+
         return $txt;
     }
 
-
-    function gem_info($msg)
+    public function gem_info($msg)
     {
         $gem_info = $this->gem_array[$msg];
         if (count($gem_info) == 2) {
@@ -490,24 +476,22 @@ class Gemcut extends BaseActiveModule
             $txt .= $this->renderBlock($rare, true);
             $txt .= "\n##gemcut_highlight##Common Cuts##end##\n";
             $txt .= $this->renderBlock($common, false);
+
             return "Gem Information : " . $this->bot->core("tools")
                 ->make_blob("$msg", $txt) . ".";
-        }
-        else {
+        } else {
             return "Sorry! I've never heard of that Gem.";
         }
     }
 
-
-    function gems($msg)
+    public function gems($msg)
     {
         if (preg_match("/[1-6]/", $msg)) {
             $txt = "##gemcut_highlight##Tier $msg gems##end## : Level " . $this->tier_info[$msg - 1][0] . " - Drops in: " . $this->tier_info[$msg - 1][1] . ".\n\n<hr/>\n\n";
             $txt .= $this->displayGems($msg);
             $output = "Tier $msg gems : " . $this->bot->core("tools")
                 ->make_blob("click here", $txt) . ".";
-        }
-        else {
+        } else {
             $txt = "";
             for ($i = 0; $i < count($this->tier_info); $i++) {
                 $txt .= $this->bot->core("tools")
@@ -516,22 +500,22 @@ class Gemcut extends BaseActiveModule
             $output = "Gemcutting info : " . $this->bot->core("tools")
                 ->make_blob("click here", $txt) . ".";
         }
+
         return $output;
     }
 
-
-    function displayGems($tier)
+    public function displayGems($tier)
     {
         $txt = "";
         foreach ($this->gem_types as $colour => $gems) {
             $txt .= ucfirst($colour) . " Gem : " . $this->bot->core("tools")
                 ->chatcmd("geminfo " . $gems[0][$tier - 1], $gems[0][$tier - 1]) . "\n";
         }
+
         return $txt;
     }
 
-
-    function renderBlock($lines, $is_rare)
+    public function renderBlock($lines, $is_rare)
     {
         $text = "";
         foreach ($lines as $line) {
@@ -547,8 +531,7 @@ class Gemcut extends BaseActiveModule
                     $text .= $this->renderLink($prefix, "Cabochon", $gem, "Arm", $cut_arm) . " ##gemcut_highlight##:##end## ";
                     $text .= "##gemcut_info##(##end##$effect##gemcut_info##)##end##\n";
                 }
-            }
-            else {
+            } else {
                 if ($rarity == 2 || $rarity == 0) {
                     $text .= "##gemcut_info##$prefix##end## ##gemcut_highlight##:##end## ";
                     $text .= $this->renderLink($prefix, "Rhombic", $gem, "1H", $cut_1h) . "##gemcut_info##/##end##";
@@ -561,20 +544,17 @@ class Gemcut extends BaseActiveModule
         if ($text == "") {
             $text = "No gem cuts found!";
         }
+
         return $text;
     }
 
-
-    function renderLink($prefix, $rarity, $gem, $text, $flag)
+    public function renderLink($prefix, $rarity, $gem, $text, $flag)
     {
         if ($flag == 1) {
             return $this->bot->core("tools")
                 ->chatcmd("items +$prefix +$rarity +$gem", $text);
-        }
-        else {
+        } else {
             return "-";
         }
     }
 }
-
-?>

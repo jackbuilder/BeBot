@@ -50,8 +50,7 @@ if (preg_match("/^windows/i", $os)) {
     $php_bin = "C:\php\php.exe";
     $main_php = "C:\BeBot\Main.php";
     */
-}
-else {
+} else {
     /*
     This is a sane default for the php binary on Unix systems.
     If your php binary is located someplace else, edit the php_bin path accordingly.
@@ -61,15 +60,14 @@ else {
     $main_php = "Main.php";
 }
 $confc = TRUE;
-require_once "./Sources/Conf.php";
+require_once './Sources/Conf.php';
 if ($argv[1] != $conf->argv) {
     echo "Use \"StartBot.php " . $conf->argv . "\" to start bot next time\n";
     $argv[1] = $conf->argv;
     $conf->ask("Press Enter to load Bot");
     if (!$argv[1] || $argv[1] == "") {
         $argc = 1;
-    }
-    else {
+    } else {
         $argc = 2;
     }
 }
@@ -91,9 +89,7 @@ while (TRUE) {
     $last_line = system($systemcommand);
     if (preg_match("/^The bot has been shutdown/i", $last_line)) {
         die();
-    }
-    else {
+    } else {
         sleep(1);
     }
 }
-?>

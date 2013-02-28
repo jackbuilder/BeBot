@@ -1,7 +1,7 @@
 <?php
 
-include_once "ServerConnection.php";
-include_once "Endpoints.php";
+include_once 'ServerConnection.php';
+include_once 'Endpoints.php';
 
 define('RPC_TERRITORY_INIT', 0x9CB2CB03);
 define('RPC_TERRITORY_INITACK', 0x5DC18991);
@@ -38,7 +38,6 @@ class CharacterServerConnection extends ServerConnection
     private $m_GuildServerPort;
     private $m_GuildServerCookie;
 
-
     public function CharacterServerConnection(
         $parent, $accountID,
         $characterName, $loginCookie,
@@ -57,34 +56,31 @@ class CharacterServerConnection extends ServerConnection
         $this->m_LoginCookie = $loginCookie;
     }
 
-
     public function GetChatServerAddress()
     {
         return $this->m_ChatServerAddress;
     }
-
 
     public function GetChatServerPort()
     {
         return $this->m_ChatServerPort;
     }
 
-
     public function GetChatServerCookie()
     {
         return $this->m_ChatServerCookie;
     }
 
-
     public function Connect()
     {
         if (parent::Connect()) {
             $this->SendAuthentication();
+
             return TRUE;
         }
+
         return FALSE;
     }
-
 
     public function SendAuthentication()
     {
@@ -96,7 +92,6 @@ class CharacterServerConnection extends ServerConnection
 
         parent::EncryptAndSend($stream, RPC_TERRITORY_INIT);
     }
-
 
     public function LoginCharacter($characterID, $language)
     {
@@ -117,7 +112,6 @@ class CharacterServerConnection extends ServerConnection
 
         parent::EncryptAndSend($stream, RPC_TERRITORY_LOGINCHARACTER);
     }
-
 
     public function HandlePackets()
     {
@@ -210,6 +204,7 @@ class CharacterServerConnection extends ServerConnection
                             echo "[" . $this->m_LogName . "] Character : ID = " . $e["id"] . ", Name = '" . $e["name"] . "'\n";
                         }
                     }
+
                     return FALSE;
                 }
                 break;
@@ -218,6 +213,7 @@ class CharacterServerConnection extends ServerConnection
             case RPC_TERRITORY_ERROR:
                 {
                 trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to territory [Err:" . $this->displayConanError($packet->args[0]) . "]", E_USER_WARNING);
+
                 return FALSE;
                 }
 
@@ -231,6 +227,7 @@ class CharacterServerConnection extends ServerConnection
 
                 $this->m_ChatServerAddress = long2ip($chatserverIP);
                 echo("[" . $this->m_LogName . "] Received chat server address [ $this->m_ChatServerAddress:$this->m_ChatServerPort ]\n");
+
                 return TRUE;
                 }
                 break;
@@ -260,11 +257,8 @@ class CharacterServerConnection extends ServerConnection
                 break;
             }
 
-        }
-        while (TRUE);
+        } while (TRUE);
 
         return TRUE;
     }
 }
-
-?>

@@ -34,22 +34,20 @@
 $items_core = new Items_Core($bot);
 class Items_Core extends BasePassiveModule
 {
-    var $server = 'http://aocdb.lunevo.net/';
-    var $itemPattern = '(<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zA-Z0-9_\'&\s\-]*)\]<\/font><\/a>)';
+    public $server = 'http://aocdb.lunevo.net/';
+    public $itemPattern = '(<a style="text-decoration:none" href="itemref:\/\/([0-9]*)\/([0-9]*)\/([0-9]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)\/([0-9a-f]*\:[0-9a-f]*\:[0-9a-f]*:[0-9a-f]*)"><font color=#([0-9a-f]*)>\[([\\-a-zA-Z0-9_\'&\s\-]*)\]<\/font><\/a>)';
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("items");
     }
 
-
     /*
     Takes an item string and returns an array of item arrays - each with lowid, highid, ql, lowcrc, highcc, colour and name.
     If $item is unparsable it returns a BotError
     */
-    function parse_items($itemText)
+    public function parse_items($itemText)
     {
         $items = array();
         $count = preg_match_all('/' . $this->itemPattern . '/i', $itemText, $matches, PREG_SET_ORDER);
@@ -63,14 +61,14 @@ class Items_Core extends BasePassiveModule
             $item['name'] = $match[8];
             $items[] = $item;
         }
+
         return $items;
     }
-
 
     /*
     Creates a text blob.  Alternate uses ' instead of ".
     */
-    function make_item($item, $alternate = FALSE)
+    public function make_item($item, $alternate = FALSE)
     {
         if (empty($item)) {
             return '';
@@ -78,8 +76,7 @@ class Items_Core extends BasePassiveModule
         if ($alternate) {
             return '<a style="text-decoration:none" href="itemref://' . $item['lowid'] . '/' . $item['highid'] . '/' . $item['ql'] . '/' . $item['lowcrc'] . '/' . $item['highcrc']
                 . '"><font color=#' . $item['colour'] . '>[' . $item['name'] . ']</font></a>';
-        }
-        else {
+        } else {
             return "<a style='text-decoration:none' href='itemref://" . $item['lowid'] . "/" . $item['highid'] . "/" . $item['ql'] . "/" . $item['lowcrc'] . "/" . $item['highcrc']
                 . "'><font color=#" . $item['colour'] . ">[" . $item['name'] . "]</font></a>";
         }
@@ -87,16 +84,17 @@ class Items_Core extends BasePassiveModule
 
 
     //Returns true if $item is an itemref, false otherwise.
-    function is_item($item)
+    public function is_item($item)
     {
         if (1 > preg_match('/' . $this->itemPattern . '/i', $item)) {
             return FALSE;
         }
+
         return TRUE;
     }
 
 
-    function submit_item($item, $name)
+    public function submit_item($item, $name)
     {
         if (empty($item)) {
             return -1;
@@ -117,11 +115,12 @@ class Items_Core extends BasePassiveModule
         $url .= '&guildname=' . urlencode($this->bot->guild);
         $url .= '&username=' . urlencode($name);
         $url .= '&checksum=' . urlencode($checksum);
+
         return $this->bot->core("tools")->get_site($url, 1);
     }
 
 
-    function search_item_db_details($words)
+    public function search_item_db_details($words)
     {
         $url = $this->server . "botsearch/";
         $url .= '?single=1';
@@ -131,18 +130,18 @@ class Items_Core extends BasePassiveModule
         if (strstr($result, 'mysql_real_escape_string') !== FALSE) {
             return ("Error in query to database");
         }
+
         return $result;
     }
 
 
-    function search_item_db($words)
+    public function search_item_db($words)
     {
         $url = $this->server . "botsearch/";
         $url .= '?search=' . urlencode($words);
         $url .= '&botname=' . $this->bot->botname;
         $url .= '&pre=' . urlencode($this->bot->commpre);
+
         return $this->bot->core("tools")->get_site($url, 1);
     }
 }
-
-?>

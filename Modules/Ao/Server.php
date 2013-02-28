@@ -41,7 +41,7 @@ The Class itself...
 class Server extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'server', 'MEMBER');
@@ -49,17 +49,15 @@ class Server extends BaseActiveModule
         $this->help['command']['server'] = "Shows the load on the server.";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         return $this->server_load();
     }
 
-
     /*
     Show server load
     */
-    function server_load()
+    public function server_load()
     {
         $server = $this->bot->core("tools")
             ->get_site("http://probes.funcom.com/ao.xml");
@@ -74,16 +72,13 @@ class Server extends BaseActiveModule
                 //$playfields[$info[1]] = $info[4];
                 if ($info[3] == 0) {
                     $info[3] = "Low";
-                }
-                else {
+                } else {
                     if ($info[3] == 1) {
                         $info[3] = "Med";
-                    }
-                    else {
+                    } else {
                         if ($info[3] == 2) {
                             $info[3] = "High";
-                        }
-                        else {
+                        } else {
                             $info[3] = "Unknown";
                         }
                     }
@@ -99,30 +94,26 @@ class Server extends BaseActiveModule
         foreach ($playfields as $key => $val) {
             if ($playfields[$key]['status'] == 1) {
                 $inside .= " " . $key . ": ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
-            }
-            else {
+            } else {
                 if ($playfields[$key]['status'] == 2) {
                     $inside .= " ##yellow##" . $key . "##end##: ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
-                }
-                else {
+                } else {
                     $inside .= " ##red##" . $key . "##end##: ##highlight##" . $playfields[$key]['load'] . " - " . $playfields[$key]['players'] . "%##end##\n";
                 }
             }
         }
         if (count($playfields) < 10) {
             return "Could not access server information";
-        }
-        else {
+        } else {
             return "Status of servers on " . $dim_name . ": " . $this->bot
                 ->core("tools")->make_blob("click to view", $inside);
         }
     }
 
-
     /*
     Pick the correct dimention
     */
-    function select_dimension()
+    public function select_dimension()
     {
         switch ($this->bot->dimension) {
         case '0':
@@ -138,8 +129,7 @@ class Server extends BaseActiveModule
             $return = "d3";
             break;
         }
+
         return $return;
     }
 }
-
-?>

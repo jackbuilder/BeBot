@@ -29,18 +29,18 @@ abstract class PBMessage
     const WIRED_END_GROUP = 4;
     const WIRED_32BIT = 5;
 
-    var $base128;
+    public $base128;
 
     // here are the field types
-    var $fields = array();
+    public $fields = array();
     // the values for the fields
-    var $values = array();
+    public $values = array();
 
     // type of the class
-    var $wired_type = 2;
+    public $wired_type = 2;
 
     // the value of a class
-    var $value = NULL;
+    public $value = NULL;
 
     // modus byte or string parse (byte for productive string for better reading and debuging)
     // 1 = byte, 2 = String
@@ -51,11 +51,10 @@ abstract class PBMessage
     protected $reader;
 
     // chunk which the class not understands
-    var $chunk = '';
+    public $chunk = '';
 
     // variable for Send method
-    var $_d_string = '';
-
+    public $_d_string = '';
 
     /**
      * Constructor - initialize base128 class
@@ -66,7 +65,6 @@ abstract class PBMessage
         $this->value = $this;
         $this->base128 = new base128varint(PBMessage::MODUS);
     }
-
 
     /**
      * Get the wired_type and field_type
@@ -83,9 +81,9 @@ abstract class PBMessage
         $high = substr($binstring, 0, strlen($binstring) - 3) . '0000';
         $types['wired'] = bindec($low);
         $types['field'] = bindec($binstring) >> 3;
+
         return $types;
     }
-
 
     /**
      * Encodes a Message
@@ -111,8 +109,7 @@ abstract class PBMessage
 
                     $stringinner .= $newstring;
                 }
-            }
-            else {
+            } else {
                 if ($this->values[$index] != NULL) {
                     // wired and type
                     $newstring = '';
@@ -136,7 +133,6 @@ abstract class PBMessage
         return $string . $stringinner;
     }
 
-
     /**
      * Serializes the chunk
      *
@@ -146,7 +142,6 @@ abstract class PBMessage
     {
         $stringinner .= $this->chunk;
     }
-
 
     /**
      * Decodes a Message and Built its things
@@ -159,7 +154,6 @@ abstract class PBMessage
         $this->_ParseFromArray();
     }
 
-
     /**
      * Internal function
      */
@@ -171,7 +165,6 @@ abstract class PBMessage
         // just take the splice from this array
         $this->_ParseFromArray($length);
     }
-
 
     /**
      * Internal function
@@ -194,16 +187,13 @@ abstract class PBMessage
                 // throw new Exception('Field ' . $messtypes['field'] . ' not present ');
                 if ($messtypes['wired'] == PBMessage::WIRED_LENGTH_DELIMITED) {
                     $consume = new PBString($this->reader);
-                }
-                else {
+                } else {
                     if ($messtypes['wired'] == PBMessage::WIRED_VARINT) {
                         $consume = new PBInt($this->reader);
-                    }
-                    else {
+                    } else {
                         if ($messtypes['wired'] == PBMessage::WIRED_32BIT) {
                             $consume = new PBFixedInt($this->reader);
-                        }
-                        else {
+                        } else {
                             throw new Exception('I dont understand this wired code:' . $messtypes['wired']);
                         }
                     }
@@ -226,8 +216,7 @@ abstract class PBMessage
                     throw new Exception('Expected type:' . $messtypes['wired'] . ' but had ' . $this->fields[$messtypes['field']]->wired_type);
                 }
                 $this->values[$messtypes['field']][$index]->ParseFromArray();
-            }
-            else {
+            } else {
                 //echo "Called as value : " . $this->fields[$messtypes['field']] . " : " . $messtypes['wired'] . " ($index)\n";
                 $this->values[$messtypes['field']] = new $this->fields[$messtypes['field']]($this->reader);
                 if ($messtypes['wired'] != $this->values[$messtypes['field']]->wired_type) {
@@ -238,7 +227,6 @@ abstract class PBMessage
         }
     }
 
-
     /**
      * Add an array value
      *
@@ -248,7 +236,6 @@ abstract class PBMessage
     {
         return $this->values[$index][] = new $this->fields[$index]();
     }
-
 
     /**
      * Set an array value -
@@ -264,7 +251,6 @@ abstract class PBMessage
         $this->values[$index][$index_arr] = $value;
     }
 
-
     /**
      * Remove the last array value
      *
@@ -274,7 +260,6 @@ abstract class PBMessage
     {
         array_pop($this->values[$index]);
     }
-
 
     /**
      * Set an value
@@ -286,13 +271,11 @@ abstract class PBMessage
     {
         if (gettype($value) == 'object') {
             $this->values[$index] = $value;
-        }
-        else {
+        } else {
             $this->values[$index] = new $this->fields[$index]();
             $this->values[$index]->value = $value;
         }
     }
-
 
     /**
      * Get a value
@@ -304,9 +287,9 @@ abstract class PBMessage
         if ($this->values[$index] == NULL) {
             return NULL;
         }
+
         return $this->values[$index]->value;
     }
-
 
     /**
      * Get array value
@@ -319,7 +302,6 @@ abstract class PBMessage
         return $this->values[$index][$value];
     }
 
-
     /**
      * Get array size
      *
@@ -330,7 +312,6 @@ abstract class PBMessage
         return count($this->values[$index]);
     }
 
-
     /**
      * Helper method for send string
      */
@@ -338,9 +319,9 @@ abstract class PBMessage
     {
         $this->_d_string .= $string;
         $content_length = strlen($this->_d_string);
+
         return strlen($string);
     }
-
 
     /**
      * Sends the message via post request ['message'] to the url
@@ -369,9 +350,9 @@ abstract class PBMessage
         if ($class != NULL) {
             $class->parseFromString($this->_d_string);
         }
+
         return $this->_d_string;
     }
-
 
     /**
      * Fix Memory Leaks with Objects in PHP 5
@@ -412,8 +393,7 @@ abstract class PBMessage
                     if (isset($name2)) {
                         unset($value->$name2);
                     }
-                }
-                else {
+                } else {
                     if (is_object($value) AND method_exists($value, '__destruct')) {
                         $value->__destruct();
                     }
@@ -426,5 +406,3 @@ abstract class PBMessage
     }
 
 }
-
-?>

@@ -38,7 +38,7 @@ The Class itself...
 class Shutdown extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("tell", "shutdown", "SUPERADMIN");
@@ -51,11 +51,10 @@ class Shutdown extends BaseActiveModule
             ->create("Shutdown", "QuietShutdown", FALSE, "Do shutdown/restart quietly without spamming the guild channel?");
     }
 
-
     /*
     This gets called on a tell with the command
     */
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (time() < $this->bot->connected_time + 10) {
             //ignore commands for 1st 10 secs to prevent unwanted restart command while offline
@@ -72,11 +71,11 @@ class Shutdown extends BaseActiveModule
         Default:
             return "##error##Error: Shutdown Module received Unknown Command ##highlight##$msg[0]##end####end##";
         }
+
         return FALSE;
     }
 
-
-    function stop($name, $text, $why)
+    public function stop($name, $text, $why)
     {
         if (!empty($why)) {
             $why = " (" . $why . ")";
@@ -94,8 +93,7 @@ class Shutdown extends BaseActiveModule
         $this->register_event("cron", "1sec");
     }
 
-
-    function cron()
+    public function cron()
     {
         if ($this->crontime[0] <= time()) {
             $this->bot->disconnect();
@@ -103,5 +101,3 @@ class Shutdown extends BaseActiveModule
         }
     }
 }
-
-?>

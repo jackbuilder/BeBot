@@ -50,7 +50,7 @@ class ClassName extends BaseActiveModule
     Creates settings for the module
     Defines help for the commands
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         //Initialize the base module
         parent::__construct($bot, get_class($this));
@@ -143,14 +143,13 @@ class ClassName extends BaseActiveModule
         $this->help['notes'] = "Notes for the help goes in here.";
     }
 
-
     /*
     Unified message handler
     $source: The originating player
     $msg: The actual message, including command prefix and all
     $type: The channel the message arrived from. This can be either "tell", "pgmsg" or "gc"
     */
-    function command_handler($source, $msg, $origin)
+    public function command_handler($source, $msg, $origin)
     {
         //ALWAYS reset the error handler before parsing the commands to prevent stale errors from giving false reports
         $this->error->reset();
@@ -173,74 +172,65 @@ class ClassName extends BaseActiveModule
         default:
             // Just a safety net to allow you to catch errors where a module has registered  a command, but fails to actually do anything about it
             $this->error->set("Broken plugin, received unhandled command: $command");
+
             return ($this->error->message());
         }
     }
 
-
     /*
     This gets called on a msg in the group if you previously registered the event 'gmsg, group'
     */
-    function gmsg($name, $group, $msg)
+    public function gmsg($name, $group, $msg)
     {
     }
-
 
     /*
     This gets called on a msg in the privgroup without a command if you previously registered the event 'privgroup'
     */
-    function privgroup($name, $msg)
+    public function privgroup($name, $msg)
     {
     }
-
 
     /*
     This gets called if someone joins the privgroup if you previously registered the event 'pgjoin'
     */
-    function pgjoin($name)
+    public function pgjoin($name)
     {
     }
-
 
     /*
     This gets called if someone leaves the privgroup if you previously registered the event 'pgleave'
     */
-    function pgleave($name)
+    public function pgleave($name)
     {
     }
-
 
     /*
     This gets called if a buddy logs on/off  if you previously registered the event 'buddy'
     */
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
     }
-
 
     /*
     This gets called on cron  if you previously registered the event 'cron, interval'
     $interval is the string name for the time delay between two cron jobs.
     */
-    function cron($interval)
+    public function cron($interval)
     {
     }
-
 
     /*
     This gets called when bot connects  if you previously registered the event 'connect'
     */
-    function connect()
+    public function connect()
     {
     }
-
 
     /*
     This gets called when bot disconnects  if you previously registered the event 'disconnect'
     */
-    function disconnect()
+    public function disconnect()
     {
     }
 }
-
-?>

@@ -4,8 +4,7 @@
  */
 class PBSignedInt extends PBScalar
 {
-    var $wired_type = PBMessage::WIRED_VARINT;
-
+    public $wired_type = PBMessage::WIRED_VARINT;
 
     /**
      * Parses the message for this type
@@ -24,7 +23,6 @@ class PBSignedInt extends PBScalar
         }
     }
 
-
     /**
      * Serializes type
      */
@@ -34,8 +32,7 @@ class PBSignedInt extends PBScalar
         $save = $this->value;
         if ($this->value < 0) {
             $this->value = abs($this->value) * 2 - 1;
-        }
-        else {
+        } else {
             $this->value = $this->value * 2;
         }
         $string = parent::SerializeToString($rec);
@@ -45,5 +42,3 @@ class PBSignedInt extends PBScalar
         return $string;
     }
 }
-
-?>

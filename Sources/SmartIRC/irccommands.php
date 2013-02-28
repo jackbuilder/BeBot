@@ -42,7 +42,7 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return boolean
      * @access public
      */
-    function message($type, $destination, $message, $priority = SMARTIRC_MEDIUM)
+    public function message($type, $destination, $message, $priority = SMARTIRC_MEDIUM)
     {
         switch ($type) {
         case SMARTIRC_TYPE_CHANNEL:
@@ -69,7 +69,6 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
         return TRUE;
     }
 
-
     /**
      * returns an object reference to the specified channel
      *
@@ -84,12 +83,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
     {
         if (isset($this->_channels[strtolower($channelname)])) {
             return $this->_channels[strtolower($channelname)];
-        }
-        else {
+        } else {
             return FALSE;
         }
     }
-
 
     // <IRC methods>
     /**
@@ -97,12 +94,12 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      *
      * @param mixed   $channelarray
      * @param string  $key
-     * @param integer $priority message priority, default is SMARTIRC_MEDIUM
+     * @param integer $priority     message priority, default is SMARTIRC_MEDIUM
      *
      * @return void
      * @access public
      */
-    function join($channelarray, $key = NULL, $priority = SMARTIRC_MEDIUM)
+    public function join($channelarray, $key = NULL, $priority = SMARTIRC_MEDIUM)
     {
         if (!is_array($channelarray)) {
             $channelarray = array($channelarray);
@@ -112,24 +109,22 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 
         if ($key !== NULL) {
             $this->_send('JOIN ' . $channellist . ' ' . $key, $priority);
-        }
-        else {
+        } else {
             $this->_send('JOIN ' . $channellist, $priority);
         }
     }
-
 
     /**
      * parts from one or more IRC channels with an optional reason
      *
      * @param mixed   $channelarray
      * @param string  $reason
-     * @param integer $priority message priority, default is SMARTIRC_MEDIUM
+     * @param integer $priority     message priority, default is SMARTIRC_MEDIUM
      *
      * @return void
      * @access public
      */
-    function part($channelarray, $reason = NULL, $priority = SMARTIRC_MEDIUM)
+    public function part($channelarray, $reason = NULL, $priority = SMARTIRC_MEDIUM)
     {
         if (!is_array($channelarray)) {
             $channelarray = array($channelarray);
@@ -139,12 +134,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 
         if ($reason !== NULL) {
             $this->_send('PART ' . $channellist . ' :' . $reason, $priority);
-        }
-        else {
+        } else {
             $this->_send('PART ' . $channellist, $priority);
         }
     }
-
 
     /**
      * Kicks one or more user from an IRC channel with an optional reason.
@@ -152,12 +145,12 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @param string  $channel
      * @param mixed   $nicknamearray
      * @param string  $reason
-     * @param integer $priority message priority, default is SMARTIRC_MEDIUM
+     * @param integer $priority      message priority, default is SMARTIRC_MEDIUM
      *
      * @return void
      * @access public
      */
-    function kick(
+    public function kick(
         $channel, $nicknamearray, $reason = NULL,
         $priority = SMARTIRC_MEDIUM
     )
@@ -170,12 +163,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 
         if ($reason !== NULL) {
             $this->_send('KICK ' . $channel . ' ' . $nicknamelist . ' :' . $reason, $priority);
-        }
-        else {
+        } else {
             $this->_send('KICK ' . $channel . ' ' . $nicknamelist, $priority);
         }
     }
-
 
     /**
      * gets a list of one ore more channels
@@ -184,12 +175,12 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * (use it with care, usualy its a looooong list)
      *
      * @param mixed   $channelarray
-     * @param integer $priority message priority, default is SMARTIRC_MEDIUM
+     * @param integer $priority     message priority, default is SMARTIRC_MEDIUM
      *
      * @return void
      * @access public
      */
-    function getList($channelarray = NULL, $priority = SMARTIRC_MEDIUM)
+    public function getList($channelarray = NULL, $priority = SMARTIRC_MEDIUM)
     {
         if ($channelarray !== NULL) {
             if (!is_array($channelarray)) {
@@ -198,12 +189,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 
             $channellist = implode(',', $channelarray);
             $this->_send('LIST ' . $channellist, $priority);
-        }
-        else {
+        } else {
             $this->_send('LIST', $priority);
         }
     }
-
 
     /**
      * requests all nicknames of one or more channels
@@ -211,12 +200,12 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * The requested nickname list also includes op and voice state
      *
      * @param mixed   $channelarray
-     * @param integer $priority message priority, default is SMARTIRC_MEDIUM
+     * @param integer $priority     message priority, default is SMARTIRC_MEDIUM
      *
      * @return void
      * @access public
      */
-    function names($channelarray = NULL, $priority = SMARTIRC_MEDIUM)
+    public function names($channelarray = NULL, $priority = SMARTIRC_MEDIUM)
     {
         if ($channelarray !== NULL) {
             if (!is_array($channelarray)) {
@@ -225,12 +214,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
 
             $channellist = implode(',', $channelarray);
             $this->_send('NAMES ' . $channellist, $priority);
-        }
-        else {
+        } else {
             $this->_send('NAMES', $priority);
         }
     }
-
 
     /**
      * sets a new topic of a channel
@@ -242,11 +229,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function setTopic($channel, $newtopic, $priority = SMARTIRC_MEDIUM)
+    public function setTopic($channel, $newtopic, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('TOPIC ' . $channel . ' :' . $newtopic, $priority);
     }
-
 
     /**
      * gets the topic of a channel
@@ -257,11 +243,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function getTopic($channel, $priority = SMARTIRC_MEDIUM)
+    public function getTopic($channel, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('TOPIC ' . $channel, $priority);
     }
-
 
     /**
      * sets or gets the mode of an user or channel
@@ -275,16 +260,14 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function mode($target, $newmode = NULL, $priority = SMARTIRC_MEDIUM)
+    public function mode($target, $newmode = NULL, $priority = SMARTIRC_MEDIUM)
     {
         if ($newmode !== NULL) {
             $this->_send('MODE ' . $target . ' ' . $newmode, $priority);
-        }
-        else {
+        } else {
             $this->_send('MODE ' . $target, $priority);
         }
     }
-
 
     /**
      * ops an user in the given channel
@@ -296,11 +279,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function op($channel, $nickname, $priority = SMARTIRC_MEDIUM)
+    public function op($channel, $nickname, $priority = SMARTIRC_MEDIUM)
     {
         $this->mode($channel, '+o ' . $nickname, $priority);
     }
-
 
     /**
      * deops an user in the given channel
@@ -312,11 +294,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function deop($channel, $nickname, $priority = SMARTIRC_MEDIUM)
+    public function deop($channel, $nickname, $priority = SMARTIRC_MEDIUM)
     {
         $this->mode($channel, '-o ' . $nickname, $priority);
     }
-
 
     /**
      * voice a user in the given channel
@@ -328,11 +309,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function voice($channel, $nickname, $priority = SMARTIRC_MEDIUM)
+    public function voice($channel, $nickname, $priority = SMARTIRC_MEDIUM)
     {
         $this->mode($channel, '+v ' . $nickname, $priority);
     }
-
 
     /**
      * devoice a user in the given channel
@@ -344,11 +324,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function devoice($channel, $nickname, $priority = SMARTIRC_MEDIUM)
+    public function devoice($channel, $nickname, $priority = SMARTIRC_MEDIUM)
     {
         $this->mode($channel, '-v ' . $nickname, $priority);
     }
-
 
     /**
      * bans a hostmask for the given channel or requests the current banlist
@@ -362,16 +341,14 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function ban($channel, $hostmask = NULL, $priority = SMARTIRC_MEDIUM)
+    public function ban($channel, $hostmask = NULL, $priority = SMARTIRC_MEDIUM)
     {
         if ($hostmask !== NULL) {
             $this->mode($channel, '+b ' . $hostmask, $priority);
-        }
-        else {
+        } else {
             $this->mode($channel, 'b', $priority);
         }
     }
-
 
     /**
      * unbans a hostmask on the given channel
@@ -383,11 +360,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function unban($channel, $hostmask, $priority = SMARTIRC_MEDIUM)
+    public function unban($channel, $hostmask, $priority = SMARTIRC_MEDIUM)
     {
         $this->mode($channel, '-b ' . $hostmask, $priority);
     }
-
 
     /**
      * invites a user to the specified channel
@@ -399,11 +375,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function invite($nickname, $channel, $priority = SMARTIRC_MEDIUM)
+    public function invite($nickname, $channel, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('INVITE ' . $nickname . ' ' . $channel, $priority);
     }
-
 
     /**
      * changes the own nickname
@@ -416,12 +391,11 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function changeNick($newnick, $priority = SMARTIRC_MEDIUM)
+    public function changeNick($newnick, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('NICK ' . $newnick, $priority);
         $this->_nick = $newnick;
     }
-
 
     /**
      * requests a 'WHO' from the specified target
@@ -432,11 +406,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function who($target, $priority = SMARTIRC_MEDIUM)
+    public function who($target, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('WHO ' . $target, $priority);
     }
-
 
     /**
      * requests a 'WHOIS' from the specified target
@@ -447,11 +420,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function whois($target, $priority = SMARTIRC_MEDIUM)
+    public function whois($target, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('WHOIS ' . $target, $priority);
     }
-
 
     /**
      * requests a 'WHOWAS' from the specified target
@@ -463,11 +435,10 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function whowas($target, $priority = SMARTIRC_MEDIUM)
+    public function whowas($target, $priority = SMARTIRC_MEDIUM)
     {
         $this->_send('WHOWAS ' . $target, $priority);
     }
-
 
     /**
      * sends QUIT to IRC server and disconnects
@@ -478,15 +449,12 @@ class Net_SmartIRC_irccommands extends Net_SmartIRC_base
      * @return void
      * @access public
      */
-    function quit($quitmessage = NULL, $priority = SMARTIRC_MEDIUM)
+    public function quit($quitmessage = NULL, $priority = SMARTIRC_MEDIUM)
     {
         if ($quitmessage !== NULL) {
             $this->_send('QUIT :' . $quitmessage, $priority);
-        }
-        else {
+        } else {
             $this->_send('QUIT', $priority);
         }
     }
 }
-
-?>

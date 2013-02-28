@@ -37,7 +37,7 @@ The Class itself...
 */
 class MassMsg extends BaseActiveModule
 {
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'announce', 'LEADER');
@@ -67,8 +67,7 @@ class MassMsg extends BaseActiveModule
             ->define_scheme("massmsg", "disable", "seablue");
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $com = $this->parse_com(
             $msg, array(
@@ -79,10 +78,12 @@ class MassMsg extends BaseActiveModule
         switch ($com['com']) {
         case 'announce':
             $this->bot->send_output($name, "Mass message being sent. Please stand by...", $origin);
+
             return ($this->mass_msg($name, $com['args'], 'Message'));
             break;
         case 'massinv':
             $this->bot->send_output($name, "Mass invite being sent. Please stand by...", $origin);
+
             return ($this->mass_msg($name, $com['args'], 'Invite'));
             break;
         default:
@@ -90,8 +91,7 @@ class MassMsg extends BaseActiveModule
         }
     }
 
-
-    function mass_msg($sender, $msg, $type)
+    public function mass_msg($sender, $msg, $type)
     {
         //get a list of online users in the configured channel.
         $users = $this->bot->core('online')->list_users(
@@ -119,22 +119,20 @@ class MassMsg extends BaseActiveModule
                 ->get($recipient, 'MassMsg', 'receive_message') == 'Yes'
             ) {
                 $massmsg = TRUE;
-            }
-            else {
+            } else {
                 $massmsg = FALSE;
             }
             if ($this->bot->core('prefs')
                 ->get($recipient, 'MassMsg', 'receive_invites') == 'Yes'
             ) {
                 $massinv = TRUE;
-            }
-            else {
+            } else {
                 $massinv = FALSE;
             }
             //Add link to preferences according to settings
             if ($this->bot->core('settings')->get('MassMsg', 'IncludePrefLink')
             ) {
-                if (!isset($blobs[(int)$massmsg][(int)$massinv])) {
+                if (!isset($blobs[(int) $massmsg][(int) $massinv])) {
                     $blob = $this->bot
                         ->core('prefs')
                         ->show_prefs($recipient, 'MassMsg', FALSE);
@@ -142,11 +140,10 @@ class MassMsg extends BaseActiveModule
                         ->core("colors")->parse($blob);
                     $blob = $this->bot
                         ->core("colors")->colorize("normal", $blob);
-                    $blobs[(int)$massmsg][(int)$massinv] = $blob;
+                    $blobs[(int) $massmsg][(int) $massinv] = $blob;
                 }
-                $message = $msg . $blobs[(int)$massmsg][(int)$massinv];
-            }
-            else {
+                $message = $msg . $blobs[(int) $massmsg][(int) $massinv];
+            } else {
                 $message = $msg;
             }
             //If they want messages they will get them regardless of type
@@ -157,13 +154,11 @@ class MassMsg extends BaseActiveModule
                 ) {
                     $status[$recipient]['sent'] = FALSE;
                     $status[$recipient]['pg'] = TRUE;
-                }
-                else {
+                } else {
                     $this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
                     $status[$recipient]['sent'] = TRUE;
                 }
-            }
-            else {
+            } else {
                 $status[$recipient]['sent'] = FALSE;
             }
             //If type is an invite and they want invites, they will receive both a message and an invite regardless of receive_message setting
@@ -172,8 +167,7 @@ class MassMsg extends BaseActiveModule
                     if ($this->bot->core("online")->in_chat($recipient)) {
                         $status[$recipient]['sent'] = FALSE;
                         $status[$recipient]['pg'] = TRUE;
-                    }
-                    else {
+                    } else {
                         //Check if they've already gotten the tell so we don't spam unneccessarily.
                         if (!$status[$recipient]['sent']) {
                             $this->bot->send_tell($recipient, $message, 0, FALSE, TRUE, FALSE);
@@ -181,42 +175,37 @@ class MassMsg extends BaseActiveModule
                         }
                         if ($this->bot->core("queue")->check_queue("invite")) {
                             $this->bot->core('chat')->pgroup_invite($recipient);
-                        }
-                        else {
+                        } else {
                             $this->bot->core("queue")
                                 ->into_queue("invite", $recipient);
                         }
                         $status[$recipient]['invited'] = TRUE;
                     }
-                }
-                else {
+                } else {
                     $status[$recipient]['invited'] = FALSE;
                 }
             }
         }
+
         return ("Mass messages complete. " . $this->make_status_blob($status));
     }
 
-
-    function make_status_blob($status_array)
+    public function make_status_blob($status_array)
     {
         $window = "<center>##blob_title##::: Status report for mass message :::##end##</center>\n";
         foreach ($status_array as $recipient => $status) {
             $window .= "\n##highlight##$recipient##end## - Message: ";
             if ($status['sent']) {
                 $window .= "##lime##Sent to user##end##";
-            }
-            elseif ($status['pg']) {
+            } elseif ($status['pg']) {
                 $window .= "##lime##Viewed in PG##end##";
-            }
-            else {
+            } else {
                 $window .= "##error##Blocked by preferences##end##";
             }
             if (isset($status['invited'])) {
                 if ($status['invited']) {
                     $window .= " - Invite to pgroup: ##lime##sent to user##end##";
-                }
-                else {
+                } else {
                     $window .= " - Invite to pgroup: ##error##blocked by preferences##end##";
                 }
             }
@@ -230,8 +219,7 @@ class MassMsg extends BaseActiveModule
                 }
             }
         }
+
         return ($this->bot->core('tools')->make_blob('report', $window));
     }
 }
-
-?>

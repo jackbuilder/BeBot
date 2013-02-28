@@ -39,8 +39,7 @@ class BotError
     private $description;
     private $source;
 
-
-    function __construct(&$bot, $module)
+    public function __construct(&$bot, $module)
     {
         $this->status = FALSE;
         $this->is_fatal = FALSE;
@@ -49,22 +48,19 @@ class BotError
         $this->bot = $bot;
     }
 
-
-    function status()
+    public function status()
     {
         return $this->status;
     }
 
-
-    function reset()
+    public function reset()
     {
         $this->status = FALSE;
         $this->is_fatal = FALSE;
         $this->description = '';
     }
 
-
-    function set($description, $log = TRUE, $fatal = FALSE)
+    public function set($description, $log = TRUE, $fatal = FALSE)
     {
         $this->description = $description;
         $this->is_error = TRUE;
@@ -78,23 +74,18 @@ class BotError
         }
     }
 
-
-    function set_description($description)
+    public function set_description($description)
     {
         $this->description = $description;
     }
 
-
-    function get()
+    public function get()
     {
         return $this->description;
     }
 
-
-    function message()
+    public function message()
     {
         return "##error##Error: ##end##The module ##highlight##{$this->source}##end## returned the error ##error##{$this->description}##end##";
     }
 }
-
-?>

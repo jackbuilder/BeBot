@@ -4,8 +4,7 @@
  */
 class PBInputStringReader extends PBInputReader
 {
-    var $length = 0;
-
+    public $length = 0;
 
     public function __construct($string)
     {
@@ -13,7 +12,6 @@ class PBInputStringReader extends PBInputReader
         $this->string = $string;
         $this->length = strlen($string);
     }
-
 
     /**
      * get the next
@@ -41,15 +39,13 @@ class PBInputStringReader extends PBInputReader
             if ($value >= 10000000 && $is_string == FALSE) {
                 // now fill to eight with 00
                 $package .= $value;
-            }
-            else {
+            } else {
                 // now fill to length of eight with 0
                 $value = substr('00000000', 0, 8 - strlen($value) % 8) . $value;
                 $ret = $this->base128->get_value($package . $value);
+
                 return $ret;
             }
         }
     }
 }
-
-?>

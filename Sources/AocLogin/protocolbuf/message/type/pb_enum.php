@@ -4,8 +4,7 @@
  */
 class PBEnum extends PBScalar
 {
-    var $wired_type = PBMessage::WIRED_VARINT;
-
+    public $wired_type = PBMessage::WIRED_VARINT;
 
     /**
      * Parses the message for this type
@@ -16,7 +15,6 @@ class PBEnum extends PBScalar
     {
         $this->value = $this->reader->next();
     }
-
 
     /**
      * Serializes type
@@ -35,5 +33,3 @@ class PBEnum extends PBScalar
         return $string;
     }
 }
-
-?>

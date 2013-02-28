@@ -38,7 +38,7 @@ $commandaliasinterface = new CommandAliasInterface($bot);
 class CommandAliasInterface extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'comalias', 'SUPERADMIN');
@@ -49,8 +49,7 @@ class CommandAliasInterface extends BaseActiveModule
         $this->help['command']['comalias'] = "Show All Aliases.";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $var = explode(" ", $msg, 3);
         switch ($var[1]) {
@@ -64,5 +63,3 @@ class CommandAliasInterface extends BaseActiveModule
         }
     }
 }
-
-?>

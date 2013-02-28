@@ -33,13 +33,13 @@
 */
 /*
 * Provides fun text filters:
-	- rot13 (rot13 encodes text)
-	- chef (Sweedish Chef)
-	- pirate (Talk like a Pirate)
-	- eleet (l33t Filter)
-	- fudd (Elmer Fudd)
+    - rot13 (rot13 encodes text)
+    - chef (Sweedish Chef)
+    - pirate (Talk like a Pirate)
+    - eleet (l33t Filter)
+    - fudd (Elmer Fudd)
 * Also provides some useful filters:
-	- nofont (removes font tags)
+    - nofont (removes font tags)
 */
 $funfilters = new FunFilters($bot);
 /*
@@ -55,18 +55,18 @@ class FunFilters extends BasePassiveModule
     Creates settings for the module
     Defines help for the commands
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("funfilters");
     }
 
-
     /*
     Rot13 something
     */
-    function rot13($text)
+    public function rot13($text)
     { // Start function rot13()
+
         return str_rot13($text);
     } // End function rot13()
 
@@ -75,10 +75,11 @@ class FunFilters extends BasePassiveModule
     For BeBot, this should remove all color formatting.
     I don't think font tags are used to change any other properties...
     */
-    function nofont($text)
+    public function nofont($text)
     { // Start function nocolor()
         $text = preg_replace("/<font.*?>/", "", $text);
         $text = preg_replace("/</font>/", "", $text);
+
         return $text;
     } // End function nocolor()
 
@@ -93,7 +94,7 @@ class FunFilters extends BasePassiveModule
     form that worked in PHP, so I modified things a little bit. The output is the same, but I'm
     sure there is a much better way of achieving it.
     */
-    function chef($text)
+    public function chef($text)
     { // Start function chef()
         // Save "The" for later
         // the: 116, 104, 101
@@ -148,13 +149,14 @@ class FunFilters extends BasePassiveModule
         $text = preg_replace("/\B[^a-hj-zA-HJ-Z]*i/", "ee", $text);
         // Special punctuation of the end of sentances but only at end of lines.
         $text = preg_replace("/([.!?])/", "$1\nBork Bork Bork!", $text);
+
         return $text;
     } // End function chef()
 
     /*
     Talk like a Pirate!
     */
-    function pirate($text)
+    public function pirate($text)
     { // Start function pirate.
         $text = trim($text);
         $trans_table = array(
@@ -249,8 +251,7 @@ class FunFilters extends BasePassiveModule
         if (preg_match("/(\.( |\t|$))/", $text, $info)) {
             $win = $this->winner(2);
             $stub = $info[1];
-        }
-        else {
+        } else {
             if (preg_match("/([!\?]( \t|$))/", $text, $info)) {
                 $win = $this->winner(3);
                 $stub = $info[1];
@@ -282,10 +283,11 @@ class FunFilters extends BasePassiveModule
             $text = rtrim($text, $stub);
             $text = $text . $shouts[array_rand($shouts, 1)];
         }
+
         return $text;
     } // End function pirate()
 
-    function eleet($text)
+    public function eleet($text)
     { // Start function eleet()
         $text = strtolower($text);
         $norm = array(
@@ -353,10 +355,11 @@ class FunFilters extends BasePassiveModule
         $text = str_replace("1337", "l33t", $text);
         // Add some other wierdness.
         $text = str_replace("h07", "h4Wt", $text);
+
         return $text;
     } // End function eleet()
 
-    function fudd($text)
+    public function fudd($text)
     { // Start function fudd()
         $text = preg_replace("/[rl]/", "w", $text);
         $text = preg_replace("/qu/", "qw", $text);
@@ -370,12 +373,13 @@ class FunFilters extends BasePassiveModule
         $text = preg_replace("/TH\B/", "D", $text);
         $text = preg_replace("/Th/", "D", $text);
         $text = preg_replace("/N\./", "N, uh-hah-hah-hah.", $text);
+
         return $text;
     } // End function fudd()
 
     /*
     Censors text.
-    function censor($text)
+    public function censor($text)
     */
     /*
     // Build your own word list.
@@ -414,6 +418,7 @@ class FunFilters extends BasePassiveModule
         $text = str_replace($strings, "PRAFBERQ", $text);
         $text = str_rot13($text);
         $text = ucfirst($text);
+
         return $text;
     } // End function censor()
     */
@@ -431,7 +436,7 @@ class FunFilters extends BasePassiveModule
     if $chance is and it was determend that high was the winning range:
         spilt would be 33 so that a high number would be 34-100.
     */
-    function winner($chance)
+    public function winner($chance)
     { // Start function winner()
         $win = FALSE;
         $rand_max = mt_getrandmax();
@@ -442,15 +447,13 @@ class FunFilters extends BasePassiveModule
             if ($rand_int >= $split) {
                 $win = TRUE;
             }
-        }
-        else {
+        } else {
             $split = round($rand_max - $rand_max / $chance);
             if ($rand_int <= $split) {
                 $win = TRUE;
             }
         }
+
         return $win;
     } // End function winner()
 }
-
-?>

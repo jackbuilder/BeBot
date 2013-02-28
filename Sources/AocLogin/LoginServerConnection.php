@@ -1,7 +1,7 @@
 <?php
 
-include_once "ServerConnection.php";
-include_once "Endpoints.php";
+include_once 'ServerConnection.php';
+include_once 'Endpoints.php';
 
 define('RPC_UNIVERSE_INIT', 0);
 define('RPC_UNIVERSE_CHALLENGE', 0);
@@ -23,7 +23,6 @@ class LoginServerConnection extends ServerConnection
     private $m_CharacterServerAddress;
     private $m_CharacterServerPort;
 
-
     public function LoginServerConnection(
         $parent, $username, $password,
         $serverAddress, $serverPort,
@@ -43,7 +42,6 @@ class LoginServerConnection extends ServerConnection
         $this->m_Password = $password;
     }
 
-
     /// GetCharacterServerAddress
     /// Returns the address of the character server
     /// @return String [return] Name of the server ( like server.ageofconan.com )
@@ -52,7 +50,6 @@ class LoginServerConnection extends ServerConnection
     {
         return $this->m_CharacterServerAddress;
     }
-
 
     /// GetCharacterServerPort
     /// Returns the port of the character server
@@ -63,7 +60,6 @@ class LoginServerConnection extends ServerConnection
         return $this->m_CharacterServerPort;
     }
 
-
     /// GetSeed
     /// Returns the cookie used to log in to all the other servers
     /// @return uint32 [return] Returns the cookie
@@ -72,7 +68,6 @@ class LoginServerConnection extends ServerConnection
     {
         return $this->m_LoginCookie;
     }
-
 
     /// GetPlayerID
     /// Return the ID of the account that we are logging in with
@@ -83,7 +78,6 @@ class LoginServerConnection extends ServerConnection
         return $this->m_AccountID;
     }
 
-
     /// Connect
     /// Connects to the login server and sends the initial login packet
     /// @author Chaoz
@@ -91,11 +85,12 @@ class LoginServerConnection extends ServerConnection
     {
         if (parent::Connect()) {
             $this->SendAuthentication();
+
             return TRUE;
         }
+
         return FALSE;
     }
-
 
     /// SendAuthentication
     /// Sends the username to the login server
@@ -108,8 +103,7 @@ class LoginServerConnection extends ServerConnection
             $stream->WriteString("");
             $stream->WriteString($key);
             $stream->WriteUInt32(1);
-        }
-        else {
+        } else {
             if ($this->m_EndpointType == LOGIN_TYPE_PROTOBUF) {
                 $stream->WriteString($this->m_Username);
                 $stream->WriteUInt32(1);
@@ -118,7 +112,6 @@ class LoginServerConnection extends ServerConnection
 
         parent::EncryptAndSend($stream, RPC_UNIVERSE_INIT);
     }
-
 
     /// AnswerChallenge
     /// Generates an encrypted login key based of the seed, username and password
@@ -133,7 +126,6 @@ class LoginServerConnection extends ServerConnection
         $stream->WriteString($response);
         parent::EncryptAndSend($stream, RPC_UNIVERSE_ANSWERCHALLENGE);
     }
-
 
     /// HandlePackets
     /// Handles all incoming messages from the loginserver.
@@ -166,11 +158,13 @@ class LoginServerConnection extends ServerConnection
 
                 if ($authStatus != 1) {
                     echo("[" . $this->m_LogName . "] Failed to authenticate [auth:$authStatus] \n");
+
                     return FALSE;
                 }
 
                 if ($loginStatus != 0) {
                     echo("[" . $this->m_LogName . "] Failed to log in [login error:$loginStatus] : " . parent::displayConanError($loginStatus) . "\n");
+
                     return FALSE;
                 }
 
@@ -178,9 +172,11 @@ class LoginServerConnection extends ServerConnection
                 if (strlen($tmAddress) != 0) {
                     list($this->m_CharacterServerAddress, $this->m_CharacterServerPort) = split(":", $tmAddress);
                     echo "[" . $this->m_LogName . "] Received character server address [ " . $this->m_CharacterServerAddress . ":" . $this->m_CharacterServerPort . " ]\n";
+
                     return TRUE;
                 }
                 echo("[" . $this->m_LogName . "] Failed to receive the character server address\n");
+
                 return FALSE;
                 }
 
@@ -189,6 +185,7 @@ class LoginServerConnection extends ServerConnection
                 trigger_error("RPC_UNIVERSE_INTERNAL_ERROR: Internal error", E_USER_WARNING);
                 $this->Disconnect("Internal error");
                 }
+
                 return FALSE;
 
             case RPC_UNIVERSE_ERROR:
@@ -196,6 +193,7 @@ class LoginServerConnection extends ServerConnection
                 //trigger_error("RPC_UNIVERSE_ERROR: Error while authenticating to universe [Err:".$this->displayConanError($packet->args[0])."]",E_USER_WARNING);
                 $this->Disconnect("Universe Error");
                 }
+
                 return FALSE;
 
             case RPC_UNIVERSE_SETREGION:
@@ -203,6 +201,7 @@ class LoginServerConnection extends ServerConnection
 
             case -1:
                 trigger_error("RPC_LOGINSERVER_ERROR: Error while reading message header [Err:Unknown RPC ID]", E_USER_WARNING);
+
                 return FALSE;
 
             default:
@@ -210,11 +209,8 @@ class LoginServerConnection extends ServerConnection
                 break;
             }
 
-        }
-        while (TRUE);
+        } while (TRUE);
 
         return TRUE;
     }
 }
-
-?>

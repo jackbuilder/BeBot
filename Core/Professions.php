@@ -39,8 +39,7 @@ class Profession_Core extends BasePassiveModule
     private $cache = array();
     private $units = array();
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query("DROP TABLE IF EXISTS #___professions");
@@ -60,8 +59,7 @@ class Profession_Core extends BasePassiveModule
                 'Herald of Xotli' => 'hox',
                 'Demonologist' => 'demo'
             );
-        }
-        else {
+        } else {
             $this->cache = array(
                 'Adventurer' => 'adv',
                 'Agent' => 'agent',
@@ -116,11 +114,10 @@ class Profession_Core extends BasePassiveModule
         }
     }
 
-
     // Returns full name of $shortcut,
     // Returns correct cased full name if $shortcut already is a full name
     // Returns BotError if it's neither
-    function full_name($shortcut)
+    public function full_name($shortcut)
     {
         $this->error->reset();
         $shortcut = strtolower($shortcut);
@@ -137,6 +134,7 @@ class Profession_Core extends BasePassiveModule
         // error otherwise
         else {
             $this->error->set("##highlight##'$shortcut'##end## is not a valid profession name or shortcut.");
+
             return ($this->error);
         }
     }
@@ -145,7 +143,7 @@ class Profession_Core extends BasePassiveModule
     // Returns the shortcut of $profession
     // Returns $profession is already a shortcut
     // Returns BotError if it's neither
-    function shortcut($profession)
+    public function shortcut($profession)
     {
         $this->error->reset();
         $profession = str_replace('-', ' ', ucfirst(strtolower($profession)));
@@ -156,51 +154,45 @@ class Profession_Core extends BasePassiveModule
         //Check if $profession is a valid shortcut.
         elseif (in_array($profession, $this->cache)) {
             return ($profession);
-        }
-        else {
+        } else {
             $this->error->set("'$profession' is not a valid profession name or shortcut.");
+
             return ($this->error);
         }
     }
 
-
     //Returns a list of professions separated by $separator
-    function get_professions($separator = ', ')
+    public function get_professions($separator = ', ')
     {
         return (implode($separator, array_keys($this->cache)));
     }
 
-
     //Returns an array with professions
-    function get_profession_array()
+    public function get_profession_array()
     {
         return (array_values(array_flip($this->cache)));
     }
 
-
-    function get_shortcuts($separator = ', ')
+    public function get_shortcuts($separator = ', ')
     {
         return (implode($separator, $this->cache));
     }
 
-
     //Returns an array with shortcuts
-    function get_shortcut_array()
+    public function get_shortcut_array()
     {
         return (array_values($this->cache));
     }
 
-
     //Returns an array with all units
-    function get_unit_array()
+    public function get_unit_array()
     {
         return (array_keys($this->units));
     }
 
-
     //Returns all units $profession is a member of
     //$profession can be a full name or a short hand.
-    function get_units($profession)
+    public function get_units($profession)
     {
         if (($profession = $this->full_name($profession)) instanceof BotError) {
             return $profession;
@@ -211,15 +203,13 @@ class Profession_Core extends BasePassiveModule
                 $prof_units[] = $unit;
             }
         }
+
         return $prof_units;
     }
 
-
     //Gets a list of units that $profession is a member of separated by $separator
-    function get_unit_list($profession, $separator = ', ')
+    public function get_unit_list($profession, $separator = ', ')
     {
         return (implode($separator, $this->get_units($profession)));
     }
 }
-
-?>

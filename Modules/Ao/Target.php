@@ -38,14 +38,13 @@ The Class itself...
 class Target extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "target", "LEADER");
         if ($this->bot->guildbot) {
             $def = "both";
-        }
-        else {
+        } else {
             $def = "pgmsg";
         }
         $this->bot->core("settings")
@@ -54,18 +53,17 @@ class Target extends BaseActiveModule
         $this->help['command']['target'] = "Calls for attack on <target>.";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $this->call_target($name, $msg);
+
         return FALSE;
     }
-
 
     /*
     Makes the message
     */
-    function call_target($name, $msg)
+    public function call_target($name, $msg)
     {
         $msg = explode(" ", $msg);
         $message = "";
@@ -82,5 +80,3 @@ class Target extends BaseActiveModule
         );
     }
 }
-
-?>

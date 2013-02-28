@@ -38,7 +38,7 @@ The Class itself...
 class Identify extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'identify', 'GUEST');
@@ -49,19 +49,16 @@ class Identify extends BaseActiveModule
         $this->help['notes'] = "<item> must be an item reference. Multiple items may be posted at a time.";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^identify (.+)$/i", $msg, $info)) {
             return $this->item_parser($info[1]);
-        }
-        else {
+        } else {
             return "0 Items Posted";
         }
     }
 
-
-    function item_parser($msg)
+    public function item_parser($msg)
     {
         $items = preg_split('/<\/a>/', $msg, -1, PREG_SPLIT_NO_EMPTY);
         //$items = explode("><",$msg);
@@ -76,16 +73,15 @@ class Identify extends BaseActiveModule
         }
         if ($count == 1) {
             $return = str_replace("\n", " ", $return);
+
             return $count . " item posted :: " . $return;
-        }
-        else {
+        } else {
             return $count . " items posted :: " . $this->bot->core("tools")
                 ->make_blob("click to view", $return);
         }
     }
 
-
-    function identify_item($low, $high, $ql)
+    public function identify_item($low, $high, $ql)
     {
         switch ($high) {
             // List all the AI Biomaterial items
@@ -295,8 +291,7 @@ class Identify extends BaseActiveModule
                 ->make_item($lowid, $highid, $ql, $type) . "\n";
         }
         $return .= $purpose . "\n";
+
         return $return;
     }
 }
-
-?>

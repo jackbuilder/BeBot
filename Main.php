@@ -67,12 +67,11 @@ _/_/_/      _/_/_/  _/_/_/      _/_/        _/_/   \n
                      And                           \n
           An Age of Conan Chat Automaton           \n
           v.$bot_version - PHP $php_version        \n
-		  OS: $os                                  \n
+          OS: $os                                  \n
 ===================================================\n
 ";
 
 sleep(2);
-
 
 /*
 Load up the required files.
@@ -82,12 +81,12 @@ MySQL.php: Used to communicate with the MySQL database
 AOChat.php: Interface to communicate with AO chat servers
 Bot.php: The actual bot itself.
 */
-require_once "./Sources/RequirementCheck.php";
-require_once "./Sources/MySQL.php";
-require_once "./Sources/AOChat.php";
-require_once "./Sources/ConfigMagik.php";
-require_once "./Sources/Bot.php";
-require_once "./Sources/sfEventDispatcher.php";
+require_once './Sources/RequirementCheck.php';
+require_once './Sources/MySQL.php';
+require_once './Sources/AOChat.php';
+require_once './Sources/ConfigMagik.php';
+require_once './Sources/Bot.php';
+require_once './Sources/sfEventDispatcher.php';
 
 /*
 Creating the bot.
@@ -95,8 +94,7 @@ Creating the bot.
 echo "Creating main Bot class!\n";
 if (isset($argv[1])) {
     $bothandle = Bot::factory($argv[1]);
-}
-else {
+} else {
     $bothandle = Bot::factory();
 }
 $bot = Bot::get_instance($bothandle);
@@ -133,4 +131,3 @@ while (TRUE) {
     }
     $bot->cron();
 }
-?>

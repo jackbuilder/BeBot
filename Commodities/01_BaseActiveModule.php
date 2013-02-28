@@ -34,17 +34,14 @@ abstract class BaseActiveModule extends BasePassiveModule
     public $help; //A window containing help text for this module
     protected $source;
 
-
-    function __construct(&$bot, $module_name)
+    public function __construct(&$bot, $module_name)
     {
         //Save reference to bot
         parent::__construct($bot, $module_name);
     }
 
-
     // Prototype for the command_handler
     abstract protected function command_handler($name, $msg, $origin);
-
 
     // Interface to register command. Now with checks for duplicate command definitions.
     // $channel is the channel the command should be registered for. "all" can be used to register a command for gc, pgmsg and tell at once.
@@ -90,8 +87,7 @@ abstract class BaseActiveModule extends BasePassiveModule
                             ->create_subcommand($channel, $command, $subcommand, $subacl);
                     }
                 }
-            }
-            else {
+            } else {
                 //Say something useful for modules not registering commands properly.
                 $old_module = $this->bot->get_command_handler($channel, $command);
                 $this->error->set(
@@ -99,12 +95,10 @@ abstract class BaseActiveModule extends BasePassiveModule
                         . " has already been registered by '$old_module' and is attempted re-registered by {$this->module_name}"
                 );
             }
-        }
-        else {
+        } else {
             $this->error->set("Illegal channel or access level when registering command '$command'");
         }
     }
-
 
     protected function unregister_command($channel, $command)
     {
@@ -127,19 +121,16 @@ abstract class BaseActiveModule extends BasePassiveModule
         }
     }
 
-
     // Registers a command alias for an already defined command.
     protected function register_alias($command, $alias)
     {
         $this->bot->core("command_alias")->register($command, $alias);
     }
 
-
     protected function unregister_alias($alias)
     {
         $this->bot->core("command_alias")->del($alias);
     }
-
 
     // This function aids in parsing the command.
     protected function parse_com(
@@ -154,8 +145,7 @@ abstract class BaseActiveModule extends BasePassiveModule
         //preg_match for items and insert a replacement.
         if ($this->bot->game == "aoc") {
             $search_pattern = '/' . $this->bot->core('items')->itemPattern . '/i';
-        }
-        else {
+        } else {
             $search_pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         }
         $item_count = preg_match_all($search_pattern, $command, $items, PREG_SET_ORDER);
@@ -180,9 +170,9 @@ abstract class BaseActiveModule extends BasePassiveModule
         if (!isset($com['args'])) {
             $com['args'] = "";
         }
+
         return ($com);
     }
-
 
     /************************************************************************
     Default to replying in the same channel as the command has been received
@@ -193,13 +183,11 @@ abstract class BaseActiveModule extends BasePassiveModule
             if ($msg instanceof BotError) {
                 //We got an error. Return the error message.
                 $this->reply($name, $msg->message());
-            }
-            else {
+            } else {
                 $this->output_destination($name, "##normal##$msg##end##", SAME);
             }
         }
     }
-
 
     public function tell($name, $msg)
     {
@@ -211,7 +199,6 @@ abstract class BaseActiveModule extends BasePassiveModule
         }
     }
 
-
     public function gc($name, $msg)
     {
         $this->source = GC;
@@ -221,7 +208,6 @@ abstract class BaseActiveModule extends BasePassiveModule
             $this->reply($name, $reply);
         }
     }
-
 
     public function pgmsg($name, $msg)
     {
@@ -233,5 +219,3 @@ abstract class BaseActiveModule extends BasePassiveModule
         }
     }
 }
-
-?>

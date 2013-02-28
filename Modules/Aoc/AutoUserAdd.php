@@ -41,8 +41,7 @@ class AutoUserAdd extends BasePassiveModule
 {
     private $checked;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_event("gmsg", "org");
@@ -62,13 +61,13 @@ class AutoUserAdd extends BasePassiveModule
     }
 
 
-    function register(&$module)
+    public function register(&$module)
     {
         $this->hooks[] = &$module;
     }
 
 
-    function gmsg($name, $group, $msg)
+    public function gmsg($name, $group, $msg)
     {
         if (!$this->bot->core("settings")->get("Autouseradd", "Enabled")) {
             Return;
@@ -81,20 +80,18 @@ class AutoUserAdd extends BasePassiveModule
                 if ($result[0][0] != 2) {
                     $this->add_user($name);
                 }
-            }
-            else {
+            } else {
                 $this->add_user($name);
             }
         }
     }
 
 
-    function add_user($name)
+    public function add_user($name)
     {
         if ($this->bot->core("settings")->get("Autouseradd", "Notify")) {
             $silent = 0;
-        }
-        else {
+        } else {
             $silent = 1;
         }
         $this->bot->core("user")
@@ -106,5 +103,3 @@ class AutoUserAdd extends BasePassiveModule
         }
     }
 }
-
-?>

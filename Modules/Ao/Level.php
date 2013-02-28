@@ -36,7 +36,7 @@ $level = new Level($bot);
 class Level extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'level', 'GUEST');
@@ -52,8 +52,7 @@ class Level extends BaseActiveModule
         $this->make_cache();
     }
 
-
-    function make_cache()
+    public function make_cache()
     {
         $this->xplevel = array(
             1 => 1450,
@@ -531,8 +530,7 @@ class Level extends BaseActiveModule
         );
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $vars = explode(' ', strtolower($msg));
         $command = $vars[0];
@@ -544,19 +542,18 @@ class Level extends BaseActiveModule
         default:
             return "Broken plugin, received unhandled command: $command";
         }
+
         return false;
     }
 
-
-    function get_level($lvl)
+    public function get_level($lvl)
     {
         if (($lvl > 220) || ($lvl < 1)) {
             Return "Please choose a number between 1 and 220";
         }
         if ($lvl < 200) {
             $xp = " XP";
-        }
-        else {
+        } else {
             $xp = " SK";
         }
         $lvllow = floor(($lvl * 0.7226)) + 1;
@@ -566,14 +563,12 @@ class Level extends BaseActiveModule
         }
         if ($lvl <= 5) {
             $pvplow = 1;
-        }
-        else {
+        } else {
             $pvplow = round($lvl * 0.8) - 1;
         }
         if ($lvl <= 2) {
             $pvphigh = 5;
-        }
-        else {
+        } else {
             $pvphigh = $lvl + (ceil($lvl / 4)) + 1;
         }
         if ($pvphigh > 220) {
@@ -610,8 +605,7 @@ class Level extends BaseActiveModule
         Return ($return);
     }
 
-
-    function get_mish($mish)
+    public function get_mish($mish)
     {
         if (($mish > 250) || ($mish < 1)) {
             Return "Please choose a number between 1 and 250";
@@ -620,5 +614,3 @@ class Level extends BaseActiveModule
         Return ($return);
     }
 }
-
-?>

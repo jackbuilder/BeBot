@@ -39,23 +39,21 @@ class CommandAlias_Core extends BasePassiveModule
 {
     private $alias;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("command_alias");
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("command_alias", "false") . " (
-						alias VARCHAR(100) NOT NULL,
-						command VARCHAR(30) NOT NULL
-					)"
+                        alias VARCHAR(100) NOT NULL,
+                        command VARCHAR(30) NOT NULL
+                    )"
         );
         $this->alias = array();
         $this->create_caches();
     }
 
-
-    function create_caches()
+    public function create_caches()
     {
         $aliaslist = $this->bot->db->select("SELECT alias, command FROM #___command_alias");
         if (!empty($aliaslist)) {
@@ -65,8 +63,7 @@ class CommandAlias_Core extends BasePassiveModule
         }
     }
 
-
-    function register($command, $alias)
+    public function register($command, $alias)
     {
         if (strtolower($alias) == "comalias") {
             echo "Error: comalias can't be added as an command alias\n";
@@ -75,43 +72,37 @@ class CommandAlias_Core extends BasePassiveModule
         $alias = explode(" ", $alias, 3);
         if (!empty($alias[1])) {
             $this->alias_sub[strtolower($alias[0])][strtolower($alias[1])] = $command;
-        }
-        else {
+        } else {
             $this->alias[strtolower($alias[0])] = $command;
         }
     }
 
-
-    function unregister($alias)
+    public function unregister($alias)
     {
         $alias = strtolower($alias);
         $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . mysql_real_escape_string($alias) . "'");
         if (empty($get) && isset($this->alias[$alias])) {
             unset($this->alias[$alias]);
             Return TRUE;
-        }
-        else {
+        } else {
             Return FALSE;
         }
     }
 
-
-    function replace($msg)
+    public function replace($msg)
     {
         $msg = explode(" ", $msg, 3);
         if (!empty($msg[1]) && isset($this->alias_sub[strtolower($msg[0])][strtolower($msg[1])])) {
             $msg[0] = $this->alias_sub[strtolower($msg[0])][strtolower($msg[1])];
             unset($msg[1]);
-        }
-        elseif (isset($this->alias[strtolower($msg[0])])) {
+        } elseif (isset($this->alias[strtolower($msg[0])])) {
             $msg[0] = $this->alias[strtolower($msg[0])];
         }
         $msg = implode(" ", $msg);
         Return $msg;
     }
 
-
-    function add($msg)
+    public function add($msg)
     {
         $var = explode(" ", $msg, 2);
         $var[0] = strtolower($var[0]);
@@ -125,18 +116,15 @@ class CommandAlias_Core extends BasePassiveModule
                 );
                 $this->alias[$var[0]] = $var[1];
                 Return ("##highlight##" . $var[0] . "##end## is now an alias of ##highlight##" . $this->alias[$var[0]] . "##end##!");
-            }
-            else {
+            } else {
                 Return ("##highlight##" . $var[0] . "##end## Cannot be set as an alias!");
             }
-        }
-        else {
+        } else {
             Return ("##highlight##" . $var[0] . "##end## is already an alias of ##highlight##" . $this->alias[$var[0]] . "##end##!");
         }
     }
 
-
-    function get_list()
+    public function get_list()
     {
         $aliaslist = $this->bot->db->select("SELECT alias, command FROM #___command_alias");
         if (!empty($aliaslist)) {
@@ -156,26 +144,22 @@ class CommandAlias_Core extends BasePassiveModule
             }
             Return "Command aliases :: " . $this->bot->core("tools")
                 ->make_blob("click to view", $inside);
-        }
-        else {
+        } else {
             Return "No command aliases set!";
         }
     }
 
-
-    function exists($alias)
+    public function exists($alias)
     {
         $alias = strtolower($alias);
         if (isset($this->alias[$alias])) {
             Return TRUE;
-        }
-        else {
+        } else {
             Return FALSE;
         }
     }
 
-
-    function del($alias)
+    public function del($alias)
     {
         $alias = strtolower($alias);
         $get = $this->bot->db->select("SELECT alias, command FROM #___command_alias WHERE alias = '" . mysql_real_escape_string($alias) . "'");
@@ -183,16 +167,12 @@ class CommandAlias_Core extends BasePassiveModule
             $this->bot->db->query("DELETE FROM #___command_alias WHERE alias = '" . mysql_real_escape_string($alias) . "'");
             unset($this->alias[$alias]);
             Return "Alias ##highlight##" . $alias . "##end## deleted.";
-        }
-        else {
+        } else {
             if (isset($this->alias[$alias])) {
                 Return "Alias ##highlight##" . $alias . "##end## cannot be deleted.";
-            }
-            else {
+            } else {
                 Return "Alias ##highlight##" . $alias . "##end## not found.";
             }
         }
     }
 }
-
-?>

@@ -38,7 +38,7 @@ The Class itself...
 class Calc extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'calc', 'GUEST');
@@ -49,29 +49,26 @@ class Calc extends BaseActiveModule
         $this->calcu = array();
     }
 
-
     /*
     This gets called on a tell with the command
     */
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^calc (.+)/i", $msg, $info)) {
             return $this->do_calcs($name, $info[1]);
-        }
-        elseif (preg_match("/^calc$/i", $msg)) {
+        } elseif (preg_match("/^calc$/i", $msg)) {
             return $this->show_calc($name);
-        }
-        else {
+        } else {
             $this->bot->send_help($name);
         }
+
         return FALSE;
     }
-
 
     /*
     Does the evaluation and calculation
     */
-    function do_calcs($name, $calc)
+    public function do_calcs($name, $calc)
     {
         $test = str_replace(".", "", $calc);
         $test = str_replace(",", "", $test);
@@ -94,12 +91,10 @@ class Calc extends BaseActiveModule
                 $calcu = "\$y=(" . $this->calcu[$name] . ")" . $calc . ";";
                 if ($matches[1] != "+" && $matches[1] != "-") {
                     $this->calcu[$name] = "(" . $this->calcu[$name] . ")" . $calc;
-                }
-                else {
+                } else {
                     $this->calcu[$name] .= $calc;
                 }
-            }
-            else {
+            } else {
                 $calcu = "\$y=" . $calc . ";";
                 $expr = $calc;
                 $this->calcu[$name] = $expr;
@@ -108,33 +103,27 @@ class Calc extends BaseActiveModule
             if (!empty($result) || $result == 0) {
                 if ($this->bot->core("settings")->get("Calc", "ShowEquation")) {
                     return $expr . " = " . str_replace(".00", "", number_format($y, "2", ".", " "));
-                }
-                else {
+                } else {
                     return $y;
                 }
-            }
-            else {
+            } else {
                 return "Wrong syntax, please /tell <botname> <pre>help <pre>calc";
             }
-        }
-        else {
+        } else {
             return "Wrong syntax, please /tell <botname> <pre>help <pre>calc";
         }
     }
 
-
-    function show_calc($name)
+    public function show_calc($name)
     {
         if (isset($this->calcu[$name])) {
             $var = "\$calc = " . $this->calcu[$name] . ";";
             eval("$var");
             $return = $this->calcu[$name] . " = " . $calc;
+
             return $return;
-        }
-        else {
+        } else {
             return "You've not made any calculations since my last restart.";
         }
     }
 }
-
-?>

@@ -40,12 +40,11 @@ class sfEventDispatcher
     protected
         $listeners = array();
 
-
     /**
      * Connects a listener to a given event name.
      *
-     * @param string  $name      An event name
-     * @param mixed   $listener  A PHP callable
+     * @param string $name     An event name
+     * @param mixed  $listener A PHP callable
      */
     public function connect($name, $listener)
     {
@@ -56,12 +55,11 @@ class sfEventDispatcher
         $this->listeners[$name][] = $listener;
     }
 
-
     /**
      * Disconnects a listener for a given event name.
      *
-     * @param string   $name      An event name
-     * @param mixed    $listener  A PHP callable
+     * @param string $name     An event name
+     * @param mixed  $listener A PHP callable
      *
      * @return mixed false if listener does not exist, null otherwise
      */
@@ -77,7 +75,6 @@ class sfEventDispatcher
             }
         }
     }
-
 
     /**
      * Notifies all listeners of a given event.
@@ -95,11 +92,10 @@ class sfEventDispatcher
         return $event;
     }
 
-
     /**
      * Notifies all listeners of a given event until one returns a non null value.
      *
-     * @param  sfEvent $event A sfEvent instance
+     * @param sfEvent $event A sfEvent instance
      *
      * @return sfEvent The sfEvent instance
      */
@@ -115,12 +111,11 @@ class sfEventDispatcher
         return $event;
     }
 
-
     /**
      * Filters a value by calling all listeners of a given event.
      *
-     * @param  sfEvent  $event   A sfEvent instance
-     * @param  mixed    $value   The value to be filtered
+     * @param sfEvent $event A sfEvent instance
+     * @param mixed   $value The value to be filtered
      *
      * @return sfEvent The sfEvent instance
      */
@@ -140,11 +135,10 @@ class sfEventDispatcher
         return $event;
     }
 
-
     /**
      * Returns true if the given event name has some listeners.
      *
-     * @param  string   $name    The event name
+     * @param string $name The event name
      *
      * @return Boolean true if some listeners are connected, false otherwise
      */
@@ -154,16 +148,15 @@ class sfEventDispatcher
             $this->listeners[$name] = array();
         }
 
-        return (boolean)count($this->listeners[$name]);
+        return (boolean) count($this->listeners[$name]);
     }
-
 
     /**
      * Returns all listeners associated with a given event name.
      *
-     * @param  string   $name    The event name
+     * @param string $name The event name
      *
-     * @return array  An array of listeners
+     * @return array An array of listeners
      */
     public function getListeners($name)
     {

@@ -4,8 +4,7 @@
  */
 class PBFixedInt extends PBScalar
 {
-    var $wired_type = PBMessage::WIRED_32BIT;
-
+    public $wired_type = PBMessage::WIRED_32BIT;
 
     /**
      * Parses the message for this type
@@ -21,7 +20,6 @@ class PBFixedInt extends PBScalar
 
         // Todo, unpack the value in case someone wants to read it
     }
-
 
     /**
      * Serializes type
@@ -46,9 +44,6 @@ class PBFixedInt extends PBScalar
 
         //$value = $this->base128->set_value($this->value);
         //parent::hexdump("PBFixedInt", $string, strlen($string) );
-
         return $string;
     }
 }
-
-?>

@@ -54,8 +54,7 @@ class Symb_sql extends BaseActiveModule
             'feet' => 'feet'
         );
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot = &$bot;
@@ -79,8 +78,7 @@ class Symb_sql extends BaseActiveModule
         $this->tables();
     }
 
-
-    function tables()
+    public function tables()
     {
         $this->bot->db->define_tablename("symbiants", "false");
         Switch ($this->bot->db->get_version("symbiants")) {
@@ -100,8 +98,7 @@ class Symb_sql extends BaseActiveModule
         $this->bot->db->set_version("symbiants", 3);
     }
 
-
-    function command_handler($name, $msg, $source)
+    public function command_handler($name, $msg, $source)
     {
         $com = $this->parse_com(
             $msg, array(
@@ -116,8 +113,7 @@ class Symb_sql extends BaseActiveModule
         }
     }
 
-
-    function symb($args)
+    public function symb($args)
     {
         $query_ql = FALSE; //quality level in query format
         $query_slot = FALSE; //slots in query format
@@ -166,8 +162,7 @@ class Symb_sql extends BaseActiveModule
                     if ($query_unit === FALSE) {
                         $query_unit = "unit = '$arg'";
                         $readable_units = "$arg";
-                    }
-                    else {
+                    } else {
                         $query_unit .= " or unit = '$arg'";
                         $readable_units .= " and $arg";
                     }
@@ -178,8 +173,7 @@ class Symb_sql extends BaseActiveModule
                 if ($query_slot === FALSE) {
                     $query_slot = "slot = '{$this->slots[$slot_match]}'";
                     $readable_slot = $slot_match;
-                }
-                else {
+                } else {
                     $query_slot .= " or slot='{$this->slots[$slot_match]}'";
                     $readable_slot .= " and $slot_match";
                 }
@@ -189,8 +183,7 @@ class Symb_sql extends BaseActiveModule
                 if ($query_ql === FALSE) {
                     $query_ql = "ql = $arg";
                     $readable_ql = "$arg";
-                }
-                else {
+                } else {
                     $query_ql .= " OR ql = $arg";
                     $readable_ql .= " or $arg";
                 }
@@ -201,16 +194,14 @@ class Symb_sql extends BaseActiveModule
                 if ($pql[1] < $pql[2]) {
                     $low = $pql[1];
                     $high = $pql[2];
-                }
-                else {
+                } else {
                     $low = $pql[2];
                     $high = $pql[1];
                 }
                 if ($query_ql === FALSE) {
                     $query_ql = " (ql >= $low AND ql <= $high)";
                     $readable_ql = "between $low and $high";
-                }
-                else {
+                } else {
                     $query_ql .= " OR (ql >= $low and ql <= $high)";
                     $readable_ql .= " or between $low and $high";
                 }
@@ -220,8 +211,7 @@ class Symb_sql extends BaseActiveModule
                 if ($query_name === FALSE) {
                     $query_name = "t1.name like '%$arg%'";
                     $readable_name = "'$arg'";
-                }
-                else {
+                } else {
                     $query_name .= " or t1.name like '%$arg%'";
                     $readable_name .= " or '$arg'";
                 }
@@ -269,10 +259,10 @@ class Symb_sql extends BaseActiveModule
         $symbiants = $this->bot->db->select($query, MYSQL_ASSOC);
         if (empty($symbiants)) {
             $readable_output .= 'No matches...';
+
             return ($this->bot->core('tools')
                 ->make_blob('Symbiants', $readable_output));
-        }
-        else {
+        } else {
             foreach ($symbiants as $symb) {
                 $title = "QL {$symb['ql']} {$symb['symb']} " . array_search($symb['slot'], $this->slots) . " symbiant, {$symb['unit']} unit aban";
                 $title = ucwords($title);
@@ -280,9 +270,8 @@ class Symb_sql extends BaseActiveModule
                 $readable_output .= "$link\n";
             }
         }
+
         return ($this->bot->core('tools')
             ->make_blob('Symbiants', $readable_output));
     }
 }
-
-?>

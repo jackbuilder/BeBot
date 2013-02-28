@@ -37,8 +37,8 @@ The Class itself...
 */
 class Roll extends BaseActiveModule
 {
-    var $bot;
-    var $roll_info;
+    public $bot;
+    public $roll_info;
     /*
         $roll_info is a two-dimentional indexed/associative array with these fields
         $roll_info[$index]['name'] == the name of the person performing the roll
@@ -48,10 +48,9 @@ class Roll extends BaseActiveModule
         $roll_info[$index]['result'] == The result of the roll
         $roll_info[$index]['info'] == Everything appended after <limit> or after the !flip command
     */
-    var $lastroll;
+    public $lastroll;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'roll', 'GUEST');
@@ -66,11 +65,10 @@ class Roll extends BaseActiveModule
             ->create("Roll", "RollTime", 30, "How many seconds must someone wait before they can roll again?", "5;10;20;30;45;60;120;300;600");
     }
 
-
     /*
     This gets called on a tell with the command
     */
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $com = $this->parse_com(
             $msg, array(
@@ -94,6 +92,7 @@ class Roll extends BaseActiveModule
             if (!isset($args['item'])) {
                 $args['item'] = "";
             }
+
             return ($this->do_roll($name, $args['min'], $args['max'], $args['item']));
             break;
         case 'flip':
@@ -107,20 +106,19 @@ class Roll extends BaseActiveModule
         }
     }
 
-
     /*
     Verifys result
     */
-    function verify($num)
+    public function verify($num)
     {
         if (empty($num)) {
             $num = count($this->roll_info);
         }
         if ($num < 0 || $num > count($this->roll_info)) {
             $this->error->set("Invalid verification ID");
+
             return ($this->error);
-        }
-        else {
+        } else {
             $roll = $this->roll_info[$num - 1];
             $name = "##highlight##{$roll['name']}##end##";
             if (!empty($roll['item'])) {
@@ -137,15 +135,15 @@ class Roll extends BaseActiveModule
             $window .= "-----------------\n";
             $blob = $this->bot->core('tools')
                 ->make_blob("Roll result: {$roll['result']}. Verify id: $num", $window);
+
             return ($blob);
         }
     }
 
-
     /*
     Starts the roll
     */
-    function do_roll($name, $min, $max, $item)
+    public function do_roll($name, $min, $max, $item)
     {
         if (!isset($this->lastroll[$name])
             || ($this->lastroll[$name] < time() - $this->bot
@@ -153,14 +151,17 @@ class Roll extends BaseActiveModule
         ) {
             if (empty($max)) {
                 $this->error->set("You need to specify a maximum value");
+
                 return ($this->error);
             }
-            if (($max != (int)$max) || $min != (int)$min) {
+            if (($max != (int) $max) || $min != (int) $min) {
                 $this->error->set("The min and max values need to be an integer.");
+
                 return ($this->error);
             }
             if ($max < 2) {
                 $this->error->set("There is no point in rolling for less than one person.");
+
                 return ($this->error);
             }
             $result['name'] = $name;
@@ -175,18 +176,16 @@ class Roll extends BaseActiveModule
             echo "Debug: " . $tempdebug . $result['result'] . "\n";
 
             return ($this->verify(count($this->roll_info)));
-        }
-        else {
+        } else {
             return "You may only roll once every " . $this->bot
                 ->core("settings")->get("Roll", "RollTime") . " seconds.";
         }
     }
 
-
     /*
     Starts the flip
     */
-    function do_flip($name, $item)
+    public function do_flip($name, $item)
     {
         if (!isset($this->lastroll[$name])
             || ($this->lastroll[$name] < time() - $this->bot
@@ -200,13 +199,11 @@ class Roll extends BaseActiveModule
             $result['item'] = $item;
             $this->lastroll[$name] = time();
             $this->roll_info[] = $result;
+
             return ($this->verify(count($this->roll_info)));
-        }
-        else {
+        } else {
             return "You may only flip once every " . $this->bot
                 ->core("settings")->get("Roll", "RollTime") . " seconds.";
         }
     }
 }
-
-?>

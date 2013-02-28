@@ -36,7 +36,6 @@ class BuddyList extends BasePassiveModule
 {
     public $buddy_status = array();
 
-
     public function __construct($bot)
     {
         parent::__construct($bot, get_class($this));
@@ -49,8 +48,7 @@ class BuddyList extends BasePassiveModule
                     'buddy_aoc'
                 )
             );
-        }
-        else {
+        } else {
             $this->bot->dispatcher->connect(
                 'core.on_buddy_onoff', array(
                     $this,
@@ -60,15 +58,14 @@ class BuddyList extends BasePassiveModule
         }
     }
 
-
-    function buddy_ao($args)
+    public function buddy_ao($args)
     {
         $user = $this->bot->core("player")->name($args['id']);
-
 
         if (empty($user)) {
             $this->bot->log("DEBUG", "BuddyList", "buddy_ao() got empty user");
             $this->bot->log("DEBUG", "BuddyList", $this->bot->debug_bt());
+
             return $this->error;
         }
 
@@ -82,19 +79,16 @@ class BuddyList extends BasePassiveModule
                 if (isset($this->bot->glob["online"][$user])) {
                     // $this -> log("BUDDY", "ERROR", $user . " logged on despite of already being marked as logged on!!");
                     return;
-                }
-                else {
+                } else {
                     // Enter the user into the online buddy list
                     $this->bot->glob["online"][$user] = $user;
                 }
-            }
-            else {
+            } else {
                 // Do we have a logoff without a prior login?
                 if (!isset($this->bot->glob["online"][$user])) {
                     // $this -> log("BUDDY", "ERROR", $user . " logged off with no prior logon!!");
                     return;
-                }
-                else {
+                } else {
                     unset($this->bot->glob["online"][$user]);
                 }
             }
@@ -104,8 +98,7 @@ class BuddyList extends BasePassiveModule
             $end = " (not on notify)";
             // Using aoc -> buddy_remove() here is an exception, all the checks in chat -> buddy_remove() aren't needed!
             $this->bot->aoc->buddy_remove($user);
-        }
-        else {
+        } else {
             $end = " (" . $this->bot->core("security")
                 ->get_access_name(
                 $this->bot->core("security")
@@ -127,15 +120,14 @@ class BuddyList extends BasePassiveModule
     }
 
 
-    function buddy_aoc($args)
+    public function buddy_aoc($args)
     {
         // Get the users current state
         $old_who = $this->bot->core("Whois")
             ->lookup($user, TRUE); // $noupdate MUST be true to avoid adding buddy recursively
         if (array_key_exists($user, $this->buddy_status)) {
             $old_buddy_status = $this->buddy_status[$user];
-        }
-        else {
+        } else {
             $old_buddy_status = 0;
         }
 
@@ -164,16 +156,13 @@ class BuddyList extends BasePassiveModule
         // 4 = AFK
         if (0 == $who["online"]) {
             $buddy_status = 0;
-        }
-        else {
+        } else {
             if (1 == $who["online"]) {
                 $buddy_status = 1;
-            }
-            else {
+            } else {
                 if (2 == $who["online"]) {
                     $buddy_status = $old_buddy_status | 2;
-                }
-                else {
+                } else {
                     if (3 == $who["online"]) {
                         $buddy_status = $old_buddy_status | 4;
                     }
@@ -199,8 +188,7 @@ class BuddyList extends BasePassiveModule
             if (1 == ($old_buddy_status & 1)) {
                 // User just went offline
                 $current_statuses[] = 0;
-            }
-            else {
+            } else {
                 // User just came online
                 $current_statuses[] = 1;
             }
@@ -209,8 +197,7 @@ class BuddyList extends BasePassiveModule
             if (2 == ($old_buddy_status & 2)) {
                 // User just returned from LFG
                 $current_statuses[] = 4;
-            }
-            else {
+            } else {
                 // User just went LFG
                 $current_statuses[] = 2;
             }
@@ -219,8 +206,7 @@ class BuddyList extends BasePassiveModule
             if (4 == ($old_buddy_status & 4)) {
                 // User just returned from AFK
                 $current_statuses[] = 5;
-            }
-            else {
+            } else {
                 // User just went AFK
                 $current_statuses[] = 3;
             }
@@ -240,8 +226,7 @@ class BuddyList extends BasePassiveModule
                 // User just came online
                 // Enter the user into the online buddy list
                 $this->bot->glob["online"][$user] = $user;
-            }
-            else {
+            } else {
                 if (in_array(0, $current_statuses)) {
                     // User just went offline
                     unset($this->bot->glob["online"][$user]);
@@ -252,8 +237,7 @@ class BuddyList extends BasePassiveModule
                 $this->bot->core("security")
                     ->get_access_level($user)
             ) . ")";
-        }
-        else {
+        } else {
             $end = " (not on notify)";
             // Using aoc -> buddy_remove() here is an exception, all the checks in chat -> buddy_remove() aren't needed!
             $this->bot->aoc->buddy_remove($user);
@@ -271,5 +255,3 @@ class BuddyList extends BasePassiveModule
         }
     }
 }
-
-?>

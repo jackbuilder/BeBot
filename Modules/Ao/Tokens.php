@@ -36,10 +36,10 @@ $tokens = new tokens($bot);
 /*
 The Class itself...
 */
-class tokens extends BaseActiveModule
+class Tokens extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "tokens", "GUEST");
@@ -51,11 +51,10 @@ class tokens extends BaseActiveModule
             = "Calculates the amount of tokens, token bags or VP tokens (and price) based on your <level>, <target> and <current> tokens";
     }
 
-
     /*
     Unified message handler
     */
-    function command_handler($source, $msg, $type)
+    public function command_handler($source, $msg, $type)
     {
         $return = false;
         $clan = false;
@@ -70,9 +69,9 @@ class tokens extends BaseActiveModule
             if ($count == 3) {
                 if (!ctype_digit($vars[1]) || !ctype_digit($vars[2])) {
                     $this->error->set("Values given are not numerical");
+
                     return $this->error;
-                }
-                else {
+                } else {
                     $who = $this->bot->core("whois")->lookup($source);
                     if (!($who instanceof BotError)) {
                         $level = $who["level"];
@@ -82,14 +81,13 @@ class tokens extends BaseActiveModule
                     }
                     $return = $this->ShowTokens($level, $vars[1], $vars[2], $clan);
                 }
-            }
-            else {
+            } else {
                 if ($count == 4) {
                     if (!ctype_digit($vars[1]) || !ctype_digit($vars[2]) || !ctype_digit($vars[3])) {
                         $this->error->set("Values given are not numerical");
+
                         return $this->error;
-                    }
-                    else {
+                    } else {
                         $who = $this->bot->core("whois")->lookup($source);
                         if (!($who instanceof BotError)) {
                             if ($who["faction"] == 'Clan') {
@@ -98,8 +96,7 @@ class tokens extends BaseActiveModule
                         }
                         $return = $this->ShowTokens($vars[1], $vars[2], $vars[3], $clan);
                     }
-                }
-                else {
+                } else {
                     if ($count == 1) {
                         $inside = "##normal##::: ##highlight##Token overview##end## :::\n\n";
                         $inside .= "Level 1-14: ##highlight##1##end## tokens per level\n";
@@ -113,11 +110,12 @@ class tokens extends BaseActiveModule
                         $inside .= "Level 190-220: ##highlight##9##end## tokens per level\n\n";
                         $inside .= "Veteran tokens give ##highlight##50##end## tokens and cost ##highlight##7##end## veteran points\n";
                         $inside .= "OFAB tokens give ##highlight##10##end##/##highlight##100##end## tokens and cost ##highlight##1000##end##/##highlight##10000##end## victory points\n";
+
                         return "##normal##::: ##highlight##Token overview##end## ::: " . $this->bot
                             ->core("tools")->make_blob("click to view", $inside);
-                    }
-                    else {
+                    } else {
                         $this->error->set("##highlight##$msg##end## is not valid input. Please see <pre>help tokens ");
+
                         return $this->error;
                     }
                 }
@@ -126,19 +124,19 @@ class tokens extends BaseActiveModule
         default:
             return "Broken plugin, received unhandled command: $command";
         }
+
         return false;
     }
 
-
-    function ShowTokens($level, $goal, $current, $clan)
+    public function ShowTokens($level, $goal, $current, $clan)
     {
         $return = false;
         // Make sure our goal is larger than our current tokens
         if ($goal == $current) {
             $this->error->set("Your goal tokens can not be the same as your current tokens!");
+
             return $this->error;
-        }
-        elseif ($goal < $current) {
+        } elseif ($goal < $current) {
             $tempgoal = $goal;
             $goal = $current;
             $current = $tempgoal;
@@ -146,33 +144,30 @@ class tokens extends BaseActiveModule
         // Make sure we have a legal level range
         if (($level < 1) || ($level > 220)) {
             $this->error->set("Enter a level between ##highlight##1##end## and ##highlight##220##end##!");
+
             return $this->error;
         }
         // Make sure we have a sane token count for both goal and current
         if (!is_finite($goal) || !is_finite($current)) {
             $this->error->set("Please enter sane values for both goal and current tokens!");
+
             return $this->error;
         }
         if ($level > 189) {
             $tpl = 9;
-        }
-        else {
+        } else {
             if ($level > 174) {
                 $tpl = 8;
-            }
-            else {
+            } else {
                 if ($level > 149) {
                     $tpl = 7;
-                }
-                else {
+                } else {
                     if ($level > 124) {
                         $tpl = 6;
-                    }
-                    else {
+                    } else {
                         if ($level > 99) {
                             $tpl = 5;
-                        }
-                        else {
+                        } else {
                             if ($level > 74) {
                                 $tpl = 4;
                             }
@@ -180,12 +175,10 @@ class tokens extends BaseActiveModule
                             else {
                                 if ($level > 49) {
                                     $tpl = 3;
-                                }
-                                else {
+                                } else {
                                     if ($level > 14) {
                                         $tpl = 2;
-                                    }
-                                    else {
+                                    } else {
                                         $tpl = 1;
                                     }
                                 }
@@ -228,8 +221,7 @@ class tokens extends BaseActiveModule
             . " tokens.##end####end##";
         $info = "Token calculator ::: " . $this->bot->core("tools")
             ->make_blob('Click for results', $inside);
+
         return $info;
     }
 }
-
-?>

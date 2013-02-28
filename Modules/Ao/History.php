@@ -42,7 +42,7 @@ The Class itself...
 class History extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'history', 'GUEST');
@@ -51,25 +51,23 @@ class History extends BaseActiveModule
         $this->help['notes'] = "No notes";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if (preg_match("/^history (.+)$/i", $msg, $info)) {
             return $this->player_history($info[1]);
-        }
-        else {
+        } else {
             if (preg_match("/^history$/i", $msg, $info)) {
                 return "No name specified";
             }
         }
+
         return FALSE;
     }
-
 
     /*
       Get info on player
     */
-    function player_history($name)
+    public function player_history($name)
     {
         $name = ucfirst(strtolower($name));
         $id = $this->bot->core('player')->id($name);
@@ -88,16 +86,13 @@ class History extends BaseActiveModule
                         }
                         if (empty($result[4])) {
                             $result[4] = "##white##No faction##end##";
-                        }
-                        else {
+                        } else {
                             if ($result[4] == 'Omni') {
                                 $result[4] = "##omni##Omni ##end##";
-                            }
-                            else {
+                            } else {
                                 if ($result[4] == 'Clan') {
                                     $result[4] = "##clan##Clan ##end##";
-                                }
-                                else {
+                                } else {
                                     if ($result[4] == 'Neutral') {
                                         $result[4] = "##neutral##Neutral ##end##";
                                     }
@@ -113,17 +108,14 @@ class History extends BaseActiveModule
                         $output .= $result[5] . " " . $result[6] . "\n";
                     }
                 }
+
                 return "History for " . $name . " :: " . $this->bot
                     ->core("tools")->make_blob("click to view", $output);
-            }
-            else {
+            } else {
                 return $content;
             }
-        }
-        else {
+        } else {
             return "Player ##highlight##" . $name . "##end## does not exist.";
         }
     }
 }
-
-?>

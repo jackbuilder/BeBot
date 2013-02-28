@@ -38,21 +38,19 @@ The Class itself...
 class TimerRelay extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("tell", "relaytimer", "SUPERADMIN");
         $this->register_command("extpgmsg", "relaytimer", "MEMBER");
     }
 
-
-    function extpgmsg($pgroup, $name, $msg)
+    public function extpgmsg($pgroup, $name, $msg)
     {
         $this->command_handler($pgroup, $msg, "extpgmsg");
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         if ($this->bot->core("settings")
             ->get('Relay', 'Status')
@@ -65,15 +63,13 @@ class TimerRelay extends BaseActiveModule
                 $this->add_timer($info[3], $info[2], $info[6], $info[1], $info[4], $info[5]);
             }
         }
+
         return FALSE;
     }
 
-
-    function add_timer($owner, $endtime, $name, $class, $repeat, $channel)
+    public function add_timer($owner, $endtime, $name, $class, $repeat, $channel)
     {
         $this->bot->core("timer")
             ->add_timer(TRUE, $owner, $endtime - time(), $name, $channel, $repeat, $class);
     }
 }
-
-?>

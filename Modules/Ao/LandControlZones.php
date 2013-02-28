@@ -35,27 +35,27 @@ $landcontrol = new LandControlZones($bot);
 class LandControlZones extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("land_control_zones", "false") . " (
-			`id` int(11) default NULL,
-			`lrange` int(10) default NULL,
-			`hrange` int(10) default NULL,
-			`area` varchar(50) default NULL,
-			`short` varchar(5) default NULL,
-			`huge` varchar(10) default NULL,
-			`zoneid` int(11) default NULL,
-			`x` varchar(10) default NULL,
-			`y` varchar(10) default NULL,
-			`name` varchar(250) default NULL,
-			PRIMARY KEY (id),
-			UNIQUE (area, name),
-			INDEX (lrange),
-			INDEX (hrange),
-			INDEX (area)
-			)"
+            `id` int(11) default NULL,
+            `lrange` int(10) default NULL,
+            `hrange` int(10) default NULL,
+            `area` varchar(50) default NULL,
+            `short` varchar(5) default NULL,
+            `huge` varchar(10) default NULL,
+            `zoneid` int(11) default NULL,
+            `x` varchar(10) default NULL,
+            `y` varchar(10) default NULL,
+            `name` varchar(250) default NULL,
+            PRIMARY KEY (id),
+            UNIQUE (area, name),
+            INDEX (lrange),
+            INDEX (hrange),
+            INDEX (area)
+            )"
         );
         $this->help['description'] = 'Land Control Areas';
         $this->help['command']['lc [name]'] = "Shows all towersites in [name]";
@@ -100,35 +100,28 @@ class LandControlZones extends BaseActiveModule
         $this->register_command("all", "lc", "MEMBER");
     }
 
-
-    function command_handler($name, $msg, $channel)
+    public function command_handler($name, $msg, $channel)
     {
         if (preg_match("/^lc  (.+)$/i", $msg, $info)) {
             return $this->show_lc($info[1]);
-        }
-        elseif (preg_match("/^lc (\d+) (\d+) (.+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc (\d+) (\d+) (.+)$/i", $msg, $info)) {
             return $this->show_lc($info[3], $info[1], $info[2]);
-        }
-        elseif (preg_match("/^lc (\d+) ([^\d]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc (\d+) ([^\d]+)$/i", $msg, $info)) {
             return $this->show_lc($info[2], $info[1], $info[1]);
-        }
-        elseif (preg_match("/^lc (\d+) (\d+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc (\d+) (\d+)$/i", $msg, $info)) {
             return $this->show_lc(NULL, $info[1], $info[2]);
-        }
-        elseif (preg_match("/^lc (\d+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc (\d+)$/i", $msg, $info)) {
             return $this->show_lc(NULL, $info[1], $info[1]);
-        }
-        elseif (preg_match("/^lc ([^\d]+)$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc ([^\d]+)$/i", $msg, $info)) {
             return $this->show_lc($info[1]);
-        }
-        elseif (preg_match("/^lc$/i", $msg, $info)) {
+        } elseif (preg_match("/^lc$/i", $msg, $info)) {
             return $this->show_lc("--all--");
         }
+
         return FALSE;
     }
 
-
-    function show_lc($iarea = NULL, $lrange = 0, $hrange = 300)
+    public function show_lc($iarea = NULL, $lrange = 0, $hrange = 300)
     {
         if ($iarea == "--all--") {
             $areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones group by area");
@@ -138,18 +131,16 @@ class LandControlZones extends BaseActiveModule
                     $return .= $this->bot->core("tools")
                         ->chatcmd("lc  " . $area[0], $area[0]) . " (" . $area[1] . ")<br>";
                 }
+
                 return $this->bot->core("tools")
                     ->make_blob("Land Control Areas", $return);
-            }
-            else {
+            } else {
                 return "No matches";
             }
-        }
-        else {
+        } else {
             if (!$iarea) {
                 $areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones group by area");
-            }
-            else {
+            } else {
                 $areas = $this->bot->db->select("select distinct(area),count(area) from #___land_control_zones where area like '%" . $iarea . "%' group by area");
             }
             if (!empty($areas)) {
@@ -164,8 +155,7 @@ class LandControlZones extends BaseActiveModule
                             "select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='" . $area[0] . "' AND lrange<=" . $lrange . " AND hrange>="
                                 . $hrange . " order by huge"
                         );
-                    }
-                    else {
+                    } else {
                         $lcs = $this->bot->db->select(
                             "select id, lrange, hrange, area, huge, x, y, name from #___land_control_zones where area='" . $area[0] . "' AND lrange>=" . $lrange . " AND hrange<="
                                 . $hrange . " order by huge"
@@ -179,45 +169,36 @@ class LandControlZones extends BaseActiveModule
                         $return .= $temp;
                     }
                 }
+
                 return $this->bot->core("tools")
                     ->make_blob("Land Control Areas", $return);
-            }
-            else {
+            } else {
                 return "No matches";
             }
         }
     }
 
-
-    function conv($num)
+    public function conv($num)
     {
         if (strlen($num) < 2) {
             return $num;
-        }
-        elseif (strlen($num) < 3) {
+        } elseif (strlen($num) < 3) {
             return $num;
-        }
-        else {
+        } else {
             return $num;
         }
     }
 
-
-    function coords($num)
+    public function coords($num)
     {
         if (strlen($num) < 2) {
             return $num;
-        }
-        elseif (strlen($num) < 3) {
+        } elseif (strlen($num) < 3) {
             return $num;
-        }
-        elseif (strlen($num) < 4) {
+        } elseif (strlen($num) < 4) {
             return $num;
-        }
-        else {
+        } else {
             return $num;
         }
     }
 }
-
-?>

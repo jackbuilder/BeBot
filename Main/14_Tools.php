@@ -34,10 +34,10 @@
 *  USA
 */
 $tools = new tools($bot);
-class tools extends BasePassiveModule
+class Tools extends BasePassiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
 
         parent::__construct($bot, get_class($this));
@@ -51,8 +51,7 @@ class tools extends BasePassiveModule
         $this->randomsource = "";
     }
 
-
-    function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
+    public function chatcmd($link, $title, $origin = FALSE, $strip = FALSE)
     {
         $origin = strtolower($origin);
         $msgstrip = "";
@@ -63,8 +62,7 @@ class tools extends BasePassiveModule
         case '3':
             if ($this->bot->game == "aoc") {
                 $chatcmd = "gu <pre>";
-            }
-            else {
+            } else {
                 $chatcmd = "o <pre>";
             }
             Break;
@@ -94,22 +92,19 @@ class tools extends BasePassiveModule
         Return ('<a ' . $msgstrip . 'href=\'chatcmd:///' . $chatcmd . $link . '\'>' . $title . '</a>');
     }
 
-
-    function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
+    public function get_site($url, $strip_headers = FALSE, $read_timeout = FALSE)
     {
         if (!function_exists('curl_init')
             || ($this->bot->core("settings")
                 ->get("tools", "force_sockets") == TRUE)
         ) {
             Return $this->get_site_sock($url, $strip_headers, $read_timeout);
-        }
-        else {
+        } else {
             Return $this->get_site_curl($url, $strip_headers, $read_timeout);
         }
     }
 
-
-    function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
+    public function get_site_sock($url, $strip_headers = FALSE, $read_timeout = FALSE)
     {
         $return = $this->get_site_data($url, $strip_headers, $read_timeout);
         if (($return instanceof BotError) && $this->use_proxy_server && !empty($this->proxy_server_address)) {
@@ -130,11 +125,10 @@ class tools extends BasePassiveModule
         return $return;
     }
 
-
     /*
     Gets the data from a URL
     */
-    function get_site_data(
+    public function get_site_data(
         $url, $strip_headers = FALSE, $read_timeout = FALSE,
         $proxy = ''
     )
@@ -145,8 +139,7 @@ class tools extends BasePassiveModule
             $proxy_address = explode(":", $proxy);
             $address = gethostbyname($proxy_address[0]);
             $service_port = $proxy_address[1];
-        }
-        else {
+        } else {
             $address = gethostbyname($get_url['host']);
             /* Get the port for the WWW service. */
             $service_port = getservbyname('www', 'tcp');
@@ -156,6 +149,7 @@ class tools extends BasePassiveModule
         // Check to see if the socket failed to create.
         if ($socket === FALSE) {
             $this->error->set("Failed to create socket. Error was: " . socket_strerror(socket_last_error()));
+
             return $this->error;
         }
 
@@ -177,6 +171,7 @@ class tools extends BasePassiveModule
         // Make sure we have a connection
         if ($connect_result === FALSE) {
             $this->error->set("Failed to connect to server " . $address . ":" . $service_port . " (" . $url . ") Error was: " . socket_strerror(socket_last_error()));
+
             return $this->error;
         }
         // Rebuild the full query after parse_url
@@ -192,6 +187,7 @@ class tools extends BasePassiveModule
         // Make sure we wrote to the server okay.
         if ($write_result === FALSE) {
             $this->error->set("Failed to write to server: " . socket_strerror(socket_last_error()));
+
             return $this->error;
         }
         $return["content"] = "";
@@ -203,12 +199,14 @@ class tools extends BasePassiveModule
         // Make sure we got a response back from the server.
         if ($read_result === FALSE) {
             $this->error->set("Failed to read response: " . socket_strerror(socket_last_error()));
+
             return $this->error;
         }
         $close_result = @socket_close($socket);
         // Make sure we closed our socket properly.  Open sockets are bad!
         if ($close_result === FALSE) {
             $this->error->set("Failed to close socket: " . socket_strerror(socket_last_error()));
+
             return $this->error;
         }
         // Did the calling function want http headers stripped?
@@ -216,11 +214,12 @@ class tools extends BasePassiveModule
             $split = split("\r\n\r\n", $return);
             $return = $split[1];
         }
+
         return $return;
     }
 
 
-    function get_site_curl(
+    public function get_site_curl(
         $url, $strip_headers = FALSE, $timeout = FALSE,
         $post = NULL,
         $login = NULL
@@ -271,22 +270,21 @@ class tools extends BasePassiveModule
         Return $return;
     }
 
-
     /*
     Parse XML crap
     */
-    function xmlparse($xml, $tag)
+    public function xmlparse($xml, $tag)
     {
         $tmp = explode("<" . $tag . ">", $xml);
         if (!isset($tmp[1])) {
             $tmp[1] = "";
         }
         $tmp = explode("</" . $tag . ">", $tmp[1]);
+
         return $tmp[0];
     }
 
-
-    function make_blob($title, $content, $header = TRUE)
+    public function make_blob($title, $content, $header = TRUE)
     {
         $inside = "";
         if ($header) {
@@ -304,14 +302,14 @@ class tools extends BasePassiveModule
         $content = str_replace("\">", "'>", $content);
         $content = str_replace("\"", "&quot;", $content);
         $inside .= $content;
+
         return "<a href=\"text://" . $inside . "\">" . $title . "</a>";
     }
-
 
     /*
     Creates a text blob.
     */
-    function make_item(
+    public function make_item(
         $lowid, $highid, $ql, $name, $alt = FALSE,
         $strip = FALSE
     )
@@ -325,110 +323,112 @@ class tools extends BasePassiveModule
             $quote = '\'';
         }
         $name = str_replace("'", "&#039;", $name);
+
         return "<a {$msgstrip}href=" . $quote . "itemref://$lowid/$highid/$ql" . $quote . ">$name</a>";
     }
-
 
     /*
     Takes an item string and returns an array with lowid, highid, ql and name.
     If $item is unparsable it returns a BotError
     */
-    function parse_item($item)
+    public function parse_item($item)
     {
         $pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         preg_match($pattern, $item, $parts);
         if (empty($parts)) {
             $this->error->set("Unable to parse item: '$item'");
+
             return ($this->error);
         }
         $parsed['lowid'] = $parts[1];
         $parsed['highid'] = $parts[2];
         $parsed['ql'] = $parts[3];
         $parsed['name'] = $parts[4];
+
         return ($parsed);
     }
 
-
     //Returns true if $item is an itemref, false otherwise.
-    function is_item($item)
+    public function is_item($item)
     {
         $pattern = '|<a href="itemref://([0-9]+)/([0-9]+)/([0-9]{1,3})">([^<]+)</a>|';
         preg_match($pattern, $item, $parts);
         if (empty($parts)) {
             return FALSE;
         }
+
         return TRUE;
     }
-
 
     /*
     Used to convert an overflowed (unsigned) integer to a string with the correct positive unsigned integer value
     If the passed integer is not negative, the integer is merely passed back in string form with no modifications.
     */
-    function int_to_string($int)
+    public function int_to_string($int)
     {
         if ($int <= -1) {
-            $int += (float)"4294967296";
+            $int += (float) "4294967296";
         }
-        return (string)$int;
-    }
 
+        return (string) $int;
+    }
 
     /*
     Used to convert an unsigned interger in string form to an overflowed (negative) integere
     If the passed string is not an integer large enough to overflow, the string is merely passed back in integer form with no modifications.
     */
-    function string_to_int($string)
+    public function string_to_int($string)
     {
-        $int = (float)$string;
-        if ($int > (float)2147483647) {
-            $int -= (float)"4294967296";
+        $int = (float) $string;
+        if ($int > (float) 2147483647) {
+            $int -= (float) "4294967296";
         }
-        return (int)$int;
-    }
 
+        return (int) $int;
+    }
 
     /*
     Checks if a player name is valid and if the player exists.
     Returns BotError on failure
     Returns ucfirst(strtolower($name)) if the player exists.
     */
-    function validate_player($name, $check_exists = TRUE)
+    public function validate_player($name, $check_exists = TRUE)
     {
         $name = trim(ucfirst(strtolower($name)));
         if (strlen($name) < 3 || strlen($name) > 14) {
             $this->error->set("Player name has to be between 4 and 13 characters long (inclusive)");
+
             return ($this->error);
         }
         if (preg_match("|([a-z]+[0-9]*[^a-z]*)|", $name) == 0) {
             $this->error->set("Player name has to be alphabetical followed by 0 or more digits not followed by alphabetical characters.");
+
             return ($this->error);
         }
         if ($check_exists) {
             $uid = $this->bot->core('player')->id($name);
             if (!$uid || ($uid instanceof BotError)) {
                 $this->error->set("Player '$name' does not exist.");
+
                 return ($this->error);
             }
         }
+
         return ($name);
     }
 
-
-    function my_rand($min = FALSE, $max = FALSE)
+    public function my_rand($min = FALSE, $max = FALSE)
     {
         // For now we only support Mersienne Twister, but this can be changed.
         $this->randomsource = "Mersenne Twister";
         if (isset($min)) {
             return mt_rand($min, $max);
-        }
-        else {
+        } else {
             return mt_rand();
         }
     }
 
-
-    function best_match($find, $in, $perc = 0)
+    public function best_match($find, $in, $perc = 0)
     {
         $use = array(0);
         $percentage = 0;
@@ -446,19 +446,18 @@ class tools extends BasePassiveModule
                 }
             }
         }
+
         return $use;
     }
 
-
     //return TRUE if the same, and FALSE if not
-    function compare($a, $b)
+    public function compare($a, $b)
     {
         if (is_array($a) && is_array($b)) {
             $dif = array_diff_assoc($a, $b);
             if (!empty($dif)) {
                 Return (FALSE);
-            }
-            else {
+            } else {
                 $check = TRUE;
                 foreach ($a as $k => $v) {
                     if (is_array($v) && $check) {
@@ -470,11 +469,8 @@ class tools extends BasePassiveModule
         }
         if (is_array($a) || is_array($b)) {
             Return (FALSE);
-        }
-        else {
+        } else {
             Return ($a == $b);
         }
     }
 }
-
-?>

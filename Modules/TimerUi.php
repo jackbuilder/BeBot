@@ -38,7 +38,7 @@ The Class itself...
 class TimerGUI extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('all', 'timer', 'GUEST');
@@ -71,8 +71,7 @@ class TimerGUI extends BaseActiveModule
         $this->help['command']['tset'] = 'Lists all existing timer class settings and allows to change them.';
     }
 
-
-    function command_handler($name, $msg, $channel)
+    public function command_handler($name, $msg, $channel)
     {
         $command = explode(" ", $msg, 2);
         Switch (strtolower($command[0])) {
@@ -87,18 +86,17 @@ class TimerGUI extends BaseActiveModule
                 if ($info[1] != "") {
                     $classused = $info[1];
                 }
+
                 return $this->add_timer($name, $info[2], $info[3], $classused, 0, $channel);
-            }
-            elseif (preg_match("/^timer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) (.*)/i", $msg, $info)) {
+            } elseif (preg_match("/^timer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) (.*)/i", $msg, $info)) {
                 if ($info[1] != "") {
                     $classused = $info[1];
                 }
+
                 return $this->add_timer($name, $info[2], $info[4], $classused, 0, $channel);
-            }
-            elseif (preg_match("/^timer$/i", $msg)) {
+            } elseif (preg_match("/^timer$/i", $msg)) {
                 return $this->show_timer($name, $channel);
-            }
-            else {
+            } else {
                 return "Correct Format: ##highlight##<pre>timer [class] #[mshd] title##end## or ##highlight##<pre>timer [class] #[:##[:##[:##]]] title##end## [class] is an optional parameter";
             }
         case 'rtimer':
@@ -106,15 +104,15 @@ class TimerGUI extends BaseActiveModule
                 if ($info[1] != "") {
                     $classused = $info[1];
                 }
+
                 return $this->add_timer($name, $info[2], $info[4], $classused, $info[3], $channel);
-            }
-            elseif (preg_match("/^rtimer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) ([0-9]+(:[0-9][0-9]){0,3}) (.*)/i", $msg, $info)) {
+            } elseif (preg_match("/^rtimer ([a-z]+ )?([0-9]+(:[0-9][0-9]){0,3}) ([0-9]+(:[0-9][0-9]){0,3}) (.*)/i", $msg, $info)) {
                 if ($info[1] != "") {
                     $classused = $info[1];
                 }
+
                 return $this->add_timer($name, $info[2], $info[6], $classused, $info[4], $channel);
-            }
-            else {
+            } else {
                 return "Correct Format: ##highlight##<pre>rtimer [class] <dur>[mshd] <repeat>[mshd] title##end## or ##highlight##<pre>rtimer [class] <dur>[:##[:##[:##]]] <repeat>[:##[:##[:##]]] title##end## [class] is an optional parameter";
             }
         case 'remtimer':
@@ -122,18 +120,15 @@ class TimerGUI extends BaseActiveModule
         case 'ptimer':
             if (isset($command[1])) {
                 return $this->command_handler($name, 'timer ' . $command[1], 'gc');
-            }
-            else {
+            } else {
                 return $this->command_handler($name, 'timer', 'gc');
             }
         case 'tset':
             if (preg_match("/^tset$/i", $msg)) {
                 return $this->show_timer_settings();
-            }
-            elseif (preg_match("/^tset show ([01-9]+)/i", $msg, $info)) {
+            } elseif (preg_match("/^tset show ([01-9]+)/i", $msg, $info)) {
                 return $this->change_timer_setting($info[1]);
-            }
-            elseif (preg_match("/^tset update ([01-9]+) ([01-9]+)/i", $msg, $info)) {
+            } elseif (preg_match("/^tset update ([01-9]+) ([01-9]+)/i", $msg, $info)) {
                 return $this->update_timer_setting($info[1], $info[2]);
             }
         default:
@@ -141,8 +136,7 @@ class TimerGUI extends BaseActiveModule
         }
     }
 
-
-    function add_timer($owner, $timestr, $name, $class, $repeatstr, $channel)
+    public function add_timer($owner, $timestr, $name, $class, $repeatstr, $channel)
     {
         $duration = $this->bot->core("time")->parse_time($timestr);
         $repeat = $this->bot->core("time")->parse_time($repeatstr);
@@ -163,17 +157,16 @@ class TimerGUI extends BaseActiveModule
             $msg .= " The timer has a repeat interval of##highlight## " . $this->bot
                 ->core("time")->format_seconds($repeat) . " ##end##";
         }
+
         return $msg;
     }
 
-
-    function show_timer($name, $channel)
+    public function show_timer($name, $channel)
     {
         $channelstr = "channel = '" . $channel . "'";
         if ($this->bot->core("settings")->get("timer", "global")) {
             $channelstr = "channel = 'global'";
-        }
-        elseif ($this->bot->core("settings")
+        } elseif ($this->bot->core("settings")
             ->get("timer", "guestchannel") == "both"
             && ($channel == "pgmsg" || $channel == "gc")
         ) {
@@ -203,19 +196,18 @@ class TimerGUI extends BaseActiveModule
             $listing .= $this->bot->core("tools")
                 ->chatcmd("remtimer " . $timer['id'], "[DELETE]");
         }
+
         return $this->bot->core("tools")
             ->make_blob("Current timers", "##blob_title##Timers for <botname>:##end##\n" . $listing);
     }
 
-
-    function rem_timer($name, $id)
+    public function rem_timer($name, $id)
     {
         return $this->bot->core("timer")->del_timer($name, $id, FALSE);
     }
 
-
     // Shows all existing timer settings with their current values:s
-    function show_timer_settings()
+    public function show_timer_settings()
     {
         $tsets = $this->bot->db->select(
             'SELECT a.id AS id, a.name AS name, b.name AS class, a.description as description '
@@ -234,14 +226,14 @@ class TimerGUI extends BaseActiveModule
             $blob .= "##blob_title##Description: ##end##" . $tset['description'] . "\n\n";
         }
         $blob .= "##end##";
+
         return $this->bot->core("tools")
             ->make_blob("Timer class settings", $blob);
     }
 
-
     // Shows timer class setting with id $tsetid, it's current value and it's default value
     // shows an interface to pick the new value among all existing timer classes
-    function change_timer_setting($tsetid)
+    public function change_timer_setting($tsetid)
     {
         $tsets = $this->bot->db->select(
             'SELECT a.id AS id, a.name AS name, b.name AS current_class, ' . 'c.name AS default_class, c.id AS default_id, a.description as description '
@@ -271,13 +263,13 @@ class TimerGUI extends BaseActiveModule
                 ->chatcmd("tset update " . $tsetid . " " . $class['id'], $class['name']);
             $blob .= "\n##blob_title##Description: ##end##" . $class['description'];
         }
+
         return $this->bot->core("tools")
             ->make_blob("Timer class settings", $blob);
     }
 
-
     // Sets $tset to $newclassid if $tsetid is valid
-    function update_timer_setting($tsetid, $newclassid)
+    public function update_timer_setting($tsetid, $newclassid)
     {
         $tsets = $this->bot->db->select('SELECT name FROM #___timer_class_settings WHERE id = ' . $tsetid, MYSQL_ASSOC);
         if (empty($tsets)) {
@@ -294,8 +286,7 @@ class TimerGUI extends BaseActiveModule
         ) {
             return "Changed timer class setting ##highlight##" . $tset['name'] . "##end## to new timer class ##highlight##" . $class['name'] . "##end##";
         }
+
         return "Error updating timer class!";
     }
 }
-
-?>

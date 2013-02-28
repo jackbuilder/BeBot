@@ -5,8 +5,8 @@ $server_list['Ao']['Testlive'] = array(
     'port' => 7109
 );
 $server_list['Ao']['Rubi-Ka'] = array(
-		'server' => 'chat.d1.funcom.com',
-		'port' => 7105
+        'server' => 'chat.d1.funcom.com',
+        'port' => 7105
 );
 $server_list['Ao']['1'] = $server_list['Ao']['Rubi-Ka'];
 
@@ -64,5 +64,3 @@ $server_list['Aoc']['Ironspine'] = $server_list['Aoc']['US'];
 $server_list['Aoc']['Tyranny'] = $server_list['Aoc']['US'];
 $server_list['Aoc']['Cimmeria'] = $server_list['Aoc']['US'];
 $server_list['Aoc']['Agony'] = $server_list['Aoc']['US'];
-
-?>

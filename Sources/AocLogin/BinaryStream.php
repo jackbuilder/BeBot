@@ -21,7 +21,6 @@ class BinaryStream
     private $m_ReadPtr = 0;
     private $m_WritePtr = 0;
 
-
     public function __construct($data = "", $len = 0)
     {
         $this->m_Data = $data;
@@ -30,7 +29,6 @@ class BinaryStream
         $this->m_WritePtr = 0;
     }
 
-
     /// GetReadData
     /// Returns the data we have not read yet from the binarystream
     /// @return String - The binary data
@@ -38,9 +36,9 @@ class BinaryStream
     public function GetReadData()
     {
         $str = substr($this->m_Data, $this->m_ReadPtr, $this->m_DataLen - $this->m_ReadPtr);
+
         return $str;
     }
-
 
     /// GetLength
     /// Returns max length of the used buffer
@@ -50,12 +48,10 @@ class BinaryStream
     {
         if ($this->m_DataLen > $this->m_WritePtr) {
             return $this->m_DataLen;
-        }
-        else {
+        } else {
             $this->m_WritePtr;
         }
     }
-
 
     /// GetWriteData
     /// Returns the databuffer that we have written to.
@@ -67,7 +63,6 @@ class BinaryStream
         return implode($this->m_Data);
     }
 
-
     /// GetRawData
     /// Returns the databuffer as is
     /// @return Array - The data buffer
@@ -76,7 +71,6 @@ class BinaryStream
     {
         return $this->m_Data;
     }
-
 
     /// GetReadLength
     /// Returns length of how much we have read so far
@@ -87,7 +81,6 @@ class BinaryStream
         return $this->m_ReadPtr;
     }
 
-
     /// GetWriteLength
     /// Returns length of how much we have written so far
     /// @return int - The write pointer
@@ -97,7 +90,6 @@ class BinaryStream
         return $this->m_WritePtr;
     }
 
-
     /// GetVecSize
     /// Returns the number of elements in the vector
     /// @return int - The number of elements
@@ -106,9 +98,9 @@ class BinaryStream
     {
         $res = $this->ReadUInt32();
         $res = (($res / 1009) - 1);
+
         return $res;
     }
-
 
     /// Skip
     /// Skips n bytes in the read buffer
@@ -117,7 +109,6 @@ class BinaryStream
     {
         $this->m_ReadPtr += $len;
     }
-
 
     /// ReadUInt16
     /// Reads two bytes from the buffer and returns the uint16 value
@@ -133,10 +124,8 @@ class BinaryStream
         $res = array_pop($data);
 
         //echo("[BinaryStream][ReadUInt16] " . $res . " [pos:" . ($this->m_ReadPtr-2) . " -> " . ($this->m_ReadPtr ) . "]\n");
-
         return $res;
     }
-
 
     /// ReadUInt32
     /// Reads four bytes from the buffer and returns the uint32 value
@@ -159,10 +148,8 @@ class BinaryStream
         }
 
         //echo("[BinaryStream][ReadUInt32] " . $res . " [pos:" . ($this->m_ReadPtr-4) . " -> " . ($this->m_ReadPtr ) . "]\n");
-
         return $res;
     }
-
 
     /// ReadString
     /// Reads first the length of the string, and then the string from the buffer
@@ -173,6 +160,7 @@ class BinaryStream
         $len = $this->ReadUInt16();
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
             echo("[BinaryStream][ReadString] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
+
             return NULL;
         }
 
@@ -183,7 +171,6 @@ class BinaryStream
         return $str;
     }
 
-
     /// ReadRaw
     /// Reads n number of bytes from the read buffer
     /// @return string - The string in the buffer
@@ -192,6 +179,7 @@ class BinaryStream
     {
         if ($this->m_ReadPtr + $len > $this->m_DataLen) {
             echo("[BinaryStream][ReadRaw] " . $str . " [pos:" . ($this->m_ReadPtr) . "] invalid length :" . $len . " since it will read outside of buffer.\n");
+
             return NULL;
         }
 
@@ -200,7 +188,6 @@ class BinaryStream
 
         return $str;
     }
-
 
     /// WriteUInt8
     /// Writes 1 byte to the write buffer
@@ -213,7 +200,6 @@ class BinaryStream
         //echo("[BinaryStream][WriteUInt8] " . $data . " [pos:" . ($this->m_WritePtr-1) . " -> " . ($this->m_WritePtr ) . "] \n");
     }
 
-
     /// WriteUInt16
     /// Writes 2 byte to the write buffer
     /// @param data [int] The data we want to write
@@ -225,7 +211,6 @@ class BinaryStream
         $this->m_Data[$this->m_WritePtr++] = $packedData[1];
         //echo("[BinaryStream][WriteUInt16] " . $data . " [pos:" . ($this->m_WritePtr-2) . " -> " . ($this->m_WritePtr ) . "] \n");
     }
-
 
     /// WriteUInt32
     /// Writes 4 bytes to the write buffer
@@ -241,7 +226,6 @@ class BinaryStream
         //echo("[BinaryStream][WriteUInt32] " . $data . " [pos:" . ($this->m_WritePtr-4) . " -> " . ($this->m_WritePtr) . "] \n");
     }
 
-
     /// WriteRaw
     /// Writes n byte to the write buffer
     /// @param str [String] The data we want to write
@@ -255,7 +239,6 @@ class BinaryStream
         }
     }
 
-
     /// WriteString
     /// Writes a string to the write buffer
     /// @param str [String] The data we want to write
@@ -267,5 +250,3 @@ class BinaryStream
         $this->WriteRaw($str, $len);
     }
 }
-
-?>

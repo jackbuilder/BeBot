@@ -40,7 +40,7 @@ The Class itself...
 class SetConf extends BaseActiveModule
 { // Start Class
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->help['description'] = "Setting management interface.";
@@ -50,13 +50,12 @@ class SetConf extends BaseActiveModule
         $this->register_alias("settings", "set");
     }
 
-
     /*
     This function handles all the inputs and returns FALSE if the
     handler should not send output, otherwise returns a string
     sutible for output via send_tell, send_pmodule, and send_gc.
     */
-    function command_handler($name, $msg, $source)
+    public function command_handler($name, $msg, $source)
     { // Start function process_command()
         $msg = explode(" ", $msg, 4);
         Switch (count($msg)) {
@@ -74,7 +73,7 @@ class SetConf extends BaseActiveModule
     /*
     Retruns a click window with the setting modules.
     */
-    function show_all_modules()
+    public function show_all_modules()
     { // Start function show_all_modules()
         $sql = "SELECT DISTINCT module FROM #___settings WHERE hidden = FALSE ORDER BY module";
         $result = $this->bot->db->select($sql);
@@ -88,6 +87,7 @@ class SetConf extends BaseActiveModule
                     ->chatcmd("settings " . $module[0], $module[0]) . "\n";
             }
         }
+
         return $this->bot->core("tools")
             ->make_blob("Settings groups for <botname>", $output);
     } // End function show_all_modules()
@@ -95,7 +95,7 @@ class SetConf extends BaseActiveModule
     /*
     Returns a click window with settings for a specific module.
     */
-    function show_module($module)
+    public function show_module($module)
     { // Start function show_module()
         $module = str_replace(" ", "_", $module); // FIXME: Do regexp right and shouldn't need this?
         $sql = "SELECT setting, value, datatype, longdesc, defaultoptions FROM #___settings ";
@@ -111,18 +111,14 @@ class SetConf extends BaseActiveModule
             if (empty($setting[3])) {
                 if ($setting[2] == "int" || $setting[2] == "float") {
                     $longdesc = "Numeric";
-                }
-                elseif ($setting[2] == "bool") {
+                } elseif ($setting[2] == "bool") {
                     $longdesc = "On/Off";
-                }
-                elseif ($setting[2] == "string") {
+                } elseif ($setting[2] == "string") {
                     $longdesc = "Text String";
-                }
-                else {
+                } else {
                     $longdesc = "Not configured.";
                 }
-            }
-            else {
+            } else {
                 $longdesc = stripslashes($setting[3]);
             }
             // Make configuration links if options are provided.
@@ -140,35 +136,29 @@ class SetConf extends BaseActiveModule
             // Make inside data...
             if (strtoupper($setting[1]) == "TRUE") {
                 $setting[1] = "On";
-            }
-            elseif (strtoupper($setting[1]) == "FALSE") {
+            } elseif (strtoupper($setting[1]) == "FALSE") {
                 $setting[1] = "Off";
             }
-            if (strtolower($setting[0]) == "password") // Mask passwords
-            {
+            if (strtolower($setting[0]) == "password") { // Mask passwords
                 $inside .= "##ao_infoheadline##" . $setting[0] . ":##end##  ##ao_infotextbold##************##end##\n";
-            }
-            elseif (preg_match("/^#[0-9a-f]{6}$/i", $setting[1])) // Show HTML Color Codes in Color
-            {
+            } elseif (preg_match("/^#[0-9a-f]{6}$/i", $setting[1])) { // Show HTML Color Codes in Color
                 $inside .= "##ao_infoheadline##" . $setting[0] . ":##end##  <font color=" . $setting[1] . ">" . $setting[1] . "</font>\n";
-            }
-            else // Normal Setting Display.
-            {
+            } else { // Normal Setting Display.
                 $inside .= "##ao_infoheadline##" . $setting[0] . ":##end##  ##ao_infotextbold##" . $setting[1] . "##end##\n";
             }
             $inside .= "  ##ao_infotextbold##Description:##end## ##ao_infotext##" . $longdesc . "##end##\n";
             if (count($options) > 1) {
                 $inside .= $optionlinks . "\n\n";
-            }
-            else {
+            } else {
                 $inside .= "/tell <botname> <pre>set " . $module . " " . $setting[0] . " &lt;new value&gt;\n\n";
             }
         }
+
         return $this->bot->core("tools")
             ->make_blob("Settings for " . $module, $inside);
     } // End fucnction show_module()
 
-    function change_setting($user, $module, $setting, $value)
+    public function change_setting($user, $module, $setting, $value)
     { // Start function change_setting()
         $module = $this->bot->core("settings")->remove_space($module);
         $setting = $this->bot->core("settings")->remove_space($setting);
@@ -185,11 +175,9 @@ class SetConf extends BaseActiveModule
             $value = strtolower($value);
             if ($value == "on") {
                 $value = TRUE;
-            }
-            elseif ($value == "off") {
+            } elseif ($value == "off") {
                 $value = FALSE;
-            }
-            else {
+            } else {
                 return "Unrecgonized value for setting " . $setting . " for module " . $module . ". No change made.";
             }
             break;
@@ -201,6 +189,7 @@ class SetConf extends BaseActiveModule
             }
             break;
         case "array": // Changing arrays are not supported! :D
+
             return "Modifying array values is not supported in this interface. See the help for " . $module;
             break;
         default:
@@ -213,18 +202,16 @@ class SetConf extends BaseActiveModule
         $this->bot->core("settings")->set_change_user("");
         if ($result instanceof BotError) {
             return $result;
-        }
-        else {
+        } else {
             if ($datatype == "bool") {
                 if ($value) {
                     $value = "On";
-                }
-                else {
+                } else {
                     $value = "Off";
                 }
             }
+
             return "Changed setting " . $setting . " for module " . $module . " to " . strval($value) . " [" . $this->show_module($module) . "]";
         }
     } // End function change_setting()
 } // End of Class
-?>

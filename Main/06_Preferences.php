@@ -34,11 +34,10 @@ class Preferences_core extends BasePassiveModule
 {
     private $cache;
 
-
     /*
     Constructor. Pass over a reference to bot and create preferences/settings
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $query = 'CREATE TABLE IF NOT EXISTS ' . $this->bot->db->define_tablename('preferences_def', 'true');
@@ -61,8 +60,7 @@ class Preferences_core extends BasePassiveModule
         $this->update_table();
     }
 
-
-    function update_table()
+    public function update_table()
     {
         if ($this->bot->db->get_version("preferences_def") == 2 and $this->bot->db->get_version("preferences") == 2) {
             return;
@@ -73,6 +71,7 @@ class Preferences_core extends BasePassiveModule
             $this->bot->db->update_table("preferences_def", "access", "drop", "ALTER TABLE #___preferences_def DROP access");
             $this->bot->db->set_version("preferences_def", 2);
             $this->update_table();
+
             return;
         default:
             break;
@@ -83,14 +82,14 @@ class Preferences_core extends BasePassiveModule
             $this->bot->db->update_table("preferences", "owner", "alter", "ALTER TABLE #___preferences MODIFY owner BIGINT NOT NULL");
             $this->bot->db->set_version("preferences", 2);
             $this->update_table();
+
             return;
         default:
             break;
         }
     }
 
-
-    function connect()
+    public function connect()
     {
         //Grab all defaults and put them in cache
         $query = "SELECT module, name, default_value AS value FROM #___preferences_def";
@@ -103,18 +102,16 @@ class Preferences_core extends BasePassiveModule
         }
     }
 
-
     /*
     Buddy handling
     */
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
         $uid = $this->bot->core('player')->id($name);
         if ($msg == 0) {
             //Buddy logging of. Throw out the cached data.
             unset($this->cache[$uid]);
-        }
-        else {
+        } else {
             if ($msg == 1) {
                 //cache costomized preferences.
                 $query = "SELECT value, module, name FROM #___preferences AS t1 JOIN #___preferences_def AS t2 ON t1.pref_ID = t2.ID WHERE owner=$uid";
@@ -128,11 +125,10 @@ class Preferences_core extends BasePassiveModule
         }
     }
 
-
     /*
     Create a new preference definition
     */
-    function create($module, $name, $description, $default, $possible_values)
+    public function create($module, $name, $description, $default, $possible_values)
     {
         //Condition the variables (ucfirst(strtolower()))
         $module = ucfirst(strtolower($module));
@@ -144,8 +140,7 @@ class Preferences_core extends BasePassiveModule
             $query = "INSERT INTO #___preferences_def VALUES (NULL, '$module', '$name', '$description', '$default', '$possible_values')";
             $this->bot->db->query($query);
             $this->bot->log('PREFS', 'CREATE', "Created preference '$name' for module '$module' with default value '$default'");
-        }
-        else {
+        } else {
             $prefs = $prefs[0];
             if ($prefs[1] != stripslashes($description) || $prefs[2] != $possible_values) {
                 $this->bot->db->query(
@@ -158,8 +153,7 @@ class Preferences_core extends BasePassiveModule
                     foreach ($temps as $temp) {
                         $pv[strtolower(trim($temp))] = TRUE;
                     }
-                    if (!isset($pv[strtolower($prefs[3])])) // current default invalid, reset
-                    {
+                    if (!isset($pv[strtolower($prefs[3])])) { // current default invalid, reset
                         $this->bot->db->query("UPDATE #___preferences_def SET default_value = '" . $default . "' WHERE module = '" . $module . "' AND name = '" . $name . "'");
                         $this->bot->log("PREFS", "UPDATED", "Reset default value as it was invalid for " . stripslashes($name) . " for module " . stripslashes($module));
                     }
@@ -183,24 +177,24 @@ class Preferences_core extends BasePassiveModule
         }
     }
 
-
-    function get($name, $module = FALSE, $setting = FALSE)
+    public function get($name, $module = FALSE, $setting = FALSE)
     {
         //Check if $name is already a uid.
         if (is_numeric($name)) {
             $uid = $name;
-        }
-        else {
+        } else {
             $uid = $this->bot->core('player')->id($name);
         }
         if ($module == FALSE && $setting == FALSE) {
             //We're fetching a list of all preferences for a user
-            $prefs = array_merge($this->cache['def'], (array)$this->cache[$uid]);
+            $prefs = array_merge($this->cache['def'], (array) $this->cache[$uid]);
+
             return ($prefs);
         }
         if ($module != FALSE && $setting == FALSE) {
             //We're fetching a list of all preferences for a given module
-            $prefs = array_merge($this->cache['def'][strtolower($module)], (array)$this->cache[$uid][strtolower($module)]);
+            $prefs = array_merge($this->cache['def'][strtolower($module)], (array) $this->cache[$uid][strtolower($module)]);
+
             return ($prefs);
         }
         $module = strtolower($module);
@@ -209,18 +203,16 @@ class Preferences_core extends BasePassiveModule
         if (isset($this->cache[$uid][$module][$setting])) {
             //Setting found. Return the value.
             return ($this->cache[$uid][$module][$setting]);
-        }
-        else {
+        } else {
             //No user preference cached. Grab the default.
             return ($this->cache['def'][$module][$setting]);
         }
     }
 
-
     /*
     Change preference for module $module named $setting to $value for user $name
     */
-    function change($name, $module, $setting, $value)
+    public function change($name, $module, $setting, $value)
     {
         $uid = $this->bot->core('player')->id($name);
         $module = strtolower($module);
@@ -230,35 +222,35 @@ class Preferences_core extends BasePassiveModule
         $old_value = $this->get($uid, $module, $setting);
         if ($old_value instanceof BotError) {
             $this->error = $old_value;
+
             return ($this->error);
-        }
-        else {
+        } else {
             if ($old_value == $value) {
                 //No changes to be made so say we've already made them.
                 return ("Preference for $name, {$module}->{$setting} was already set to '$value'. Nothing changed.");
-            }
-            elseif ($value == $default) {
+            } elseif ($value == $default) {
                 //Changing to the default value. Remove from preference table and user cache.
                 $query
                     = "DELETE FROM #___preferences WHERE owner = $uid AND pref_id = (SELECT ID FROM #___preferences_def WHERE module = '$module' AND name = '$setting' LIMIT 1) LIMIT 1";
                 $this->bot->db->query($query);
                 unset($this->cache[$uid][$module][$setting]);
+
                 return ("Preferences for $name, {$module}->{$setting} reset to default value '$value'");
-            }
-            elseif ($old_value == $default) {
+            } elseif ($old_value == $default) {
                 //The value was previously set to default. An entry need to be made in the table
                 $query
                     = "INSERT INTO #___preferences (pref_id, owner, value) VALUES ((SELECT ID FROM #___preferences_def WHERE module='$module' AND name='$setting' LIMIT 1), $uid, '$value')";
                 $this->bot->db->query($query);
                 $this->cache[$uid][$module][$setting] = $value;
+
                 return ("Preference was created for $name, {$module}->{$setting} = $value");
-            }
-            else {
+            } else {
                 //Neither old nor new value are defaults. An update need to be made to the table.
                 $query
                     = "UPDATE #___preferences SET value='$value' WHERE owner=$uid AND pref_id=(SELECT ID FROM #___preferences_def WHERE module='$module' AND name='$setting' LIMIT 1) LIMIT 1";
                 $this->bot->db->query($query);
                 $this->cache[$uid][$module][$setting] = $value;
+
                 return ("Preferences for $name, {$module}->{$setting} changed to '$value'");
             }
         }
@@ -268,7 +260,7 @@ class Preferences_core extends BasePassiveModule
     /*
     Changes the default value of a preference
     */
-    function change_default($name, $module, $setting, $value)
+    public function change_default($name, $module, $setting, $value)
     {
         $module = strtolower($module);
         $setting = strtolower($setting);
@@ -289,17 +281,18 @@ class Preferences_core extends BasePassiveModule
         //}
         //unset($user);
         $this->bot->log("PREFS", "CHANGE", "$name changed the default value for setting $module -> $setting to $value");
+
         return ("The default value for {$module}->{$setting} has been set to '$value'.");
     }
 
 
-    function exists($module, $setting)
+    public function exists($module, $setting)
     {
         return (isset($this->cache['def'][strtolower($module)][strtolower($setting)]));
     }
 
 
-    function show_modules($name)
+    public function show_modules($name)
     {
         $list = $this->bot->core("prefs")->get($name);
         $list = array_keys($list);
@@ -307,11 +300,12 @@ class Preferences_core extends BasePassiveModule
             $window .= "Preferences for " . $this->bot->core("tools")
                 ->chatcmd("preferences show " . $module, $module) . "<br>";
         }
+
         return ($this->bot->core("tools")->make_blob('Preferences', $window));
     }
 
 
-    function show_prefs($name, $module, $defaults = TRUE)
+    public function show_prefs($name, $module, $defaults = TRUE)
     {
         //Show preferences for the given module
         //Grab some values from the definitions
@@ -332,8 +326,7 @@ class Preferences_core extends BasePassiveModule
                 //Check if this is the current value.
                 if ($option == $current_value) {
                     $buttonlist .= $option;
-                }
-                else {
+                } else {
                     //Create a link that enables this option to be chosen.
                     $buttonlist .= $this->bot->core("tools")
                         ->chatcmd("preferences set $module {$preference['name']} $option", $option);
@@ -348,8 +341,7 @@ class Preferences_core extends BasePassiveModule
                         $buttonlist .= '##green##[##end##';
                         $buttonlist .= "D";
                         $buttonlist .= '##green##]##end##';
-                    }
-                    else {
+                    } else {
                         $buttonlist .= '##red##[##end##';
                         $buttonlist .= $this->bot->core("tools")
                             ->chatcmd("preferences default $module {$preference['name']} $option", "D");
@@ -364,9 +356,8 @@ class Preferences_core extends BasePassiveModule
             $buttonlist .= "##highlight## ]##end##<br><br>";
             $window .= $buttonlist;
         }
+
         return ('Preferences for ' . $this->bot->core("tools")
             ->make_blob($module, $window));
     }
 }
-
-?>

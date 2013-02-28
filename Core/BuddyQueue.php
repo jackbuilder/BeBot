@@ -42,7 +42,7 @@ class Buddy_Queue_Core extends BasePassiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("buddy_queue");
@@ -59,16 +59,14 @@ class Buddy_Queue_Core extends BasePassiveModule
         );
     }
 
-
-    function settings($user, $module, $setting, $new, $old)
+    public function settings($user, $module, $setting, $new, $old)
     {
         $rate = 1 / $new;
         $max = $new * 2;
         $this->bot->core("queue")->register($this, "buddy", $rate, $max);
     }
 
-
-    function do_add($uid)
+    public function do_add($uid)
     {
         if (!empty($uid) && $uid != 0 && $uid != -1) {
             if (!($this->bot->core("chat")->buddy_exists($uid))) {
@@ -78,8 +76,7 @@ class Buddy_Queue_Core extends BasePassiveModule
                         ->core("player")->name($uid)
                 );
             }
-        }
-        else {
+        } else {
             $this->bot->log(
                 "BUDDY QUEUE", "BUDDY-ERROR", "Tried to add " . $this->bot
                 ->core("player")
@@ -88,8 +85,7 @@ class Buddy_Queue_Core extends BasePassiveModule
         }
     }
 
-
-    function do_delete($uid)
+    public function do_delete($uid)
     {
         if (!empty($uid) && $uid != 0 && $uid != -1) {
             if (($this->bot->core("chat")->buddy_exists($uid))) {
@@ -102,8 +98,7 @@ class Buddy_Queue_Core extends BasePassiveModule
                     "BUDDY QUEUE", "BUDDY-DEL", $this->bot
                         ->core("player")->name($uid)
                 );
-            }
-            else {
+            } else {
                 $this->bot->log(
                     "BUDDY QUEUE", "BUDDY-ERROR", "Tried to remove " . $this->bot
                     ->core("player")
@@ -113,47 +108,41 @@ class Buddy_Queue_Core extends BasePassiveModule
         }
     }
 
-
     /*
     This gets called on cron
     */
-    function queue($module, $info)
+    public function queue($module, $info)
     {
         if ($info[1]) {
             $this->do_add($info[0]);
-        }
-        else {
+        } else {
             $this->do_delete($info[0]);
         }
     }
 
-
     /*
     Checks if buddy can be added or removed. true if yes, false it has to be put to queue
     */
-    function check_queue()
+    public function check_queue()
     {
         if (!$this->bot->core("settings")->get("Buddy_Queue", "Enabled")) {
             Return TRUE;
-        }
-        else {
+        } else {
             return $this->bot->core("queue")->check_queue("buddy");
         }
     }
-
 
     /*
     Puts a buddy into the queue
     $type is a boolean, true means add the uid, false means delete it
     */
-    function into_queue($uid, $type)
+    public function into_queue($uid, $type)
     {
         $info = array(
             $uid,
             $type
         );
+
         return $this->bot->core("queue")->into_queue("buddy", $info);
     }
 }
-
-?>

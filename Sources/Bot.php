@@ -109,30 +109,30 @@ define("IRC", 32);
 define("ALL", 255);
 class Bot
 {
-    var $lasttell;
-    var $banmsgout;
-    var $dimension;
-    var $botversion;
-    var $botversionname;
-    var $other_bots;
-    var $aoc;
-    var $irc;
-    var $db;
-    var $commpre;
-    var $crondelay;
-    var $telldelay;
-    var $maxsize;
-    var $reconnecttime;
-    var $guildbot;
-    var $guildid;
-    var $guild;
-    var $log;
-    var $log_path;
-    var $log_timestamp;
-    var $use_proxy_server;
-    var $proxy_server_address;
-    var $starttime;
-    var $commands;
+    public $lasttell;
+    public $banmsgout;
+    public $dimension;
+    public $botversion;
+    public $botversionname;
+    public $other_bots;
+    public $aoc;
+    public $irc;
+    public $db;
+    public $commpre;
+    public $crondelay;
+    public $telldelay;
+    public $maxsize;
+    public $reconnecttime;
+    public $guildbot;
+    public $guildid;
+    public $guild;
+    public $log;
+    public $log_path;
+    public $log_timestamp;
+    public $use_proxy_server;
+    public $proxy_server_address;
+    public $starttime;
+    public $commands;
     public $owner;
     public $super_admin;
     private $module_links = array();
@@ -149,22 +149,19 @@ class Bot
     public static $instance;
     public $dispatcher;
 
-
     public static function factory($config_file = NULL)
     {
-        require ('./conf/ServerList.php');
+        require './conf/ServerList.php';
         if (!empty($config_file)) {
             $config_file = ucfirst(strtolower($config_file)) . ".Bot.conf";
-        }
-        else {
+        } else {
             $config_file = "Bot.conf";
         }
         //Read config_file
         if (file_exists("./conf/" . $config_file)) {
-            require_once "./conf/" . $config_file;
+            require_once './conf/'. $config_file;
             echo "Loaded bot configuration from conf/" . $config_file . "\n";
-        }
-        else {
+        } else {
             die("Could not read config file conf/" . $config_file);
         }
 
@@ -176,8 +173,7 @@ class Bot
                 $fp = fopen('./conf/pw', 'w');
                 fwrite($fp, "");
                 fclose($fp);
-            }
-            else {
+            } else {
                 if (empty($ao_password) || $ao_password == "") {
                     die("No password set in either ./conf/" . $config_file . " or in conf/pw");
                 }
@@ -186,11 +182,9 @@ class Bot
         //Determine which game we are playing
         if (!empty($server_list['ao'][$dimension])) {
             define('AOCHAT_GAME', 'ao');
-        }
-        elseif (!empty($server_list['aoc'][$dimension])) {
+        } elseif (!empty($server_list['aoc'][$dimension])) {
             define('AOCHAT_GAME', 'aoc');
-        }
-        else {
+        } else {
             die("Unable to find dimension '$dimension' in any game.");
         }
         //Make sure that the log path exists.
@@ -240,14 +234,12 @@ class Bot
         //We need to keep these too.
         if (isset($owner)) {
             self::$instance[$bothandle]->owner = $owner;
-        }
-        else {
+        } else {
             self::$instance[$bothandle]->owner = NULL;
         }
         if (isset($super_admin)) {
             self::$instance[$bothandle]->super_admin = $super_admin;
-        }
-        else {
+        } else {
             self::$instance[$bothandle]->super_admin = NULL;
         }
         // create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
@@ -261,26 +253,25 @@ class Bot
         return ($bothandle);
     }
 
-
     public static function get_instance($bothandle)
     {
         if (!isset(self::$instance[$bothandle])) {
             return FALSE;
         }
+
         return self::$instance[$bothandle];
     }
-
 
     private function __construct()
     {
         //Empty
     }
 
-
-    function load_files($section, $directory)
+    public function load_files($section, $directory)
     {
         if (!is_dir($directory)) {
             $this->log("LOAD", "ERROR", "The specified directory '$directory' is inaccessible!");
+
             return;
         }
         $bot = $this;
@@ -305,11 +296,10 @@ class Bot
         echo "\n";
     }
 
-
     /*
     Connects the bot to AO's chat server
     */
-    function connect()
+    public function connect()
     {
         // Make sure all cronjobs are locked, we don't want to run any cronjob before we are logged in!
         $this->cron_activated = FALSE;
@@ -328,12 +318,10 @@ class Bot
         if (isset($server_list['ao'][$dimension])) {
             $server = $server_list['ao'][$dimension]['server'];
             $port = $server_list['ao'][$dimension]['port'];
-        }
-        elseif (isset($server_list['aoc'][$dimension])) {
+        } elseif (isset($server_list['aoc'][$dimension])) {
             $server = $server_list['aoc'][$dimension]['server'];
             $port = $server_list['aoc'][$dimension]['port'];
-        }
-        else {
+        } else {
             die("Unknown dimension " . $this->dimension);
         }
 
@@ -355,8 +343,7 @@ class Bot
                 sleep($this->reconnecttime);
                 die("The bot is restarting.\n");
             }
-        }
-        else {
+        } else {
             // Authenticate
             $this->log("LOGIN", "STATUS", "Authenticating $this->username");
             $this->aoc->authenticate($this->username, $this->password);
@@ -371,8 +358,7 @@ class Bot
         unset($this->password);
         if ($this->game == "aoc") {
             $dispg = TRUE;
-        }
-        else {
+        } else {
             $dispg = FALSE;
         }
 
@@ -445,7 +431,7 @@ class Bot
     /*
     Reconnect the bot.
     */
-    function reconnect()
+    public function reconnect()
     {
         $this->cron_activated = FALSE;
         $this->disconnect();
@@ -458,7 +444,7 @@ class Bot
     /*
     Dissconnect the bot
     */
-    function disconnect()
+    public function disconnect()
     {
         $this->aoc->disconnect();
         if (!empty($this->commands["disconnect"])) {
@@ -472,11 +458,12 @@ class Bot
     }
 
 
-    function replace_string_tags($msg)
+    public function replace_string_tags($msg)
     {
         $msg = str_replace("<botname>", $this->botname, $msg);
         $msg = str_replace("<guildname>", $this->guildname, $msg);
         $msg = str_replace("<pre>", str_replace("\\", "", $this->commpre), $msg);
+
         return $msg;
     }
 
@@ -484,12 +471,11 @@ class Bot
     /*
     sends a tell asking user to use "help"
     */
-    function send_help($to, $command = FALSE)
+    public function send_help($to, $command = FALSE)
     {
         if ($command == FALSE) {
             $this->send_tell($to, "/tell <botname> <pre>help");
-        }
-        else {
+        } else {
             $this->send_tell(
                 $to, $this->core("help")
                     ->show_help($to, $command)
@@ -501,7 +487,7 @@ class Bot
     /*
     sends a message over IRC if it's enabled and connected
     */
-    function send_irc($prefix, $name, $msg)
+    public function send_irc($prefix, $name, $msg)
     {
         //		if (isset($this -> irc) && $this -> exists_module("irc"))
         if ($this->exists_module("irc")) {
@@ -513,11 +499,10 @@ class Bot
         }
     }
 
-
     /*
     Notifies someone that they are banned, but only once.
     */
-    function send_ban($to, $msg = FALSE)
+    public function send_ban($to, $msg = FALSE)
     {
         if (!isset($this->banmsgout[$to]) || $this->banmsgout[$to] < (time() - 60 * 5)) {
             $this->banmsgout[$to] = time();
@@ -530,46 +515,39 @@ class Bot
                                 ->core("settings")
                                 ->get("Time", "FormatString"), $why[0][2]
                         );
-                    }
-                    else {
+                    } else {
                         $until = "Permanent ban.";
                     }
                     $why = " by ##highlight##" . $why[0][0] . "##end## for Reason: ##highlight##" . $why[0][1] . "##end##\n" . $until;
-                }
-                else {
+                } else {
                     $why = ".";
                 }
                 $this->send_tell($to, "You are banned from <botname>" . $why);
-            }
-            else {
+            } else {
                 $this->send_tell($to, $msg);
             }
-        }
-        else {
+        } else {
             return FALSE;
         }
     }
 
-
     /*
     Sends a permission denied error to user for the given command.
     */
-    function send_permission_denied($to, $command, $type = 0)
+    public function send_permission_denied($to, $command, $type = 0)
     {
         $string = "You do not have permission to access $command";
         if ($type = 0) {
             return $string;
-        }
-        else {
+        } else {
             $this->send_output($to, $string, $type);
         }
     }
 
-
     /*
     send a tell. Set $low to 1 on tells that are likely to cause spam.
     */
-    function send_tell(
+    public function send_tell(
         $to, $msg, $low = 0, $color = TRUE, $sizecheck = TRUE,
         $parsecolors = TRUE
     )
@@ -587,8 +565,7 @@ class Bot
                         $send = FALSE;
                     }
                 }
-            }
-            else {
+            } else {
                 $info = explode('<a href="', $msg, 2);
                 if (count($info) > 1) {
                     if (strlen($msg) > $this->maxsize) {
@@ -607,25 +584,22 @@ class Bot
             if ($this->core("chat_queue")->check_queue()) {
                 if (is_numeric($to)) {
                     $to_name = $this->core('player')->name($to);
-                }
-                else {
+                } else {
                     $to_name = $to;
                 }
                 $this->log("TELL", "OUT", "-> " . $to_name . ": " . $msg);
                 $msg = utf8_encode($msg);
                 $this->aoc->send_tell($to, $msg);
-            }
-            else {
+            } else {
                 $this->core("chat_queue")->into_queue($to, $msg, "tell", $low);
             }
         }
     }
 
-
     /*
     send a message to privategroup
     */
-    function send_pgroup(
+    public function send_pgroup(
         $msg, $group = NULL, $checksize = TRUE,
         $parsecolors = TRUE
     )
@@ -667,18 +641,16 @@ class Bot
                     $msg = $this->core("colors")->colorize("normal", $msg);
                 }
                 $this->aoc->send_privgroup($gid, $msg);
-            }
-            else {
+            } else {
                 $this->aoc->send_privgroup($gid, $msg);
             }
         }
     }
 
-
     /*
     * Send a message to guild channel
     */
-    function send_gc($msg, $low = 0, $checksize = TRUE)
+    public function send_gc($msg, $low = 0, $checksize = TRUE)
     {
         if ($this->core("settings")->get("Core", "DisableGC")) {
             Return FALSE;
@@ -701,22 +673,19 @@ class Bot
             }
             if ($this->game == "ao") {
                 $guild = $this->guildname;
-            }
-            else {
+            } else {
                 $guild = "~Guild";
             }
             if ($this->core("chat_queue")->check_queue()) {
                 $msg = utf8_encode($msg);
                 $this->aoc->send_group($guild, $msg);
-            }
-            else {
+            } else {
                 $this->core("chat_queue")->into_queue($guild, $msg, "gc", $low);
             }
         }
     }
 
-
-    function send_output($source, $msg, $type, $low = 0)
+    public function send_output($source, $msg, $type, $low = 0)
     {
         // Parse color tags now to be sure they don't get changed by output filters
         $msg = $this->core("colors")->parse($msg);
@@ -760,7 +729,7 @@ class Bot
     * all available commands in $channel. The percentage of match and the closest matching command
     * are returned in an array.
     */
-    function find_similar_command($channel, $cmd)
+    public function find_similar_command($channel, $cmd)
     {
         $use = array(0);
         $percentage = 0;
@@ -777,6 +746,7 @@ class Bot
                 );
             }
         }
+
         return $use;
     }
 
@@ -786,7 +756,7 @@ class Bot
     * in $channel. If the check is positive the command is executed and TRUE returned, otherwise FALSE.
     * $pgname is used to identify which external private group issued the command if $channel = extpgmsg.
     */
-    function check_access_and_execute($user, $command, $msg, $channel, $pgname)
+    public function check_access_and_execute($user, $command, $msg, $channel, $pgname)
     {
         if ($this->commands[$channel][$command] != NULL) {
             if ($this->core("access_control")
@@ -794,13 +764,14 @@ class Bot
             ) {
                 if ($channel == "extpgmsg") {
                     $this->commands[$channel][$command]->$channel($pgname, $user, $msg);
-                }
-                else {
+                } else {
                     $this->commands[$channel][$command]->$channel($user, $msg);
                 }
+
                 return TRUE;
             }
         }
+
         return FALSE;
     }
 
@@ -820,13 +791,14 @@ class Bot
     *) search the command library for a similar command, notify user about the typo and execute if found
 
     */
-    function handle_command_input($user, $msg, $channel, $pgname = NULL)
+    public function handle_command_input($user, $msg, $channel, $pgname = NULL)
     {
         $match = FALSE;
         $this->command_error_text = FALSE;
         if (!empty($this->commands[$channel])) {
             if ($this->core("security")->is_banned($user)) {
                 $this->send_ban($user);
+
                 return TRUE;
             }
             $stripped_prefix = str_replace("\\", "", $this->commpre);
@@ -856,8 +828,7 @@ class Bot
                     if ($this->check_access_and_execute($user, $cmd[0], $msg, $channel, $pgname)) {
                         return TRUE;
                     }
-                }
-                elseif ($this->core("settings")->get("Core", "SimilarCheck")) {
+                } elseif ($this->core("settings")->get("Core", "SimilarCheck")) {
                     $use = $this->find_similar_command($channel, $cmd[0]);
                     if ($use[0] > 0) {
                         $cmd[0] = $use[1];
@@ -880,8 +851,7 @@ class Bot
                         ->get_min_rights($cmd[0], $msg, $channel);
                     if ($minlevel == OWNER + 1) {
                         $minstr = "DISABLED";
-                    }
-                    else {
+                    } else {
                         $minstr = $this->core("security")
                             ->get_access_name($minlevel);
                     }
@@ -897,14 +867,14 @@ class Bot
                             $this->command_error_text
                                 = "You're not authorized to use this " . $req[0] . ": ##highlight##" . $req[1] . "##end##, it is Currently ##highlight##DISABLED##end##";
                         }
-                    }
-                    else {
+                    } else {
                         $this->command_error_text
                             = "You're not authorized to use this " . $req[0] . ": ##highlight##" . $req[1] . "##end##, Your Access Level is required to be at least ##highlight##"
                             . $req[2] . "##end##";
                     }
                 }
             }
+
             return FALSE;
         }
     }
@@ -917,7 +887,7 @@ class Bot
     * $group is used by external private groups and to listen to specific chat channels outside the bot.
     * Returns true if some module accessing this chat returns true, false otherwise.
     */
-    function hand_to_chat($found, $user, $msg, $channel, $group = NULL)
+    public function hand_to_chat($found, $user, $msg, $channel, $group = NULL)
     {
         if ($found) {
             return TRUE;
@@ -927,8 +897,7 @@ class Bot
                 $group = "org";
             }
             $registered = $this->commands[$channel][$group];
-        }
-        else {
+        } else {
             $registered = $this->commands[$channel];
         }
         if (!empty($registered)) {
@@ -938,14 +907,12 @@ class Bot
                     if ($this->commands[$channel][$key] != NULL) {
                         $found = $found | $this->commands[$channel][$key]->$channel($group, $user, $msg);
                     }
-                }
-                else {
+                } else {
                     if ($channel == "gmsg") {
                         if ($this->commands[$channel][$group][$key] != NULL) {
                             $found = $found | $this->commands[$channel][$group][$key]->$channel($user, $group, $msg);
                         }
-                    }
-                    else {
+                    } else {
                         if ($this->commands[$channel][$key] != NULL) {
                             $found = $found | $this->commands[$channel][$key]->$channel($user, $msg);
                         }
@@ -953,19 +920,18 @@ class Bot
                 }
             }
         }
+
         return $found;
     }
 
-
-    function incoming_chat($message)
+    public function incoming_chat($message)
     {
     }
-
 
     /*
     Incoming Tell
     */
-    function inc_tell($args)
+    public function inc_tell($args)
     {
         //Get the name of the user. It's easier to handle... or is it?
         $user = $this->core("player")->name($args[0]);
@@ -974,11 +940,12 @@ class Bot
         if ($user == 'BOTNAME') {
             // Danger will robinson. We just sent a tell to ourselves!!!!!!!!!
             $this->log("CORE", "INC_TELL", "Danger will robinson. Received tell from myself: $args[1]");
+
             return;
         }
         //Silently ignore tells from other bots.
-        if (isset($this->other_bots[$user])) //TO DO: Do we ever ucfirst(strtolower()) the other bots?
-        {
+        if (isset($this->other_bots[$user])) //TO DO: Do we ever ucfirst(strtolower()) { the other bots?
+
             return;
         }
         if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match("/.tell (.+)help/i", $args[1]) || preg_match("/I only listen to members of this bot/i", $args[1])
@@ -994,19 +961,16 @@ class Bot
         $found = $this->hand_to_chat($found, $user, $args[1], "tells");
         if ($this->command_error_text) {
             $this->send_tell($args[0], $this->command_error_text);
-        }
-        elseif (!$found
+        } elseif (!$found
             && $this->core("security")
                 ->check_access($user, "GUEST")
         ) {
             $this->send_help($args[0]);
-        }
-        else {
+        } else {
             if (!$found) {
                 if ($this->guild_bot) {
                     $this->send_tell($args[0], "I only listen to members of " . $this->guildname . ".");
-                }
-                else {
+                } else {
                     $this->send_tell($args[0], "I only listen to members of this bot.");
                 }
             }
@@ -1018,7 +982,7 @@ class Bot
     /*
     Someone joined privategroup
     */
-    function inc_pgjoin($args)
+    public function inc_pgjoin($args)
     {
         $pgname = $this->core("player")->name($args[0]);
         if (empty($pgname) || $pgname == "") {
@@ -1035,8 +999,7 @@ class Bot
                     }
                 }
             }
-        }
-        else {
+        } else {
             $this->log("PGRP", "JOIN", $user . " joined the exterior privategroup of " . $pgname . ".");
             if (!empty($this->commands["extpgjoin"])) {
                 $keys = array_keys($this->commands["extpgjoin"]);
@@ -1053,7 +1016,7 @@ class Bot
     /*
     Someone left privategroup
     */
-    function inc_pgleave($args)
+    public function inc_pgleave($args)
     {
         $pgname = $this->core("player")->name($args[0]);
         if (empty($pgname) || $pgname == "") {
@@ -1070,8 +1033,7 @@ class Bot
                     }
                 }
             }
-        }
-        else {
+        } else {
             $this->log("PGRP", "LEAVE", $user . " left the exterior privategroup " . $pgname . ".");
             if (!empty($this->commands["extpgleave"])) {
                 $keys = array_keys($this->commands["extpgleave"]);
@@ -1088,7 +1050,7 @@ class Bot
     /*
     Message in privategroup
     */
-    function inc_pgmsg($args)
+    public function inc_pgmsg($args)
     {
         $pgname = $this->core("player")->name($args[0]);
         $user = $this->core("player")->name($args[1]);
@@ -1112,9 +1074,9 @@ class Bot
                     ->name($args[0]) . "] " . $user . ": " . $args[2]
                 );
             }
+
             return;
-        }
-        else {
+        } else {
             $this->log(
                 "PGRP", "MSG", "[" . $this->core("player")
                 ->name($args[0]) . "] " . $user . ": " . $args[2]
@@ -1128,8 +1090,7 @@ class Bot
                 if (!$dispgmsgchat) {
                     $found = $this->hand_to_chat($found, $user, $args[2], "privgroup");
                 }
-            }
-            else {
+            } else {
                 $found = $this->handle_command_input($user, $args[2], "extpgmsg", $pgname);
                 $found = $this->hand_to_chat($found, $user, $args[2], "extprivgroup", $pgname);
             }
@@ -1140,11 +1101,10 @@ class Bot
         }
     }
 
-
     /*
     Incoming group announce
     */
-    function inc_gannounce($args)
+    public function inc_gannounce($args)
     {
         if ($args[2] == 32772 && $this->game == "ao") {
             $this->guildname = $args[1];
@@ -1152,11 +1112,10 @@ class Bot
         }
     }
 
-
     /*
     * Incoming private group invite
     */
-    function inc_pginvite($args)
+    public function inc_pginvite($args)
     {
         $group = $this->core("player")->name($args[0]);
         if (!empty($this->commands["pginvite"])) {
@@ -1169,11 +1128,10 @@ class Bot
         }
     }
 
-
     /*
     * Incoming group message (Guildchat, towers etc)
     */
-    function inc_gmsg($args)
+    public function inc_gmsg($args)
     {
         $found = FALSE;
         $group = $this->core("chat")->lookup_group($args[0]);
@@ -1184,16 +1142,14 @@ class Bot
         if (isset($this->commands["gmsg"][$group]) || $group == $this->guildname || ($this->game == "aoc" && $group == "~Guild")) {
             if ($this->game == "aoc" && $group == "~Guild") {
                 $msg = "[" . $this->guildname . "] ";
-            }
-            else {
+            } else {
                 $msg = "[" . $group . "] ";
             }
             if ($args[1] != 0) {
                 $msg .= $this->core("player")->name($args[1]) . ": ";
             }
             $msg .= $args[2];
-        }
-        else {
+        } else {
             // If we dont have a hook active for the group, and its not guildchat... BAIL now before wasting cycles
             return FALSE;
         }
@@ -1204,8 +1160,7 @@ class Bot
         }
         if ($args[1] == 0) {
             $user = "0";
-        }
-        else {
+        } else {
             $user = $this->core("player")->name($args[1]);
         }
         // Ignore bot chat, no need to handle it's own output as input again
@@ -1213,9 +1168,9 @@ class Bot
             if ($this->core("settings")->get("Core", "LogGCOutput")) {
                 $this->log("GROUP", "MSG", $msg);
             }
+
             return;
-        }
-        else {
+        } else {
             $this->log("GROUP", "MSG", $msg);
         }
         if (!isset($this->other_bots[$user])) {
@@ -1240,7 +1195,7 @@ class Bot
     /*
     Does all the checks and work for a specific cron time
     */
-    function cronjob($time, $duration)
+    public function cronjob($time, $duration)
     {
         if (($this->cron_job_timer[$duration] <= $time) && ($this->cron_job_active[$duration] == FALSE)) {
             if (!empty($this->cron[$duration])) {
@@ -1261,7 +1216,7 @@ class Bot
     /*
     CronJobs of the bot
     */
-    function cron()
+    public function cron()
     {
         if (!$this->cron_activated) {
             return;
@@ -1281,7 +1236,7 @@ class Bot
     /*
     Writes events to the console and log if logging is turned on.
     */
-    function log($first, $second, $msg, $write_to_db = FALSE)
+    public function log($first, $second, $msg, $write_to_db = FALSE)
     {
         //Remove font tags
         $msg = preg_replace("/<font(.+)>/U", "", $msg);
@@ -1298,14 +1253,11 @@ class Bot
         $msg = $this->replace_string_tags($msg);
         if ($this->log_timestamp == 'date') {
             $timestamp = "[" . gmdate("Y-m-d") . "]\t";
-        }
-        elseif ($this->log_timestamp == 'time') {
+        } elseif ($this->log_timestamp == 'time') {
             $timestamp = "[" . gmdate("H:i:s") . "]\t";
-        }
-        elseif ($this->log_timestamp == 'none') {
+        } elseif ($this->log_timestamp == 'none') {
             $timestamp = "";
-        }
-        else {
+        } else {
             $timestamp = "[" . gmdate("Y-m-d H:i:s") . "]\t";
         }
         $line = $timestamp . "[" . $first . "]\t[" . $second . "]\t" . $msg . "\n";
@@ -1315,8 +1267,7 @@ class Bot
         if (preg_match("/^security$/i", $second)) {
             if ($this->guildbot) {
                 $this->send_gc($line);
-            }
-            else {
+            } else {
                 $this->send_pgroup($line);
             }
             $log = fopen($this->log_path . "/security.txt", "a");
@@ -1341,12 +1292,11 @@ class Bot
     /*
     Cut msg into Size Small enough to Send
     */
-    function cut_size($msg, $type, $to = "", $pri = 0)
+    public function cut_size($msg, $type, $to = "", $pri = 0)
     {
         if (strlen($msg) < 100000) {
             preg_match("/^(.*)<a href=\"(.+)\">(.*)$/isU", $msg, $info);
-        }
-        else {
+        } else {
             $var = explode("<a href=\"", $msg, 2);
             $var2 = explode("\">", $var[1], 2);
             $info[1] = $var[0];
@@ -1360,8 +1310,7 @@ class Bot
         foreach ($content as $line) {
             if ((strlen($result[$page]) + strlen($line) + 12) < $this->maxsize) {
                 $result[$page] .= $line . "\n";
-            }
-            else {
+            } else {
                 $page++;
                 $result[$page] = $line . "\n";
             }
@@ -1374,12 +1323,10 @@ class Bot
             $msg = $info[1] . "<a href=\"" . $between . $result[$i] . "\">" . $info[3] . " <font color=#ffffff>(page " . ($i + 1) . " of " . ($page + 1) . ")</font>";
             if ($type == "tell") {
                 $this->send_tell($to, $msg, $pri, TRUE, FALSE);
-            }
-            else {
+            } else {
                 if ($type == "pgroup") {
                     $this->send_pgroup($msg, $to, FALSE);
-                }
-                else {
+                } else {
                     if ($type == "gc") {
                         $this->send_gc($msg, $pri, FALSE);
                     }
@@ -1397,6 +1344,7 @@ class Bot
                 'CORE', 'ERROR',
                 "Module '$name' has Already Been Registered by " . get_class($this->module_links[strtolower($name)]) . " so cannot be registered by " . get_class($ref) . "."
             );
+
             return;
         }
         $this->module_links[strtolower($name)] = &$ref;
@@ -1426,6 +1374,7 @@ class Bot
         }
         $dummy = new BasePassiveModule($this, $name);
         $this->log('CORE', 'ERROR', "Module '$name' does not exist or is not loaded.");
+
         return $dummy;
     }
 
@@ -1446,8 +1395,7 @@ class Bot
             foreach ($allchannels as $cnl) {
                 $this->commands[$cnl][$command] = &$module;
             }
-        }
-        else {
+        } else {
             $this->commands[$channel][$command] = &$module;
         }
     }
@@ -1467,8 +1415,7 @@ class Bot
                 $this->commands[$cnl][$command] = NULL;
                 unset($this->commands[$cnl][$command]);
             }
-        }
-        else {
+        } else {
             $this->commands[$channel][$command] = NULL;
             unset($this->commands[$channel][$command]);
         }
@@ -1489,10 +1436,10 @@ class Bot
             foreach ($allchannels as $cnl) {
                 $exists = $exists & isset($this->commands[$cnl][$command]);
             }
-        }
-        else {
+        } else {
             $exists = isset($this->commands[$channel][$command]);
         }
+
         return $exists;
     }
 
@@ -1519,10 +1466,10 @@ class Bot
                 $handlers[] = get_class($this->commands[$cnl][$command]);
             }
             $handler = implode(", ", $handles);
-        }
-        else {
+        } else {
             $handler = get_class($this->commands[$channel][$command]);
         }
+
         return $handler;
     }
 
@@ -1556,13 +1503,12 @@ class Bot
             if ($event == 'gmsg') {
                 if ($target) {
                     $this->commands[$event][$target][get_class($module)] = &$module;
+
                     return FALSE;
-                }
-                else {
+                } else {
                     return "No channel specified for gmsg. Not registering.";
                 }
-            }
-            elseif ($event == 'cron') {
+            } elseif ($event == 'cron') {
                 $time = strtotime($target, 0);
                 if ($time > 0) {
                     if (!isset($this->cron_job_active[$time])) {
@@ -1573,42 +1519,40 @@ class Bot
                     }
                     $this->cron_times[$time] = $time;
                     $this->cron[$time][get_class($module)] = &$module;
+
                     return FALSE;
-                }
-                else {
+                } else {
                     return "Cron time '$target' is invalid. Not registering.";
                 }
-            }
-            elseif ($event == 'timer') {
+            } elseif ($event == 'timer') {
                 if ($target) {
                     $this->core("timer")->register_callback($target, $module);
+
                     return FALSE;
-                }
-                else {
+                } else {
                     return "No name for the timer callback given! Not registering.";
                 }
-            }
-            elseif ($event == 'logon_notify') {
+            } elseif ($event == 'logon_notify') {
                 $this->core("logon_notifies")->register($module);
+
                 return FALSE;
-            }
-            elseif ($event == 'settings') {
+            } elseif ($event == 'settings') {
                 if (is_array($target) && isset($target['module']) && isset($target['setting'])) {
                     return $this->core("settings")
                         ->register_callback($target['module'], $target['setting'], $module);
                 }
+
                 return "No module and/or setting defined, can't register!";
-            }
-            elseif ($event == 'irc') {
-				$this->core("irc")->ircmsg[] = &$module;
-				return FALSE;
-			}
-            else {
+            } elseif ($event == 'irc') {
+                $this->core("irc")->ircmsg[] = &$module;
+
+                return FALSE;
+            } else {
                 $this->commands[$event][get_class($module)] = &$module;
+
                 return FALSE;
             }
-        }
-        else {
+        } else {
             return "Event '$event' is invalid. Not registering.";
         }
     }
@@ -1640,50 +1584,47 @@ class Bot
                 if (isset($this->commands[$event][$target][get_class($module)])) {
                     $this->commands[$event][$target][get_class($module)] = NULL;
                     unset($this->commands[$event][$target][get_class($module)]);
+
                     return FALSE;
-                }
-                else {
+                } else {
                     return "GMSG $target is not registered or invalid!";
                 }
-            }
-            elseif ($event == 'cron') {
+            } elseif ($event == 'cron') {
                 $time = strtotime($target, 0);
                 if (isset($this->cron[$time][get_class($module)])) {
                     $this->cron[$time][get_class($module)] = NULL;
                     unset($this->cron[$time][get_class($module)]);
+
                     return FALSE;
-                }
-                else {
+                } else {
                     return "Cron time '$target' is not registered or invalid!";
                 }
-            }
-            elseif ($event == 'timer') {
+            } elseif ($event == 'timer') {
                 return $this->core("timer")->unregister_callback($target);
-            }
-            elseif ($event == 'logon_notify') {
+            } elseif ($event == 'logon_notify') {
                 $this->core("logon_notifies")->unregister($module);
+
                 return FALSE;
-            }
-            elseif ($event == 'settings') {
+            } elseif ($event == 'settings') {
                 if (is_array($target) && isset($target['module']) && isset($target['setting'])) {
                     return $this->core("settings")
                         ->unregister_callback($target['module'], $target['setting'], $module);
                 }
+
                 return "No module and/or setting defined, can't unregister!";
-            }
-            else {
+            } else {
                 $this->commands[$event][get_class($module)] = NULL;
                 unset($this->commands[$event][get_class($module)]);
+
                 return FALSE;
             }
-        }
-        else {
+        } else {
             return "Event '$event' is invalid. Not registering.";
         }
     }
 
 
-    function debug_bt()
+    public function debug_bt()
     {
         $trace = debug_backtrace();
         $r = '';
@@ -1711,5 +1652,3 @@ class Bot
     }
 
 }
-
-?>

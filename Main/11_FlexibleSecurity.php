@@ -49,17 +49,17 @@ class FlexibleSecurity_Core extends BasePassiveModule
     private $querynames;
 
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("security_flexible", "true") . " (
-					id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-					gid INT(10) unsigned NOT NULL,
-					field ENUM('join', 'level', 'profession', 'faction', 'rank_id', 'org_id', 'at_id'),
-					op ENUM('=', '<', '<=', '>', '>=', '!=', '&&', '||'),
-					compareto VARCHAR(100) NOT NULL DEFAULT ''
-				)"
+                    id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                    gid INT(10) unsigned NOT NULL,
+                    field ENUM('join', 'level', 'profession', 'faction', 'rank_id', 'org_id', 'at_id'),
+                    op ENUM('=', '<', '<=', '>', '>=', '!=', '&&', '||'),
+                    compareto VARCHAR(100) NOT NULL DEFAULT ''
+                )"
         );
         $this->register_module("flexible_security");
         $this->register_event("cron", "6hour");
@@ -78,7 +78,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
     }
 
 
-    function update_table()
+    public function update_table()
     {
         if ($this->bot->core("settings")
             ->exists("FlexibleSecurity", "SchemaVersion")
@@ -108,7 +108,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
 
 
     // Clean cache periodically to react to changed in whois cache
-    function cron()
+    public function cron()
     {
         $this->clear_cache();
     }
@@ -116,7 +116,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
 
     // Clears the cache and checks if we need to enable flexible security, should be called everytime a flexible group gets modified in any way.
     // This means changes in the access levels via security GUI too!
-    function clear_cache()
+    public function clear_cache()
     {
         $this->cache = array();
         $this->check_enable();
@@ -125,7 +125,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
     }
 
 
-    function check_enable()
+    public function check_enable()
     {
         $result = $this->bot->db->select("SELECT * FROM #___security_flexible WHERE field = 'join'");
         $this->enabled = !empty($result);
@@ -133,7 +133,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
 
 
     // Returns the highest access level $player has due to flexible security groups if higher then $highest. Returns $highest otherwise.
-    function flexible_group_access($player, $highest)
+    public function flexible_group_access($player, $highest)
     {
         // If we have no rules active, save time, memory and resources.
         if (!$this->enabled) {
@@ -146,6 +146,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
             if ($this->cache[$player] > $highest) {
                 $highest = $this->cache[$player];
             }
+
             return $highest;
         }
         // Not in cache, get all flexible security groups with a higher access level then $highest (no sense to check for lower)
@@ -165,8 +166,7 @@ class FlexibleSecurity_Core extends BasePassiveModule
             $acl = $group[1];
             if ($group[2] == '||') {
                 $groupkind = 'OR';
-            }
-            else {
+            } else {
                 $groupkind = 'AND';
             }
             // Now get the other fields of the rules
@@ -182,15 +182,13 @@ class FlexibleSecurity_Core extends BasePassiveModule
                     if (strtolower($rule[0]) == 'faction' && strtolower($rule[2]) == 'all') {
                         if ($rule[1] == '=') {
                             $op = "OR";
-                        }
-                        else {
+                        } else {
                             $op = "AND";
                         }
                         $wherestring .= " (faction " . $rule[1] . " 'omni' " . $op . " faction ";
                         $wherestring .= $rule[1] . " 'clan' " . $op . " faction " . $rule[1];
                         $wherestring .= " 'neutral') ";
-                    }
-                    else {
+                    } else {
                         $wherestring .= " " . $this->querynames[$rule[0]] . " " . $rule[1];
                         $wherestring .= " '" . $rule[2] . "'";
                     }
@@ -203,14 +201,14 @@ class FlexibleSecurity_Core extends BasePassiveModule
                 // If we got a result $player is member of this group, cache result and return it
                 if (!empty($ret)) {
                     $this->cache[$player] = $acl;
+
                     return $acl;
                 }
             }
         }
         // Nothing higher found, cache this as result and return $highest
         $this->cache[$player] = $highest;
+
         return $highest;
     }
 }
-
-?>

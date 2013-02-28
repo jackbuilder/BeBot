@@ -41,12 +41,11 @@ class BotHelp_Core extends BaseActiveModule
 {
     private $help_cache;
 
-
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
 
@@ -58,8 +57,7 @@ class BotHelp_Core extends BaseActiveModule
         $this->help['notes'] = "No notes";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $vars = explode(' ', $msg);
         unset($vars[0]);
@@ -70,8 +68,7 @@ class BotHelp_Core extends BaseActiveModule
 
         if (!isset($vars[1])) {
             return ($this->show_help_menu($name, 'source', $origin));
-        }
-        else {
+        } else {
             switch ($vars[1]) {
             case 'tell':
             case 'gc':
@@ -85,8 +82,7 @@ class BotHelp_Core extends BaseActiveModule
         }
     }
 
-
-    function show_help_menu($name, $section = 'source', $origin = FALSE)
+    public function show_help_menu($name, $section = 'source', $origin = FALSE)
     {
         switch ($section) {
         case 'source':
@@ -101,20 +97,21 @@ class BotHelp_Core extends BaseActiveModule
                 $window = $this->get_commands($name, 'pgmsg');
                 break;
             }
+
             return ($this->bot->core("tools")->make_blob('Help', $window));
             break;
         default:
             $window = $this->get_commands($name, $section);
+
             return ($this->bot->core("tools")->make_blob('Help', $window));
             break;
         }
     }
 
-
     /*
     Gets commands for a given channel
     */
-    function get_commands($name, $channel)
+    public function get_commands($name, $channel)
     {
         $channel = strtolower($channel);
         $lvl = $this->bot->core("security")->get_access_name(
@@ -122,19 +119,18 @@ class BotHelp_Core extends BaseActiveModule
                 ->core("security")->get_access_level($name)
         );
         $window = ":: BeBot Help ::\n\n" . $this->help_cache[$channel][$lvl];
+
         return $window;
     }
 
-
-    function update_cache()
+    public function update_cache()
     {
         $this->make_help_blobs("tell");
         $this->make_help_blobs("pgmsg");
         $this->make_help_blobs("gc");
     }
 
-
-    function make_help_blobs($channel)
+    public function make_help_blobs($channel)
     {
         $channel = strtolower($channel);
         $this->help_cache[$channel] = array();
@@ -152,8 +148,7 @@ class BotHelp_Core extends BaseActiveModule
             if (is_array($module->help)) {
                 $cmdstr = $this->bot->core("tools")
                     ->chatcmd("help " . $command, $command) . " ";
-            }
-            else {
+            } else {
                 $cmdstr = $command . " ";
             }
             switch ($this->bot->core("access_control")
@@ -180,24 +175,19 @@ class BotHelp_Core extends BaseActiveModule
         }
     }
 
-
-    function show_help($name, $command)
+    public function show_help($name, $command)
     {
         if (!$this->bot->core("access_control")
             ->check_for_access($name, $command)
         ) {
             return ("##highlight##$command##end## does not exist or you do not have access to it.");
-        }
-        elseif (!empty($this->bot->commands['tell'][$command])) {
+        } elseif (!empty($this->bot->commands['tell'][$command])) {
             $com = $this->bot->commands['tell'][$command];
-        }
-        elseif (!empty($this->bot->commands['gc'][$command])) {
+        } elseif (!empty($this->bot->commands['gc'][$command])) {
             $com = $this->bot->commands['gc'][$command];
-        }
-        elseif (!empty($this->bot->commands['pgmsg'][$command])) {
+        } elseif (!empty($this->bot->commands['pgmsg'][$command])) {
             $com = $this->bot->commands['pgmsg'][$command];
-        }
-        else {
+        } else {
             return ("##highlight##$command##end## does not exist or you do not have access to it.");
         }
         $window = "##blob_title## ::::: HELP ON " . strtoupper($command) . " :::::##end##<br><br>";
@@ -212,8 +202,7 @@ class BotHelp_Core extends BaseActiveModule
                     $key = str_replace('<', '&lt;', $key);
                     $value = str_replace('<', '&lt;', $value);
                     $window .= " ##highlight##<pre>$key##end## - ##blob_text##$value##end##<br>";
-                }
-                else {
+                } else {
                     if ($this->bot->core("access_control")
                         ->check_for_access($name, $parts[0])
                     ) {
@@ -228,13 +217,11 @@ class BotHelp_Core extends BaseActiveModule
                 $window .= "<br><br>##blob_title##OTHER COMMANDS OF THIS MODULE:##end##<br>";
                 $window .= implode(" ", $module_commands);
             }
-        }
-        else {
+        } else {
             $window .= '##error##No Help Found##end##';
         }
+
         return ('help on ' . $this->bot->core("tools")
             ->make_blob($command, $window));
     }
 }
-
-?>

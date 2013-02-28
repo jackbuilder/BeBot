@@ -238,5 +238,3 @@ $GLOBALS['SMARTIRC_nreplycodes'] = $SMARTIRC_nreplycodes;
 $GLOBALS['SMARTIRC_replycodes'] = $SMARTIRC_replycodes;
 unset($SMARTIRC_nreplycodes);
 unset($SMARTIRC_replycodes);
-
-?>

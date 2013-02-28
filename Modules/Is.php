@@ -60,8 +60,7 @@ class Is extends BaseActiveModule
     //Counter holding how big part of the buddy queue we are currently using.
     private $queue_counter = 0;
 
-
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "is", "GUEST");
@@ -82,8 +81,7 @@ class Is extends BaseActiveModule
         $this->help['command']['is <name>'] = "Shows if player <name> is online or offline";
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         //Check if a is-request is being processed
         if (isset($this->is_queue[$name])) {
@@ -98,10 +96,12 @@ class Is extends BaseActiveModule
         $player = $this->bot->core('tools')->validate_player($com['player']);
         if ($player instanceof BotError) {
             unset($this->is_queue[$name]);
+
             return ($player);
         }
         if ($player == ucfirst(strtolower($this->bot->botname))) {
             unset($this->is_queue[$name]);
+
             return ("I'm online!");
         }
         if ($this->bot->core("settings")->get("Is", "Checkalts")) {
@@ -110,13 +110,13 @@ class Is extends BaseActiveModule
             $alts = $this->bot->core("alts")->get_alts($main);
             //Add the main to the list so we've got everybody in one list.
             $alts[] = $main;
-        }
-        else {
+        } else {
             //Not checking alts, but we use the same code to check the single player
             $alts[] = $player;
         }
         if (in_array($name, $alts)) {
             unset($this->is_queue[$name]);
+
             return ("Why are you asking me if you are online?!");
         }
         $this->is_queue[$name]['chn'] = $origin;
@@ -129,8 +129,7 @@ class Is extends BaseActiveModule
                 //If they are, check if they are online
                 if ($this->bot->core('chat')->buddy_online($alt)) {
                     $this->is_queue[$name][$alt] = 'Online';
-                }
-                else {
+                } else {
                     $this->is_queue[$name][$alt] = 'Offline';
                 }
                 //Alt processed. We don't need to do anything else with it.
@@ -140,8 +139,7 @@ class Is extends BaseActiveModule
         //If the alts list is empty all alts have been processed. Return the result.
         if (empty($alts)) {
             $this->send($name);
-        }
-        else {
+        } else {
             //The names now remaining in the list of alts need to be checked further
             foreach ($alts as &$alt) {
                 //And add to buddy list unless we've already used the alotted space
@@ -152,8 +150,7 @@ class Is extends BaseActiveModule
                     $this->bot->core('chat')->buddy_add($alt);
                     $this->queue_counter++;
                     unset($alt);
-                }
-                else {
+                } else {
                     //Put him on hold if the alotted space is used.
                     $this->is_queue[$name][$alt] = 'Waiting';
                 }
@@ -165,7 +162,7 @@ class Is extends BaseActiveModule
     /*
     This gets called if a buddy logs on/off
     */
-    function buddy($name, $msg)
+    public function buddy($name, $msg)
     {
         if ($msg == 1 || $msg == 0) {
             //If the queue is empty there's nothing to do.
@@ -176,8 +173,7 @@ class Is extends BaseActiveModule
                         if ($name == $player) {
                             if ($msg == 1) {
                                 $this->is_queue[$source][$name] = 'Online';
-                            }
-                            else {
+                            } else {
                                 $this->is_queue[$source][$name] = 'Offline';
                             }
                             // This toon is removed by the inc_buddy() function of the buddy list already.
@@ -201,8 +197,7 @@ class Is extends BaseActiveModule
         }
     }
 
-
-    function cron()
+    public function cron()
     {
         if (!empty($this->is_queue)) {
             //Go trough everyone who has an is-query running
@@ -222,8 +217,7 @@ class Is extends BaseActiveModule
                             $this->queue_counter++;
                         }
                     }
-                }
-                else {
+                } else {
                     //Timeout has occured!!
                     foreach ($targets as $player => $status) {
                         //Set people waiting or in queue as timed out
@@ -244,7 +238,7 @@ class Is extends BaseActiveModule
     }
 
 
-    function send($name)
+    public function send($name)
     {
         foreach ($this->is_queue[$name] as $player => $status) {
             if ($status == 'Online') {
@@ -257,8 +251,7 @@ class Is extends BaseActiveModule
         if (empty($online_list)) {
             $reply = "{$this->is_queue[$name]['trg']} is ##red##Offline##end##";
             $reply .= $this->last_seen($this->is_queue[$name]['trg']);
-        }
-        else {
+        } else {
             $online = implode(', ', $online_list);
             $reply = "{$this->is_queue[$name]['trg']} is ##lime##Online##end## with $online.";
         }
@@ -270,8 +263,7 @@ class Is extends BaseActiveModule
         unset($this->is_queue[$name]);
     }
 
-
-    function last_seen($name)
+    public function last_seen($name)
     {
         $seen = $this->bot->core("online")->get_last_seen(
             $name, $this->bot
@@ -284,8 +276,7 @@ class Is extends BaseActiveModule
                         ->core("settings")
                         ->get("Time", "FormatString"), $seen[0]
                 ) . "##end## on ##highlight##" . $seen[1] . "##end##";
-            }
-            else {
+            } else {
                 $msg = ", last seen at ##highlight##" . gmdate(
                     $this->bot
                         ->core("settings")
@@ -293,8 +284,7 @@ class Is extends BaseActiveModule
                 ) . "##end##";
             }
         }
+
         return $msg;
     }
 }
-
-?>

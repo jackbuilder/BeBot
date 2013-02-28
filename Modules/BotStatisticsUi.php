@@ -32,17 +32,16 @@
 *  USA
 */
 $botstatisticsui = new BotStatisticsUI($bot);
-class BotStatisticsUI extends BaseActiveModule
+class BotStatisticsUi extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "bots", "MEMBER");
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $var = explode(" ", $msg, 2);
         $command = $var[0];
@@ -57,8 +56,7 @@ class BotStatisticsUI extends BaseActiveModule
         }
     }
 
-
-    function check_bots($name, $origin, $msg)
+    public function check_bots($name, $origin, $msg)
     {
         if (!$this->bot->accessallbots) {
             $msg = $this->bot->botname . " " . $this->bot->dimension;
@@ -68,17 +66,13 @@ class BotStatisticsUI extends BaseActiveModule
             if (!empty($msg[1])) {
                 Return $this->bot->core("bot_statistics")
                     ->check_bots($name, $origin, $msg[0], $msg[1]);
-            }
-            else {
+            } else {
                 Return $this->bot->core("bot_statistics")
                     ->check_bots($name, $origin, $msg[0]);
             }
-        }
-        else {
+        } else {
             Return $this->bot->core("bot_statistics")
                 ->check_bots($name, $origin);
         }
     }
 }
-
-?>

@@ -38,21 +38,19 @@ The Class itself...
 class SetDebug extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command('tell', 'setdebug', 'OWNER');
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $this->bot->debug = !$this->bot->debug;
         if ($this->bot->debug) {
             return "Debugging output enabled!";
         }
+
         return "Debugging output disabled!";
     }
 }
-
-?>

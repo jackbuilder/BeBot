@@ -42,7 +42,7 @@ class OnlineDisplay extends BaseActiveModule
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_command("all", "online", "GUEST");
@@ -54,8 +54,7 @@ class OnlineDisplay extends BaseActiveModule
             $cp = "profession";
             $this->cp = "profession";
             $mode = "Fancy";
-        }
-        else {
+        } else {
             $cp = "classes";
             $this->cp = "class";
             $mode = "Basic";
@@ -76,12 +75,10 @@ class OnlineDisplay extends BaseActiveModule
             if ($this->bot->core("settings")->get("Online", "Otherbots") != ""
             ) {
                 $guildtext = "members online in Alliance.";
-            }
-            else {
+            } else {
                 $guildtext = "members online in Guild.";
             }
-        }
-        else {
+        } else {
             $altmode = FALSE;
             $charinfo = "org";
             $guildtext = "members online";
@@ -125,8 +122,7 @@ class OnlineDisplay extends BaseActiveModule
         $this->bot->core("colors")->define_scheme("online", "afk", "white");
     }
 
-
-    function notify($user, $startup = FALSE)
+    public function notify($user, $startup = FALSE)
     {
         if (!$startup
             && $this->bot->core("settings")
@@ -141,8 +137,7 @@ class OnlineDisplay extends BaseActiveModule
         }
     }
 
-
-    function pgjoin($user)
+    public function pgjoin($user)
     {
         if ($this->bot->core("settings")->get("Online", "PgjoinSpam")) {
             $this->bot->send_tell(
@@ -154,8 +149,7 @@ class OnlineDisplay extends BaseActiveModule
         }
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         return $this->handler(
             $msg, $this->bot->core("settings")
@@ -163,17 +157,14 @@ class OnlineDisplay extends BaseActiveModule
         );
     }
 
-
-    function handler($msg, $what, $name = FALSE)
+    public function handler($msg, $what, $name = FALSE)
     {
         if (preg_match("/^online$/i", $msg)) {
             return $this->online_msg("", $what);
-        }
-        else {
+        } else {
             if (preg_match("/^online (.+)$/i", $msg, $info)) {
                 return $this->online_msg($info[1], $what, $name);
-            }
-            else {
+            } else {
                 if (preg_match("/^sm$/i", $msg)) {
                     return $this->sm_msg($what);
                 }
@@ -181,11 +172,10 @@ class OnlineDisplay extends BaseActiveModule
         }
     }
 
-
     /*
     Makes the message.
     */
-    function online_msg($param, $what, $name = FALSE)
+    public function online_msg($param, $what, $name = FALSE)
     {
         if ($param == "all") {
             if ($this->bot->core("security")->check_access(
@@ -273,14 +263,14 @@ class OnlineDisplay extends BaseActiveModule
         }
         $msg .= ":: " . $this->bot->core("tools")
             ->make_blob("click to view", $online);
+
         return $msg;
     }
-
 
     /*
     make the list of online players
     */
-    function online_list($channel, $like, $lvl = FALSE)
+    public function online_list($channel, $like, $lvl = FALSE)
     {
         $andlvl = "";
         if ($this->bot->game == "ao") {
@@ -294,8 +284,7 @@ class OnlineDisplay extends BaseActiveModule
         ) == "level"
         ) {
             $sortstring = " ORDER BY " . $this->cp . " ASC, t2.level DESC, " . $ex1 . "t1.nickname ASC";
-        }
-        else {
+        } else {
             $sortstring = " ORDER BY " . $this->cp . " ASC, t1.nickname ASC";
         }
         if ($lvl !== FALSE) {
@@ -324,8 +313,7 @@ class OnlineDisplay extends BaseActiveModule
                 $profgfx["Necromancer"] = "100998";
                 $profgfx["Herald of Xotli"] = "16341";
                 $profgfx["Demonologist"] = "16196";
-            }
-            else {
+            } else {
                 $profgfx["Meta-Physicist"] = "16308";
                 $profgfx["Adventurer"] = "84203";
                 $profgfx["Engineer"] = "16252";
@@ -361,8 +349,7 @@ class OnlineDisplay extends BaseActiveModule
                     ) {
                         $online_list .= "\n<img src=tdb://id:GFX_GUI_FRIENDLIST_SPLITTER>\n";
                         $online_list .= "<img src=rdb://" . $profgfx[$player[4]] . ">";
-                    }
-                    else {
+                    } else {
                         $online_list .= "\n";
                     }
                     $online_list .= $this->bot->core("colors")
@@ -386,11 +373,9 @@ class OnlineDisplay extends BaseActiveModule
                 ) {
                     if (isset($this->bot->core("raid")->user[$player[0]])) {
                         $raid = " :: ##green##In Raid##end## ";
-                    }
-                    elseif (isset($this->bot->core("raid")->user2[$player[0]])) {
+                    } elseif (isset($this->bot->core("raid")->user2[$player[0]])) {
                         $raid = " :: ##red##" . $this->bot->core("raid")->user2[$player[0]] . "##end## ";
-                    }
-                    else {
+                    } else {
                         $raid = " :: ##red##Not in Raid##end## ";
                     }
                 }
@@ -413,8 +398,7 @@ class OnlineDisplay extends BaseActiveModule
                         ->core("settings")->get("Whois", "Alts")
                 ) {
                     $altcmd = "whois";
-                }
-                else {
+                } else {
                     $altcmd = "alts";
                 }
                 if (empty($alts)
@@ -422,13 +406,11 @@ class OnlineDisplay extends BaseActiveModule
                         ->get("Online", "Showalts")
                 ) {
                     $alts = "";
-                }
-                else {
+                } else {
                     if ($main == $player[0]) {
                         $alts = ":: " . $this->bot->core("tools")
                             ->chatcmd($altcmd . " " . $player[0], "Details") . " ::";
-                    }
-                    else {
+                    } else {
                         $alts = ":: " . $this->bot->core("tools")
                             ->chatcmd($altcmd . " " . $player[0], $main . "'s Alt") . " ";
                     }
@@ -440,8 +422,7 @@ class OnlineDisplay extends BaseActiveModule
                         ->get_short($player[2]);
                     $player[3] = $this->bot->core("shortcuts")
                         ->get_short(stripslashes($player[3]));
-                }
-                else {
+                } else {
                     $player[3] = stripslashes($player[3]);
                 }
                 if ($this->bot->game == "ao") {
@@ -453,8 +434,7 @@ class OnlineDisplay extends BaseActiveModule
                         if ($player[3] != '') {
                             $charinfo = "(" . $player[2] . ", " . $player[3] . ") ";
                         }
-                    }
-                    elseif (strtolower(
+                    } elseif (strtolower(
                         $this->bot->core("settings")
                             ->get("Online", "Charinfo")
                     ) == "rank"
@@ -462,8 +442,7 @@ class OnlineDisplay extends BaseActiveModule
                         if ($player[2] != '') {
                             $charinfo = "(" . $player[2] . ") ";
                         }
-                    }
-                    elseif (strtolower(
+                    } elseif (strtolower(
                         $this->bot->core("settings")
                             ->get("Online", "Charinfo")
                     ) == "org"
@@ -483,20 +462,19 @@ class OnlineDisplay extends BaseActiveModule
                 if (isset($this->bot->commands["tell"]["afk"]->afk[$player[0]])) {
                     $online_list .= ":: " . $this->bot->core("colors")
                         ->colorize("online_afk", "( AFK )") . "\n";
-                }
-                else {
+                } else {
                     $online_list .= "\n";
                 }
             }
         }
+
         return array(
             $online_num,
             $online_list
         );
     }
 
-
-    function irc_online_list()
+    public function irc_online_list()
     {
         $online = $this->bot->db->select(
             "SELECT nickname FROM #___online WHERE botname = '" . $this->bot
@@ -511,17 +489,17 @@ class OnlineDisplay extends BaseActiveModule
                 $online_num++;
             }
         }
+
         return array(
             $online_num,
             $online_list
         );
     }
 
-
     /*
     Makes the message.
     */
-    function sm_msg($what)
+    public function sm_msg($what)
     {
         if ($param == "all") {
             $param = "";
@@ -598,9 +576,8 @@ class OnlineDisplay extends BaseActiveModule
         if (empty($countonline[0][0])) {
             $countonline[0][0] = 0;
         }
+
         return $countonline[0][0] . " Members Online :: " . $this->bot
             ->core("tools")->make_blob("click to view", $msg);
     }
 }
-
-?>

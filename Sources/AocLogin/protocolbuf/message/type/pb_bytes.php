@@ -4,8 +4,7 @@
  */
 class PBBytes extends PBScalar
 {
-    var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
-
+    public $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
 
     /**
      * Parses the message for this type
@@ -24,7 +23,6 @@ class PBBytes extends PBScalar
         $this->value = $this->reader->get_message_from($pointer);
     }
 
-
     /**
      * Serializes type
      */
@@ -42,5 +40,3 @@ class PBBytes extends PBScalar
         return $string;
     }
 }
-
-?>

@@ -8,12 +8,10 @@ abstract class PBInputReader
     protected $pointer = 0;
     protected $string = '';
 
-
     public function __construct()
     {
         $this->base128 = new base128varint(1);
     }
-
 
     /**
      * Gets the acutal position of the point
@@ -25,7 +23,6 @@ abstract class PBInputReader
         return $this->pointer;
     }
 
-
     /**
      * Add add to the pointer
      *
@@ -35,7 +32,6 @@ abstract class PBInputReader
     {
         $this->pointer += $add;
     }
-
 
     /**
      * Get the message from from to actual pointer
@@ -47,13 +43,10 @@ abstract class PBInputReader
         return substr($this->string, $from, $this->pointer - $from);
     }
 
-
     /**
      * Getting the next varint as decimal number
      *
      * @return varint
      */
-    public abstract function next();
+    abstract public function next();
 }
-
-?>

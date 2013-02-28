@@ -36,16 +36,14 @@ class Notify_Core extends BasePassiveModule
 {
     private $cache;
 
-
-    function Notify_Core(&$bot)
+    public function Notify_Core(&$bot)
     {
         parent::__construct($bot, get_class($this));
         $this->register_module("notify");
         $this->update_cache();
     }
 
-
-    function update_cache()
+    public function update_cache()
     {
         $this->cache = array();
         $notifylist = $this->bot->db->select("SELECT nickname FROM #___users WHERE notify = 1");
@@ -56,19 +54,18 @@ class Notify_Core extends BasePassiveModule
         }
     }
 
-
-    function check($name)
+    public function check($name)
     {
         return isset($this->cache[ucfirst(strtolower($name))]);
     }
 
-
-    function add($source, $user)
+    public function add($source, $user)
     {
         $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));
         if ($id == 0) {
             $this->error->set($user . " is no valid character name!");
+
             return $this->error;
         }
         // Make sure user is in users table
@@ -76,11 +73,11 @@ class Notify_Core extends BasePassiveModule
         if (empty($usr)) {
             // Need to add $user to users table as anonymous and silent
             $this->bot->core("user")->add($source, $user, 0, 0, 1);
-        }
-        else {
+        } else {
             // Check if already on notify
             if ($usr[0][0] == 1) {
                 $this->error->set($user . " is already on the notify list!");
+
                 return $this->error;
             }
         }
@@ -89,26 +86,29 @@ class Notify_Core extends BasePassiveModule
         $this->cache[$user] = TRUE;
         // Now add to notify list if not yet there
         $this->bot->core("chat")->buddy_add($id);
+
         return $user . " added to notify list!";
     }
 
-
-    function del($user)
+    public function del($user)
     {
         $id = $this->bot->core('player')->id($user);
         $user = ucfirst(strtolower($user));
         if ($id == 0) {
             $this->error->set($user . " is no valid character name!");
+
             return $this->error;
         }
         // Make sure $user is on notify (and in users table)
         $usr = $this->bot->db->select("SELECT notify FROM #___users WHERE nickname = '" . $user . "'");
         if (empty($usr)) {
             $this->error->set($user . " is not on notify list!");
+
             return $this->error;
         }
         if ($usr[0][0] == 0) {
             $this->error->set($user . " is not on notify list!");
+
             return $this->error;
         }
         // Unflag notify for user in table and cache
@@ -117,11 +117,11 @@ class Notify_Core extends BasePassiveModule
         // If in buddy list remove
         $this->bot->core("chat")->buddy_remove($id);
         $this->bot->db->query("UPDATE #___online SET status_gc = 0 WHERE nickname = '" . $user . "' AND botname = '" . $this->bot->botname . "'");
+
         return $user . " removed from notify list!";
     }
 
-
-    function list_cache()
+    public function list_cache()
     {
         $count = 0;
         $notify_list = $this->cache;
@@ -131,43 +131,38 @@ class Notify_Core extends BasePassiveModule
             $msg .= $key;
             if ($value == 1) {
                 $msg .= " [##green##Cache##end##]";
-            }
-            else {
+            } else {
                 $msg .= " [##red##Cache##end##]";
             }
             if ($notify_db[0][0] == 1) {
                 $msg .= "[##green##DB##end##]";
-            }
-            else {
+            } else {
                 $msg .= "[##red##DB##end##]";
             }
             if ($notify_db[0][0] != $value) {
                 $msg .= " ##yellow##MISMATCH##end##\n";
-            }
-            else {
+            } else {
                 $msg .= "\n";
             }
             $count++;
         }
+
         return $count . " members in <botname>'s notify cache :: " . $this->bot
             ->core("tools")->make_blob("click to view", $msg);
     }
 
-
-    function clear_cache()
+    public function clear_cache()
     {
         $count = 0;
         $count = count($this->cache);
         unset($this->cache);
         $this->cache = array();
+
         return "Removed " . $count . " members from <botname>'s notify cache.";
     }
 
-
-    function get_all()
+    public function get_all()
     {
         Return $this->cache;
     }
 }
-
-?>

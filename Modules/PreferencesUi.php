@@ -36,7 +36,7 @@ The Class itself...
 class Preferences_GUI extends BaseActiveModule
 {
 
-    function __construct(&$bot)
+    public function __construct(&$bot)
     {
         parent::__construct($bot, get_class($this));
         //Create access settings for this module
@@ -51,8 +51,7 @@ class Preferences_GUI extends BaseActiveModule
         $this->help['notes'] .= 'and have option A as default again.';
     }
 
-
-    function command_handler($name, $msg, $origin)
+    public function command_handler($name, $msg, $origin)
     {
         $com = $this->parse_com(
             $msg, array(
@@ -98,9 +97,8 @@ class Preferences_GUI extends BaseActiveModule
             break;
         default:
             $this->error->set("Unknown command ##highlight##'{$com['sub']}'##end##");
+
             return ($this->error);
         }
     }
 }
-
-?>

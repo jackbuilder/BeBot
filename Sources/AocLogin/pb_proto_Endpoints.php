@@ -1,12 +1,11 @@
 <?php
-include_once "protocolbuf/message/pb_message.php";
+include_once 'protocolbuf/message/pb_message.php';
 
 class ProtoEndpoint extends PBMessage
 {
-    var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
+    public $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
     //var $wired_type = 0;
-    var $value = "ProtoEndpoint";
-
+    public $value = "ProtoEndpoint";
 
     public function __construct($reader = NULL)
     {
@@ -19,49 +18,41 @@ class ProtoEndpoint extends PBMessage
         $this->values["3"] = "";
     }
 
-
-    function type()
+    public function type()
     {
         return $this->_get_value("1");
     }
 
-
-    function set_type($value)
+    public function set_type($value)
     {
         return $this->_set_value("1", $value);
     }
 
-
-    function instance()
+    public function instance()
     {
         return $this->_get_value("2");
     }
 
-
-    function set_instance($value)
+    public function set_instance($value)
     {
         return $this->_set_value("2", $value);
     }
 
-
-    function token()
+    public function token()
     {
         return $this->_get_value("3");
     }
 
-
-    function set_token($value)
+    public function set_token($value)
     {
         return $this->_set_value("3", $value);
     }
 }
 
-
 class RpcHeader extends PBMessage
 {
     //var $wired_type = 0;
-    var $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
-
+    public $wired_type = PBMessage::WIRED_LENGTH_DELIMITED;
 
     public function __construct($reader = NULL)
     {
@@ -76,71 +67,58 @@ class RpcHeader extends PBMessage
         $this->values["4"] = "";
     }
 
-
-    function caller_id()
+    public function caller_id()
     {
         return $this->_get_value("1");
     }
 
-
-    function set_caller_id($value)
+    public function set_caller_id($value)
     {
         return $this->_set_value("1", $value);
     }
 
-
-    function endpoint_id()
+    public function endpoint_id()
     {
         return $this->_get_value("2");
     }
 
-
-    function set_endpoint_id($value)
+    public function set_endpoint_id($value)
     {
         return $this->_set_value("2", $value);
     }
 
-
-    function full_routing_context($offset)
+    public function full_routing_context($offset)
     {
         return $this->_get_arr_value("3", $offset);
     }
 
-
-    function add_full_routing_context()
+    public function add_full_routing_context()
     {
         return $this->_add_arr_value("3");
     }
 
-
-    function set_full_routing_context($index, $value)
+    public function set_full_routing_context($index, $value)
     {
         $this->_set_arr_value("3", $index, $value);
     }
 
-
-    function remove_last_full_routing_context()
+    public function remove_last_full_routing_context()
     {
         $this->_remove_last_arr_value("3");
     }
 
-
-    function full_routing_context_size()
+    public function full_routing_context_size()
     {
         return $this->_get_arr_size("3");
     }
 
-
-    function method_instance()
+    public function method_instance()
     {
         return $this->_get_value("4");
     }
 
-
-    function set_method_instance($value)
+    public function set_method_instance($value)
     {
         return $this->_set_value("4", $value);
     }
 }
-
-?>

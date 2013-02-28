@@ -29,40 +29,35 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-class message
+class Message
 {
     public $source;
     public $sender;
     public $destination = array();
     public $message;
 
-
-    function __construct($source, $sender, $message)
+    public function __construct($source, $sender, $message)
     {
         $this->source = $source;
         $this->sender = $sender;
         $this->message = $message;
     }
 
-
-    function set_destination($destination, $overwrite = FALSE)
+    public function set_destination($destination, $overwrite = FALSE)
     {
         if (empty($this->destination)) {
             $this->destination[] = $destination;
+
             return TRUE;
-        }
-        else {
+        } else {
             return FALSE;
         }
     }
 
-
-    function add_destination($destination)
+    public function add_destination($destination)
     {
         if (!in_array($destination, $this->destination)) {
             $this->destination[] = $destination;
         }
     }
 }
-
-?>

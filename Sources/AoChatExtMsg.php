@@ -196,7 +196,7 @@ $GLOBALS["ref_cat"] = array(
 class AOExtMsg
 {
 
-    function AOExtMsg($str = NULL)
+    public function AOExtMsg($str = NULL)
     {
         $this->type = AOEM_UNKNOWN;
         if (!empty($str)) {
@@ -204,18 +204,17 @@ class AOExtMsg
         }
     }
 
-
-    function arg($n)
+    public function arg($n)
     {
         $key = "{" . strtoupper($n) . "}";
         if (isset($this->args[$key])) {
             return $this->args[$key];
         }
+
         return NULL;
     }
 
-
-    function read($msg)
+    public function read($msg)
     {
         if (substr($msg, 0, 2) !== "~&") {
             return false;
@@ -225,6 +224,7 @@ class AOExtMsg
         $instance = $this->b85g($msg);
         if (!isset($GLOBALS["msg_cat"][$category]) || !isset($GLOBALS["msg_cat"][$category][$instance])) {
             echo "\nAOChat ExtMsg Debug: Unknown Cat: $category Instance: $instance\n\n";
+
             return false;
         }
         $typ = $GLOBALS["msg_cat"][$category][$instance][0];
@@ -251,8 +251,7 @@ class AOExtMsg
                 $ins = $this->b85g($msg);
                 if (!isset($GLOBALS["ref_cat"][$cat]) || !isset($GLOBALS["ref_cat"][$cat][$ins])) {
                     $str = "Unknown ($cat, $ins)";
-                }
-                else {
+                } else {
                     $str = $GLOBALS["ref_cat"][$cat][$ins];
                 }
                 $args[$ename] = $str;
@@ -265,16 +264,14 @@ class AOExtMsg
         $this->args = $args;
     }
 
-
-    function b85g(&$str)
+    public function b85g(&$str)
     {
         $n = 0;
         for ($i = 0; $i < 5; $i++) {
             $n = $n * 85 + ord($str[$i]) - 33;
         }
         $str = substr($str, 5);
+
         return $n;
     }
 }
-
-?>
