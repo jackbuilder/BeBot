@@ -1760,6 +1760,10 @@ class Security_Core extends \Commodities\BaseActiveModule
         } // Raidbot.
         //$guild = $this -> bot -> db -> select("SELECT org_name FROM #___whois WHERE nickname = '".$this -> bot -> botname."'");
         $whois = $this->bot->core("whois")->lookup($this->bot->botname);
+        if (!is_array($whois)) {
+       		//TODO: strange shit, i guess whois not good atm..
+       		return false;
+        }
         if ($whois && !($whois instanceof BotError)) {
             $guild = $whois['org'];
         }
@@ -2004,8 +2008,11 @@ class Security_Core extends \Commodities\BaseActiveModule
             return FALSE; // Tried to ID the org government and failed. Try again in 12 hours.
         }
         $sql = "SELECT org_rank, access_level, org_rank_id FROM #___security_org ";
-        $sql .= "WHERE org_gov = '" . $this->bot->core("settings")
-            ->get('Security', 'Orggov') . "' ";
+        $orggov = $this->bot->core("settings")->get('Security', 'Orggov');
+        if (!is_string($orggov)) {
+        	return false;
+        }
+        $sql .= "WHERE org_gov = '" . $orggov . "' ";
         $sql .= "ORDER BY org_rank_id ASC";
         $result = $this->bot->db->select($sql, MYSQL_ASSOC);
         if (empty($result)) {

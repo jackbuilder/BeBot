@@ -32,8 +32,8 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-new BuddyList($bot);
-class BuddyList extends BasePassiveModule
+
+class BuddyList extends \Commodities\BasePassiveModule
 {
     public $buddy_status = array();
 
@@ -50,12 +50,15 @@ class BuddyList extends BasePassiveModule
                 )
             );
         } else {
+/*
             $this->bot->dispatcher->connect(
                 'core.on_buddy_onoff', array(
                     $this,
                     'buddy_ao'
                 )
             );
+            */
+        	// TODO: Events.
         }
     }
 
@@ -145,7 +148,9 @@ class BuddyList extends BasePassiveModule
             $who["craft1"] = $lookup[0]['class1'];
             $who["craft2"] = $lookup[0]['class2'];
         }
+        var_dump($who); die();
         $this->bot->core("Whois")->update($who);
+        
         if ($old_who instanceof BotError) {
             $old_who = array();
             $old_who["level"] = 0;
@@ -256,3 +261,4 @@ class BuddyList extends BasePassiveModule
         }
     }
 }
+$buddylist = new BuddyList($bot);

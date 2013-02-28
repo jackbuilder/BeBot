@@ -39,7 +39,7 @@
 $nroll = new Nroll($bot);
 //////////////////////////////////////////////////////////////////////
 // The Class itself...
-class nroll extends BaseActiveModule
+class nroll extends \Commodities\BaseActiveModule
 {
     public $bot;
     public $help;

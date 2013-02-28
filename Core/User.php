@@ -32,8 +32,8 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$user_core = new User_Core($bot);
-class User_Core extends BasePassiveModule
+
+class User extends \Commodities\BasePassiveModule
 {
 
     public function __construct(&$bot)
@@ -411,3 +411,4 @@ class User_Core extends BasePassiveModule
         }
     }
 }
+$user = new User($bot);

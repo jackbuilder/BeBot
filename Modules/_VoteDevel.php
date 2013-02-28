@@ -38,7 +38,7 @@ $VoteClass = new Vote($bot);
 /*
 The Class itself...
 */
-class Vote extends BaseActiveModule
+class Vote extends \Commodities\BaseActiveModule
 {
 
     public function __construct(&$bot)

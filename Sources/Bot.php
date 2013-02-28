@@ -1148,7 +1148,11 @@ class Bot
                 $msg = "[" . $group . "] ";
             }
             if ($args[1] != 0) {
-                $msg .= $this->core("player")->name($args[1]) . ": ";
+                $player = $this->core("player")->name($args[1]);
+                if (!is_string($player)) {
+                    return false;
+                }
+                $msg .= $player . ": ";
             }
             $msg .= $args[2];
         } else {

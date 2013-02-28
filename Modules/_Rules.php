@@ -35,7 +35,7 @@ $rules = new Rules($bot);
 /*
 The Class itself...
 */
-class Rules extends BaseActiveModule
+class Rules extends \Commodities\BaseActiveModule
 {
 
     public function __construct(&$bot)

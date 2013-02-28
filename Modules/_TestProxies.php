@@ -34,7 +34,7 @@
 *  USA
 */
 $testproxy = new testproxy($bot);
-class testproxy extends BaseActiveModule
+class testproxy extends \Commodities\BaseActiveModule
 {
 
     public function __construct(&$bot)

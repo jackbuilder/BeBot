@@ -48,8 +48,8 @@ namespace Core;
  * of some things on bot restarts, useful for modules that only should do something if a
  * character logs in for real, instead of the possibly false logons on bot startup.
  */
-$logon_notifies_core = new Logon_Notifies_Core($bot);
-class Logon_Notifies_Core extends BasePassiveModule
+
+class LogonNotifies extends \Commodities\BasePassiveModule
 {
     public $bot;
     public $modules;
@@ -146,3 +146,4 @@ class Logon_Notifies_Core extends BasePassiveModule
         return;
     }
 }
+$logon_notifies_core = new LogonNotifies($bot);

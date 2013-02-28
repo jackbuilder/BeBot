@@ -691,7 +691,7 @@ class AoChat
             //$signal = new signal_message('aochat', $gid, $name);
             //$dispatcher->post($signal, 'onGroupAnnounce');
             //unset($signal);
-            $event = new sfEvent($this, 'Core.on_group_announce', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_group_announce', array(
                 'source' => $gid,
                 'message' => $name,
                 'status' => $status
@@ -712,7 +712,7 @@ class AoChat
             //$signal = new signal_message('aochat', $gid, 'invite');
             //$dispatcher->post($signal, 'onGroupInvite');
 
-            $event = new sfEvent($this, 'Core.on_group_invite', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_group_invite', array(
                 'source' => $gid,
                 'message' => 'invite'
             ));
@@ -735,7 +735,7 @@ class AoChat
             //$dispatcher->post($signal, 'onPlayerName');
             //unset($signal);
 
-            $event = new sfEvent($this, 'Core.on_player_name', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_player_name', array(
                 'id' => $id,
                 'name' => $name
             ));
@@ -757,7 +757,7 @@ class AoChat
 
             echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
 
-            $event = new sfEvent($this, 'Core.on_player_id', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_player_id', array(
                 'id' => $id,
                 'name' => $name
             ));
@@ -771,7 +771,7 @@ class AoChat
             if (strtolower(AOCHAT_GAME) == "aoc") {
                 list ($bid, $bonline, $blevel, $blocation, $bclass) = $packet->args;
                 $this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | AOC_BUDDY_KNOWN;
-                $event = new sfEvent($this, 'Core.on_buddy_onoff', array(
+                $event = new \SymfonyEvent\Event($this, 'Core.on_buddy_onoff', array(
                     'id' => $bid,
                     'online' => $bonline,
                     'level' => $blevel,
@@ -781,7 +781,7 @@ class AoChat
             } else {
                 list ($bid, $bonline, $btype) = $packet->args;
                 $this->buddies[$bid] = ($bonline ? AOC_BUDDY_ONLINE : 0) | (ord($btype) ? AOC_BUDDY_KNOWN : 0);
-                $event = new sfEvent($this, 'Core.on_buddy_onoff', array(
+                $event = new \SymfonyEvent\Event($this, 'Core.on_buddy_onoff', array(
                     'id' => $bid,
                     'online' => $bonline,
                     'type' => $btype
@@ -810,7 +810,7 @@ class AoChat
 //				$dispatcher->post($signal, 'onBuddyRemove');
 //				unset($signal);
 
-            $event = new sfEvent($this, 'Core.on_buddy_remove', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_buddy_remove', array(
                 'source' => 'system',
                 'message' => $pakcte->args[0]
             ));
@@ -863,7 +863,7 @@ class AoChat
             //$dispatcher->post($signal, 'onPgJoin');
             //unset($signal);
 
-            $event = new sfEvent($this, 'Core.on_privgroup_join', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_privgroup_join', array(
                 'source' => $id,
                 'message' => 'join'
             ));
@@ -881,7 +881,7 @@ class AoChat
             //$dispatcher->post($signal, 'onPgLeave');
             //unset($signal);
 
-            $event = new sfEvent($this, 'Core.on_privgroup_leave', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_privgroup_leave', array(
                 'source' => $id,
                 'message' => 'leave'
             ));
@@ -900,7 +900,7 @@ class AoChat
             //$dispatcher->post($signal, 'onTell');
             //unset($signal);
 
-            $event = new sfEvent($this, 'Core.on_tell', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_tell', array(
                 'source' => $id,
                 'message' => $message
             ));
@@ -916,7 +916,7 @@ class AoChat
             //$signal = new signal_message('aochat', $id, $message);
             //$dispatcher->post($signal, 'onPgMessage');
 
-            $event = new sfEvent($this, 'Core.on_privgroup_message', array(
+            $event = new \SymfonyEvent\Event($this, 'Core.on_privgroup_message', array(
                 'source' => $id,
                 'message' => $message
             ));

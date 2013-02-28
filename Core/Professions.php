@@ -33,8 +33,8 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$profession_core = new Profession_Core($bot);
-class Profession_Core extends BasePassiveModule
+
+class Profession extends \Commodities\BasePassiveModule
 {
     // array with profession name as key and shortcut as value
     private $cache = array();
@@ -214,3 +214,4 @@ class Profession_Core extends BasePassiveModule
         return (implode($separator, $this->get_units($profession)));
     }
 }
+$profession = new Profession($bot);

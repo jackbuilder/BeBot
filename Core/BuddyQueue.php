@@ -32,11 +32,11 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$buddy_queue_core = new BuddyQueue($bot);
+
 /*
 The Class itself...
 */
-class BuddyQueue extends BasePassiveModule
+class BuddyQueue extends \Commodities\BasePassiveModule
 {
 
     /*
@@ -147,3 +147,4 @@ class BuddyQueue extends BasePassiveModule
         return $this->bot->core("queue")->into_queue("buddy", $info);
     }
 }
+$buddy_queue_core = new BuddyQueue($bot);

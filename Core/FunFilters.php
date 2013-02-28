@@ -42,11 +42,11 @@ namespace Core;
 * Also provides some useful filters:
     - nofont (removes font tags)
 */
-$funfilters = new FunFilters($bot);
+
 /*
 The Class itself...
 */
-class FunFilters extends BasePassiveModule
+class FunFilters extends \Commodities\BasePassiveModule
 {
 
     /*
@@ -458,3 +458,4 @@ class FunFilters extends BasePassiveModule
         return $win;
     } // End function winner()
 }
+$funfilters = new FunFilters($bot);

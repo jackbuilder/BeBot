@@ -39,7 +39,7 @@ $securitytest = new SecurityTest($bot);
 /*
 The Class itself...
 */
-class SecurityTest extends BaseActiveModule
+class SecurityTest extends \Commodities\BaseActiveModule
 { // Start Class
 
     public function __construct(&$bot)

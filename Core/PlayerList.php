@@ -30,8 +30,8 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-new PlayerList($bot);
-class PlayerList extends BasePassiveModule
+
+class PlayerList extends \Commodities\BasePassiveModule
 {
     private $namecache = array();
     private $uidcache = array();
@@ -42,7 +42,7 @@ class PlayerList extends BasePassiveModule
         $this->register_module('player');
         //$dispatcher = Event_Dispatcher2::getInstance();
         //$dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
-        $this->bot->dispatcher->connect(
+     /*   $this->bot->dispatcher->connect(
             'core.on_player_name', array(
                 $this,
                 'signal_handle'
@@ -53,7 +53,7 @@ class PlayerList extends BasePassiveModule
                 $this,
                 'signal_handle'
             )
-        );
+        );*/
     }
 
     public function signal_handle($data)
@@ -253,3 +253,4 @@ class PlayerList extends BasePassiveModule
         var_dump($this->uidcache);
     }
 }
+new PlayerList($bot);

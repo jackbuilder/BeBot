@@ -33,8 +33,8 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$shortcuts_core = new ShortCuts_Core($bot);
-class ShortCuts_Core extends BasePassiveModule
+
+class ShortCuts extends \Commodities\BasePassiveModule
 {
     public $short; // cache of shortcuts indexed by long descriptions
     public $long; // cache of long descriptions indexed by shortcuts
@@ -167,3 +167,4 @@ class ShortCuts_Core extends BasePassiveModule
         return "The entry with the ID " . $id . " has been deleted. Shortcut: " . $ret[0][0] . ", long description: " . $ret[0][1] . ".";
     }
 }
+$shortcuts = new ShortCuts($bot);

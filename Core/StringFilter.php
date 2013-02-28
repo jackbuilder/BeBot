@@ -33,11 +33,11 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$stringfilter_core = new stringfilter_core($bot);
+
 /*
 The Class itself...
 */
-class stringfilter_core extends BasePassiveModule
+class Stringfilter extends \Commodities\BasePassiveModule
 { // Start Class
     public $stringlist;
 
@@ -198,3 +198,4 @@ class stringfilter_core extends BasePassiveModule
         }
     } // End function funmode()
 } // End of Class
+$stringfilter = new stringfilter($bot);

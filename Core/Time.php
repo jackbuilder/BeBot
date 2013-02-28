@@ -33,11 +33,11 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$time_core = new Time_Core($bot);
+
 /*
 The Class itself...
 */
-class Time_Core extends BaseActiveModule
+class Time extends \Commodities\BaseActiveModule
 { // Start Class
 
     /*
@@ -199,3 +199,4 @@ class Time_Core extends BaseActiveModule
         return $timestr . " ago";
     }
 }
+$time = new Time($bot);

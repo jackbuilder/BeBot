@@ -33,11 +33,11 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$statistics = new statistics($bot);
+
 /*
 The Class itself...
 */
-class Statistics extends BasePassiveModule
+class Statistics extends \Commodities\BasePassiveModule
 { // Start Class
 
     /*
@@ -95,3 +95,4 @@ class Statistics extends BasePassiveModule
         }
     }
 } // End of Class
+$statistics = new Statistics($bot);

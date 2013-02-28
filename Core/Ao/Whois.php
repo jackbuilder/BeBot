@@ -1,5 +1,6 @@
 <?php
 namespace Core\Whois;
+use Commodities\BotError;
 /*
 * Whois.php - Funcom XML whois lookup with database caching.
 *
@@ -54,8 +55,8 @@ $array["at"] - Character alien defender rank name or NULL
 $array["at_id"] - Character alien defender rank id or NULL
 $array["pictureurl"] - URL to character picture
 */
-$whois_core = new Whois_Core($bot);
-class Whois_Core extends BasePassiveModule
+
+class Whois extends \Commodities\BasePassiveModule
 {
 
     public function __construct(&$bot)
@@ -541,14 +542,14 @@ class Whois_Core extends BasePassiveModule
     Updates whois cache info with passed array.
     */
     public function update($who)
-    { // Start function update()
+    { 
         //Adding in some validation and error handling due to an unknown bug (work around).
         //If ID is stops being 0, then remove this code.
+
         if ($who instanceof BotError) {
-            return FALSE;
+            return false;
         }
-
-
+          
         if ($who["id"] < 1) {
             $this->bot->log('Whois', 'Update', $who["nickname"] . " had an invalid user ID! UID: " . $who["id"]);
             $who["id"] = $this->bot->core("player")->id($who["nickname"]);
@@ -750,3 +751,4 @@ class Whois_Core extends BasePassiveModule
         return ($this->bot->core("tools")->make_blob("Details", $window));
     }
 }
+$whois = new Whois($bot);

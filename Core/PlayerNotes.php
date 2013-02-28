@@ -32,11 +32,11 @@ namespace Core;
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$playernotes_core = new PlayerNotes_Core($bot);
+
 /*
 The Class itself...
 */
-class PlayerNotes_Core extends BasePassiveModule
+class PlayerNotes extends \Commodities\BasePassiveModule
 { // Start Class
     public $schema_version;
 
@@ -204,3 +204,4 @@ class PlayerNotes_Core extends BasePassiveModule
         $this->bot->db->set_version('player_notes', 3);
     }
 } // End of Class
+$playernotes_core = new PlayerNotes($bot);
