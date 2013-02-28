@@ -1,14 +1,15 @@
 <?php
 // AO
-$server_list['Ao']['Testlive'] = array(
+global $server_list;
+$server_list['ao']['Testlive'] = array(
     'server' => 'chat.dt.funcom.com',
     'port' => 7109
 );
-$server_list['Ao']['Rubi-Ka'] = array(
+$server_list['ao']['Rubi-Ka'] = array(
         'server' => 'chat.d1.funcom.com',
         'port' => 7105
 );
-$server_list['ao']['1'] = $server_list['Ao']['Rubi-Ka'];
+$server_list['ao']['1'] = $server_list['ao']['Rubi-Ka'];
 
 // AOC
 $server_list['Aoc']['EU'] = array(
