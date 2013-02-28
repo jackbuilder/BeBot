@@ -54,6 +54,8 @@ if (empty($os)) {
 }
 if (preg_match("/^windows/i", $os)) {
     define('OS_WINDOWS', TRUE);
+} else {
+    define('OS_WINDOWS', FALSE);
 }
 
 echo "
@@ -81,12 +83,12 @@ MySQL.php: Used to communicate with the MySQL database
 AOChat.php: Interface to communicate with AO chat servers
 Bot.php: The actual bot itself.
 */
-require_once './Sources/RequirementCheck.php';
-require_once './Sources/MySQL.php';
-require_once './Sources/AOChat.php';
+require_once './Sources/RequirementsCheck.php';
+require_once './Sources/Mysql.php';
+require_once './Sources/AoChat.php';
 require_once './Sources/ConfigMagik.php';
 require_once './Sources/Bot.php';
-require_once './Sources/sfEventDispatcher.php';
+require_once './Sources/SymfonyEvent/sfEventDispatcher.php';
 
 /*
 Creating the bot.

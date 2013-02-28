@@ -64,10 +64,10 @@ class Mysql
         /*
         Load up config
         */
-        $botname_mysql_conf = "Conf/" . $this->botname . ".MySQL.conf";
-        if (file_exists($botname_mysql_conf)) {
-            include $botname_mysql_conf;
-            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from " . $botname_mysql_conf, FALSE);
+        $botname_mysqli_conf = "Conf/" . $this->botname . ".MySQL.conf";
+        if (file_exists($botname_mysqli_conf)) {
+            include $botname_mysqli_conf;
+            $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from " . $botname_mysqli_conf, FALSE);
         } else {
             include 'Conf/MySQL.conf';
             $this->bot->log("MYSQL", "START", "Loaded MySQL configuration from Conf/MySQL.conf", FALSE);
@@ -137,13 +137,13 @@ class Mysql
         if ($initial) {
             $this->bot->log("MYSQL", "START", "Establishing MySQL database connection....");
         }
-        $conn = @mysql_connect($this->SERVER, $this->USER, $this->PASS);
+        $conn = @mysqli_connect($this->SERVER, $this->USER, $this->PASS);
         if (!$conn) {
             $this->error("Cannot connect to the database server!", $initial, false);
 
             return false;
         }
-        if (!mysql_select_db($this->DBASE, $conn)) {
+        if (!mysqli_select_db($this->DBASE, $conn)) {
             $this->error("Database not found or insufficient priviledges!", $initial, false);
 
             return false;
@@ -157,14 +157,14 @@ class Mysql
     public function close()
     {
         if ($this->CONN != NULL) {
-            mysql_close($this->CONN);
+            mysqli_close($this->CONN);
             $this->CONN = NULL;
         }
     }
 
     public function error($text, $fatal = false, $connected = true)
     {
-        $msg = mysql_error();
+        $msg = mysqli_error();
         $this->error_count++;
         $this->bot->log("MySQL", "ERROR", "(# " . $this->error_count . ") on query: $text", $connected);
         $this->bot->log("MySQL", "ERROR", $msg, $connected);
@@ -181,7 +181,7 @@ class Mysql
         $this->connect();
         $data = "";
         $sql = $this->add_prefix($sql);
-        $result = mysql_query($sql, $this->CONN);
+        $result = mysqli_query($sql, $this->CONN);
         if (!$result) {
             $this->error($sql);
 
@@ -190,10 +190,10 @@ class Mysql
         if (empty($result)) {
             return false;
         }
-        while ($row = mysql_fetch_array($result, $result_form)) {
+        while ($row = mysqli_fetch_array($result, $result_form)) {
             $data[] = $row;
         }
-        mysql_free_result($result);
+        mysqli_free_result($result);
 
         return $data;
     }
@@ -202,7 +202,7 @@ class Mysql
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
-        $return = mysql_query($sql, $this->CONN);
+        $return = mysqli_query($sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
 
@@ -216,7 +216,7 @@ class Mysql
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
-        $result = mysql_query($sql, $this->CONN);
+        $result = mysqli_query($sql, $this->CONN);
         if (!$result) {
             return false;
         } else {
@@ -228,7 +228,7 @@ class Mysql
     {
         $this->connect();
         $sql = $this->add_prefix($sql);
-        $result = mysql_query("DROP TABLE " . $sql, $this->CONN);
+        $result = mysqli_query("DROP TABLE " . $sql, $this->CONN);
         if (!$return) {
             $this->error($sql);
 

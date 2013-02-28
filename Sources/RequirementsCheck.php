@@ -52,9 +52,9 @@ if (!extension_loaded("sockets")) {
         die("Sockets extention required to run this bot");
     }
 }
-if (!extension_loaded("mysql")) {
+if (!extension_loaded("mysqli")) {
     if (OS_WINDOWS) {
-        if (!dl("php_mysql.dll")) {
+        if (!dl("php_mysqli.dll")) {
             die("Loading php_mysql.dll failed. MySQL extention required to run this bot");
         }
     } else {
