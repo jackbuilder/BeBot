@@ -4,26 +4,11 @@ $server_list['Ao']['Testlive'] = array(
     'server' => 'chat.dt.funcom.com',
     'port' => 7109
 );
-$server_list['Ao']['Atlantean'] = array(
-    'server' => 'chat.d1.funcom.com',
-    'port' => 7101
-);
-$server_list['Ao']['Rimor'] = array(
-    'server' => 'chat.d2.funcom.com',
-    'port' => 7102
-);
-$server_list['Ao']['Die neue welt'] = array(
-    'server' => 'chat.d3.funcom.com',
-    'port' => 7103
-);
 $server_list['Ao']['Rubi-Ka'] = array(
 		'server' => 'chat.d1.funcom.com',
 		'port' => 7105
 );
-$server_list['Ao']['1'] = $server_list['Ao']['Atlantean'];
-$server_list['Ao']['2'] = $server_list['Ao']['Rimor'];
-$server_list['Ao']['3'] = $server_list['Ao']['Die neue welt'];
-$server_list['Ao']['5'] = $server_list['Ao']['Rubi-Ka'];
+$server_list['Ao']['1'] = $server_list['Ao']['Rubi-Ka'];
 
 // AOC
 $server_list['Aoc']['EU'] = array(

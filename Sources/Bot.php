@@ -319,15 +319,6 @@ class Bot
             $dimension = "Testlive";
             break;
         case "1":
-            $dimension = "Atlantean";
-            break;
-        case "2":
-            $dimension = "Rimor";
-            break;
-        case "3":
-            $dimension = "Die neue welt";
-            break;
-        case "5":
             $dimension = "Rubi-Ka";
             break;
         Default:
