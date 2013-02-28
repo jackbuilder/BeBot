@@ -91,6 +91,9 @@ Bot.php: The actual bot itself.
 #require_once './Sources/SymfonyEvent/sfEventDispatcher.php';
 require_once './Sources/SplClassLoader.php';
 
+$rest = new SplClassLoader('Core');
+$rest->register();
+
 $rest = new SplClassLoader('Commodities');
 $rest->register();
 
@@ -114,19 +117,19 @@ $bot = Bot::get_instance($bothandle);
 //Load modules.
 $bot->load_files('Commodities', 'commodities'); //Classes that do not instantiate themselves.
 $bot->load_files('Commodities', "commodities/{$bot->game}");
-$bot->load_files('Main', 'main');
-$bot->load_files('Core', 'core');
-$bot->load_files('Core', "core/{$bot->game}");
-$bot->load_files('Core', 'custom/core');
+$bot->load_files('Main', 'Main');
+$bot->load_files('Core', 'Core');
+$bot->load_files('Core', "Core/{$bot->game}");
+$bot->load_files('Core', 'Custom/Core');
 if (!empty($bot->core_directories)) {
     $core_dirs = explode(",", $bot->core_directories);
     foreach ($core_dirs as $core_dir) {
         $bot->load_files('Core', trim($core_dir));
     }
 }
-$bot->load_files('Modules', 'modules');
-$bot->load_files('Modules', "modules/{$bot->game}");
-$bot->load_files('Modules', 'custom/modules');
+$bot->load_files('Modules', 'Modules');
+$bot->load_files('Modules', "Modules/" . ucfirst($bot->game));
+$bot->load_files('Modules', 'Custom/Modules');
 if (!empty($bot->module_directories)) {
     $module_dirs = explode(",", $bot->module_directories);
     foreach ($module_dirs as $module_dir) {
