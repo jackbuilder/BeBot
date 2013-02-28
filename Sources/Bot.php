@@ -151,31 +151,31 @@ class Bot
 
     public static function factory($config_file = NULL)
     {
-        require './conf/ServerList.php';
+        require './Conf/ServerList.php';
         if (!empty($config_file)) {
             $config_file = ucfirst(strtolower($config_file)) . ".Bot.conf";
         } else {
             $config_file = "Bot.conf";
         }
         //Read config_file
-        if (file_exists("./conf/" . $config_file)) {
-            require_once './conf/'. $config_file;
-            echo "Loaded bot configuration from conf/" . $config_file . "\n";
+        if (file_exists("./Conf/" . $config_file)) {
+            require_once './Conf/'. $config_file;
+            echo "Loaded bot configuration from Conf/" . $config_file . "\n";
         } else {
-            die("Could not read config file conf/" . $config_file);
+            die("Could not read config file Conf/" . $config_file);
         }
 
         if (empty($ao_password) || $ao_password == "") {
-            $fp = fopen('./conf/pw', 'r');
+            $fp = fopen('./Conf/pw', 'r');
             if ($fp) {
-                $ao_password = fread($fp, filesize('./conf/pw'));
+                $ao_password = fread($fp, filesize('./Conf/pw'));
                 fclose($fp);
-                $fp = fopen('./conf/pw', 'w');
+                $fp = fopen('./Conf/pw', 'w');
                 fwrite($fp, "");
                 fclose($fp);
             } else {
                 if (empty($ao_password) || $ao_password == "") {
-                    die("No password set in either ./conf/" . $config_file . " or in conf/pw");
+                    die("No password set in either ./Conf/" . $config_file . " or in Conf/pw");
                 }
             }
         }
@@ -243,7 +243,7 @@ class Bot
             self::$instance[$bothandle]->super_admin = NULL;
         }
         // create new ConfigMagik-Object (HACXX ALERT! This should most likely be a singleton!)
-        self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", TRUE, TRUE);
+        self::$instance[$bothandle]->ini = ConfigMagik::get_instance($bothandle, "Conf/" . ucfirst(strtolower($bot_name)) . ".Modules.ini", TRUE, TRUE);
         self::$instance[$bothandle]->register_module(self::$instance[$bothandle]->ini, 'ini');
         //Instantiate singletons
         self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
@@ -314,7 +314,7 @@ class Bot
         Default:
             $dimension = ucfirst(strtolower($this->dimension));
         }
-        Require ("conf/ServerList.php");
+        Require ("Conf/ServerList.php");
         if (isset($server_list['ao'][$dimension])) {
             $server = $server_list['ao'][$dimension]['server'];
             $port = $server_list['ao'][$dimension]['port'];
@@ -944,11 +944,13 @@ class Bot
             return;
         }
         //Silently ignore tells from other bots.
-        if (isset($this->other_bots[$user])) //TO DO: Do we ever ucfirst(strtolower()) { the other bots?
+        if (isset($this->other_bots[$user])) {
 
             return;
         }
-        if (preg_match("/is AFK .Away from keyboard./i", $args[1]) || preg_match("/.tell (.+)help/i", $args[1]) || preg_match("/I only listen to members of this bot/i", $args[1])
+        if (preg_match("/is AFK .Away from keyboard./i", $args[1]) 
+	    || preg_match("/.tell (.+)help/i", $args[1])
+            || preg_match("/I only listen to members of this bot/i", $args[1])
             || preg_match("/I am away from my keyboard right now,(.+)your message has been logged./i", $args[1])
             || preg_match("/Away From Keyboard/i", $args[1])
         ) {
