@@ -1,6 +1,6 @@
 <?php
 /*
-* AOChat, a PHP class for talking with the Age of Conan and Anarchy Online chat servers.
+* AoChat, a PHP class for talking with the Age of Conan and Anarchy Online chat servers.
 * It requires the sockets extension (to connect to the chat server..)
 * from PHP 5.2.0+ and the BCMath extension (for generating
 * and calculating the login keys) to work.
@@ -9,7 +9,7 @@
 * Copyright (c) 2008 Allan Noer <allan@noer.biz>
 * Copyright (C) 2002-2005  Oskari Saarenmaa <auno@auno.org>.
 *
-* This is an adapted version of Auno's original AOChat PHP class.
+* This is an adapted version of Auno's original AoChat PHP class.
 * This version has been adapted for use with pre PHP 5 versions aswell as other bugfixes
 * by the community and BeBot development team.
 *
@@ -76,10 +76,7 @@ if (PHP_INT_SIZE != 8) {
 * have been done anyway..  // auno - 2004/mar/26
 */
 
-include 'AoChatPacket.php';
-include 'AoChatExtMsg.php';
-include 'AocLogin/LoginServerConnection.php';
-include 'AocLogin/CharacterServerConnection.php';
+
 define('AOCP_LOGIN_CHARID', 0);
 define('AOCP_LOGIN_SEED', 0);
 define('AOCP_LOGIN_REQUEST', 2);
@@ -224,7 +221,7 @@ class AoChat
             }
         }
         if ($this->state !== "connect") {
-            die("AOChat: not expecting connect.\n");
+            die("AoChat: not expecting connect.\n");
         }
         $s = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
         if (!is_resource($s)) /* this is fatal */ {
@@ -339,7 +336,7 @@ class AoChat
         if ($this->char["id"] != 0 && $this->serverseed != 0) {
             $this->login_num++;
 
-            $loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(
+            $loginCharacterPacket = new AoChatPacket("out", AOCP_LOGIN_CHARID, array(
                 1,
                 $this->char["id"],
                 $this->serverseed,
@@ -401,11 +398,11 @@ class AoChat
     {
         // If we are not authenticating, bail
         if ($this->state != "auth") {
-            die("AOChat: not expecting authentication.\n");
+            die("AoChat: not expecting authentication.\n");
         }
         $key = $this->generate_login_key($this->serverseed, $username, $password);
         // Prepare and send the login packet.
-        $pak = new AOChatPacket("out", AOCP_LOGIN_REQUEST, array(
+        $pak = new AoChatPacket("out", AOCP_LOGIN_REQUEST, array(
             0,
             $username,
             $key
@@ -414,7 +411,7 @@ class AoChat
         $packet = $this->get_packet();
         // If we receive anything but the character list, something's wrong.
         if ($packet->type != AOCP_LOGIN_CHARLIST) {
-            die("AOChat: {$packet->args[0]}\n");
+            die("AoChat: {$packet->args[0]}\n");
         }
         // Prepare an array of all characters returned
         for ($i = 0; $i < sizeof($packet->args[0]); $i++) {
@@ -442,9 +439,9 @@ class AoChat
         // If we have not authenticated, bail
         if ($this->state != "login") {
             if ($this->login_num >= 1) {
-                die("AOChat: authentication failed. Keygeneration failure likely\n");
+                die("AoChat: authentication failed. Keygeneration failure likely\n");
             } else {
-                die("AOChat: not expecting login.\n");
+                die("AoChat: not expecting login.\n");
             }
         }
         // Allows us to catch if we've been here before and failed.
@@ -472,11 +469,11 @@ class AoChat
             }
         }
         if (!is_array($char)) {
-            die("AOChat: no valid character to login.\n");
+            die("AoChat: no valid character to login.\n");
         }
 
         // Prepare the login packet and send it
-        $pq = new AOChatPacket("out", AOCP_LOGIN_SELECT, $char["id"]);
+        $pq = new AoChatPacket("out", AOCP_LOGIN_SELECT, $char["id"]);
         $this->send_packet($pq);
         $pr = $this->get_packet();
 
@@ -542,8 +539,8 @@ class AoChat
         // Prevent this function from being called recursively
         static $already_running = false;
         if ($already_running) {
-            $this->bot->log("NETWORK", "ERROR", "AOChat::wait_for_certain_packet() called recursively! Don't do that!");
-            $this->bot->log("DEBUG", "AOChat", $this->bot->debug_bt());
+            $this->bot->log("NETWORK", "ERROR", "AoChat::wait_for_certain_packet() called recursively! Don't do that!");
+            $this->bot->log("DEBUG", "AoChat", $this->bot->debug_bt());
 
             return false;
         }
@@ -568,7 +565,7 @@ class AoChat
             }
 
             // Check if this packet is the one we are looking for --> return
-            if (($packet instanceof AOChatPacket) && ($packet->type == $type)) {
+            if (($packet instanceof AoChatPacket) && ($packet->type == $type)) {
                 $args_match = true;
                 for ($i = 0; $i < count($packet->args); $i++) {
                     if ($args[$i] !== NULL && $packet->args[$i] != $args[$i]) {
@@ -679,7 +676,7 @@ class AoChat
             fwrite($this->debug, $data);
             fwrite($this->debug, "\n=====\n");
         }
-        $packet = new AOChatPacket("in", $type, $data);
+        $packet = new AoChatPacket("in", $type, $data);
         $bot->cron();
         switch ($type) {
             // system
@@ -848,7 +845,7 @@ class AoChat
                 }
                 // echo "Resending auth to chatserver [Character:" . $this->char["name"] . ", id:" . $this->char["id"] . "]\n";
                 $this->state = "connected";
-                $loginCharacterPacket = new AOChatPacket("out", AOCP_LOGIN_CHARID, array(
+                $loginCharacterPacket = new AoChatPacket("out", AOCP_LOGIN_CHARID, array(
                     1,
                     $this->char["id"],
                     $this->serverseed,
@@ -1004,7 +1001,7 @@ class AoChat
         $u = ucfirst(strtolower($u));
         //		$timelimit = time() + $timeout;
         //		array_unshift($stack, array('user' => $u , 'timeout' => $timelimit));
-        $pq = new AOChatPacket("out", AOCP_CLIENT_LOOKUP, $u);
+        $pq = new AoChatPacket("out", AOCP_CLIENT_LOOKUP, $u);
         $this->send_packet($pq);
 
         while ($p == FALSE) {
@@ -1047,7 +1044,7 @@ class AoChat
     public function lookup_group($arg, $type = 0)
     {
         $is_gid = false;
-        // This should probably be moved out of AOChat and into Core/PlayerList.php
+        // This should probably be moved out of AoChat and into Core/PlayerList.php
         if ($type && ($is_gid = (strlen($arg) === 5 && (ord($arg[0]) & ~0x80) < 0x10))) {
             return $arg;
         }
@@ -1060,13 +1057,13 @@ class AoChat
 
     public function get_gid($g)
     {
-        // This should probably be moved out of AOChat and into Core/PlayerList.php
+        // This should probably be moved out of AoChat and into Core/PlayerList.php
         return $this->lookup_group($g, 1);
     }
 
     public function get_gname($g)
     {
-        // This should probably be moved out of AOChat and into Core/GroupList.php
+        // This should probably be moved out of AoChat and into Core/GroupList.php
         if (($gid = $this->lookup_group($g, 1)) === false) {
             return false;
         }
@@ -1079,7 +1076,7 @@ class AoChat
     {
         $this->last_ping = time();
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_PING, "AoChat.php"));
+        return $this->send_packet(new AoChatPacket("out", AOCP_PING, "AoChat.php"));
     }
 
     public function send_tell($user, $msg, $blob = "\0")
@@ -1094,7 +1091,7 @@ class AoChat
         }
 
         return $this->send_packet(
-            new AOChatPacket("out", AOCP_MSG_PRIVATE, array(
+            new AoChatPacket("out", AOCP_MSG_PRIVATE, array(
                 $uid,
                 $msg,
                 $blob
@@ -1110,7 +1107,7 @@ class AoChat
         }
 
         return $this->send_packet(
-            new AOChatPacket("out", AOCP_GROUP_MESSAGE, array(
+            new AoChatPacket("out", AOCP_GROUP_MESSAGE, array(
                 $gid,
                 $msg,
                 $blob
@@ -1125,7 +1122,7 @@ class AoChat
         }
 
         return $this->send_packet(
-            new AOChatPacket("out", AOCP_GROUP_DATA_SET, array(
+            new AoChatPacket("out", AOCP_GROUP_DATA_SET, array(
                 $gid,
                 $this->grp[$gid] & ~AOC_GROUP_MUTE,
                 "\0"
@@ -1140,7 +1137,7 @@ class AoChat
         }
 
         return $this->send_packet(
-            new AOChatPacket("out", AOCP_GROUP_DATA_SET, array(
+            new AoChatPacket("out", AOCP_GROUP_DATA_SET, array(
                 $gid,
                 $this->grp[$gid] | AOC_GROUP_MUTE,
                 "\0"
@@ -1170,7 +1167,7 @@ class AoChat
         }
 
         return $this->send_packet(
-            new AOChatPacket("out", AOCP_PRIVGRP_MESSAGE, array(
+            new AoChatPacket("out", AOCP_PRIVGRP_MESSAGE, array(
                 $gid,
                 $msg,
                 $blob
@@ -1185,7 +1182,7 @@ class AoChat
             return false;
         }
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_JOIN, $gid));
+        return $this->send_packet(new AoChatPacket("out", AOCP_PRIVGRP_JOIN, $gid));
     }
 
     public function join_privgroup($group) /* Deprecated - 2004/Mar/26 - auno@auno.org */
@@ -1200,7 +1197,7 @@ class AoChat
             return false;
         }
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_PART, $gid));
+        return $this->send_packet(new AoChatPacket("out", AOCP_PRIVGRP_PART, $gid));
     }
 
     public function privategroup_invite($user)
@@ -1210,7 +1207,7 @@ class AoChat
             return false;
         }
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_INVITE, $uid));
+        return $this->send_packet(new AoChatPacket("out", AOCP_PRIVGRP_INVITE, $uid));
     }
 
     public function privategroup_kick($user)
@@ -1220,12 +1217,12 @@ class AoChat
             return false;
         }
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_KICK, $uid));
+        return $this->send_packet(new AoChatPacket("out", AOCP_PRIVGRP_KICK, $uid));
     }
 
     public function privategroup_kick_all()
     {
-        return $this->send_packet(new AOChatPacket("out", AOCP_PRIVGRP_KICKALL, 0));
+        return $this->send_packet(new AoChatPacket("out", AOCP_PRIVGRP_KICKALL, 0));
     }
 
     /* Buddies */
@@ -1249,7 +1246,7 @@ class AoChat
             );
         }
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_BUDDY_ADD, $uid));
+        return $this->send_packet(new AoChatPacket("out", AOCP_BUDDY_ADD, $uid));
     }
 
     public function buddy_remove($user)
@@ -1259,7 +1256,7 @@ class AoChat
             return false;
         }
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_BUDDY_REMOVE, $uid));
+        return $this->send_packet(new AoChatPacket("out", AOCP_BUDDY_REMOVE, $uid));
     }
 
     public function buddy_remove_unknown()
@@ -1277,7 +1274,7 @@ class AoChat
             );
         }
 
-        return $this->send_packet(new AOChatPacket("out", AOCP_CC, array($array)));
+        return $this->send_packet(new AoChatPacket("out", AOCP_CC, array($array)));
     }
 
     public function buddy_exists($who)

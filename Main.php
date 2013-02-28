@@ -83,13 +83,15 @@ MySQL.php: Used to communicate with the MySQL database
 AOChat.php: Interface to communicate with AO chat servers
 Bot.php: The actual bot itself.
 */
-require_once './Sources/RequirementsCheck.php';
-require_once './Sources/Mysql.php';
-require_once './Sources/AoChat.php';
-require_once './Sources/ConfigMagik.php';
-require_once './Sources/Bot.php';
-require_once './Sources/SymfonyEvent/sfEventDispatcher.php';
-
+#require_once './Sources/RequirementsCheck.php';
+#require_once './Sources/Mysql.php';
+#require_once './Sources/AoChat.php';
+#require_once './Sources/ConfigMagik.php';
+#require_once './Sources/Bot.php';
+#require_once './Sources/SymfonyEvent/sfEventDispatcher.php';
+require_once './Sources/SplClassLoader.php';
+$classLoader = new SplClassLoader(null, realpath('.').'/Sources');
+$classLoader->register();
 /*
 Creating the bot.
 */
@@ -100,7 +102,7 @@ if (isset($argv[1])) {
     $bothandle = Bot::factory();
 }
 $bot = Bot::get_instance($bothandle);
-$bot->dispatcher = new sfEventDispatcher();
+#$bot->dispatcher = new \sfEventDispatcher();
 
 //Load modules.
 $bot->load_files('Commodities', 'commodities'); //Classes that do not instantiate themselves.

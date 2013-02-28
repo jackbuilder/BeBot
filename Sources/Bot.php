@@ -247,8 +247,8 @@ class Bot
         self::$instance[$bothandle]->register_module(self::$instance[$bothandle]->ini, 'ini');
         //Instantiate singletons
         self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
-        self::$instance[$bothandle]->aoc = AOChat::get_instance($bothandle);
-        self::$instance[$bothandle]->db = MySQL::get_instance($bothandle);
+        self::$instance[$bothandle]->aoc = AoChat::get_instance($bothandle);
+        self::$instance[$bothandle]->db = \Database\MyPdo::get_instance($bothandle, $database);
         //Pass back the handle of the bot for future reference.
         return ($bothandle);
     }
