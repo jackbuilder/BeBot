@@ -1,4 +1,5 @@
 <?php
+namespace Commodities;
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax
@@ -36,7 +37,7 @@ class BasePassiveModule
     protected $error; //This holds an error class.
     protected $link_name;
 
-    public function __construct(&$bot, $module_name)
+    public function __construct($bot, $module_name)
     {
         //Save reference to bot
         $this->bot = &$bot;

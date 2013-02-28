@@ -90,8 +90,15 @@ Bot.php: The actual bot itself.
 #require_once './Sources/Bot.php';
 #require_once './Sources/SymfonyEvent/sfEventDispatcher.php';
 require_once './Sources/SplClassLoader.php';
-$classLoader = new SplClassLoader(null, realpath('.').'/Sources');
-$classLoader->register();
+
+$rest = new SplClassLoader('Commodities');
+$rest->register();
+
+$core = new SplClassLoader(null, realpath('.').'/Sources');
+$core->register();
+
+
+
 /*
 Creating the bot.
 */

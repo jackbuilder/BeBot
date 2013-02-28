@@ -1374,7 +1374,7 @@ class Bot
         if (isset($this->module_links[strtolower($name)])) {
             return $this->module_links[strtolower($name)];
         }
-        $dummy = new BasePassiveModule($this, $name);
+        $dummy = new \Commodities\BasePassiveModule($this, $name);
         $this->log('CORE', 'ERROR', "Module '$name' does not exist or is not loaded.");
 
         return $dummy;

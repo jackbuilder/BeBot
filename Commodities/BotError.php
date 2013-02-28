@@ -1,4 +1,5 @@
 <?php
+namespace Commodities;
 /*
 * BotError.php - Error handling class
 *
