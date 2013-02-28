@@ -42,8 +42,8 @@
  * A flexible security group is ALWAYS just an extension of an existing security group defined by the Security module.
  * The access level is linked via the GID entries.
  */
-$flexiblesecurity_core = new FlexibleSecurity_Core($bot);
-class FlexibleSecurity_Core extends BasePassiveModule
+
+class FlexibleSecurity_Core extends \Commodities\BasePassiveModule
 {
     private $cache; // saves the highest access level defined by all flexible groups for a player.
     private $querynames;
@@ -212,3 +212,4 @@ class FlexibleSecurity_Core extends BasePassiveModule
         return $highest;
     }
 }
+$flexiblesecurity_core = new FlexibleSecurity_Core($bot);

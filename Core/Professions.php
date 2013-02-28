@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
  * Utillities for handling units, profession names and shortcuts.
  * Written by Alreadythere (RK2).

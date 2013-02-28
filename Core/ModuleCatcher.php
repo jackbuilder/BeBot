@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * ModuleCatcher.php - Collects information about modules available to the bot.
 *

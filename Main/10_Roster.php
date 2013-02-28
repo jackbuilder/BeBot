@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$roster_core = new Roster_Core($bot);
-class Roster_Core extends BasePassiveModule
+
+class Roster_Core extends \Commodities\BasePassiveModule
 {
 
     public function __construct(&$bot)
@@ -786,3 +786,4 @@ class Roster_Core extends BasePassiveModule
         return $members;
     }
 }
+$roster_core = new Roster_Core($bot);

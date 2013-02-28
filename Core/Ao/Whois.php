@@ -1,4 +1,5 @@
 <?php
+namespace Core\Whois;
 /*
 * Whois.php - Funcom XML whois lookup with database caching.
 *

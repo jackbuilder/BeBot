@@ -31,8 +31,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$notify_core = new Notify_Core($bot);
-class Notify_Core extends BasePassiveModule
+
+class Notify_Core extends \Commodities\BasePassiveModule
 {
     private $cache;
 
@@ -166,3 +166,4 @@ class Notify_Core extends BasePassiveModule
         Return $this->cache;
     }
 }
+$notify_core = new Notify_Core($bot);

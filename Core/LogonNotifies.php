@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Logon_Notifies.php - Notifies registered modules when members log on.
 * This notify is send after a configurable delay to avoid spamming right at logon.

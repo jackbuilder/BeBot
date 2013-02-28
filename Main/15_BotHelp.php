@@ -32,12 +32,12 @@
 *  USA
 */
 
-$bothelp_core = new BotHelp_Core($bot);
+
 
 /*
 The Class itself...
 */
-class BotHelp_Core extends BaseActiveModule
+class BotHelp_Core extends \Commodities\BaseActiveModule
 {
     private $help_cache;
 
@@ -225,3 +225,4 @@ class BotHelp_Core extends BaseActiveModule
             ->make_blob($command, $window));
     }
 }
+$bothelp_core = new BotHelp_Core($bot);

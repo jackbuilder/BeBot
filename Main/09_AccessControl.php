@@ -34,11 +34,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$accesscontrol_core = new AccessControl_Core($bot);
+
 /*
   The Class itself...
 */
-class AccessControl_Core extends BasePassiveModule
+class AccessControl_Core extends \Commodities\BasePassiveModule
 {
     private $access_cache;
     private $access_levels;
@@ -719,3 +719,4 @@ class AccessControl_Core extends BasePassiveModule
         return OWNER + 1;
     }
 }
+$accesscontrol_core = new AccessControl_Core($bot);

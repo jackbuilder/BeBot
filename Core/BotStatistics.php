@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Bots.php - Module Manage Online / Offline Status monitoring and Statistics.
 *
@@ -31,8 +32,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$botstatistics_core = new BotStatistics_Core($bot);
-class BotStatistics_Core extends BasePassiveModule
+
+class BotStatistics_Core extends \Commodities\BasePassiveModule
 {
 
     public function __construct(&$bot)
@@ -349,3 +350,4 @@ class BotStatistics_Core extends BasePassiveModule
         }
     }
 }
+$botstatistics_core = new BotStatistics_Core($bot);

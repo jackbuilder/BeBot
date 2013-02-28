@@ -47,11 +47,11 @@
 * - #___online is aliased as t1
 * - #___whois is aliased as t2
 */
-$OnlineDB_Core = new OnlineDB_Core($bot);
+
 /*
 The Class itself...
 */
-class OnlineDB_Core extends BasePassiveModule
+class OnlineDB_Core extends \Commodities\BasePassiveModule
 { // Start Class
     public $last_seen; // Caches all known last seen info for faster access
     public $guest_cache; // Caches all character in the guest channel for optional security handling
@@ -464,3 +464,4 @@ class OnlineDB_Core extends BasePassiveModule
         return ($user_list);
     }
 } // End of Class
+$OnlineDB_Core = new OnlineDB_Core($bot);

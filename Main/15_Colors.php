@@ -36,11 +36,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$colors_core = new Colors_Core($bot);
+
 /*
 The Class itself...
 */
-class Colors_Core extends BasePassiveModule
+class Colors_Core extends \Commodities\BasePassiveModule
 {
     private $no_tags;
     private $color_tags;
@@ -368,16 +368,14 @@ class Colors_Core extends BasePassiveModule
     public function read_theme()
     {
         $theme_dir = "./themes/";
+        //TODO: Something horrible wrong here so we just default everything.
+        $themeFilename = 'Default';
+        
         // Security check, theme filename HAS to be all letters or numbers, otherwise dying here for security reasons!
-        if (!preg_match(
-            "/^([a-z01-9-_]+)$/i", $this->bot->core("settings")
-                ->get("Color", "Theme")
-        )
-        ) {
+        if (!empty($themeFilename) && !preg_match("/^([a-z01-9-_]+)$/i", $themeFilename)) {
             die("POSSIBLE SECURITY PROBLEM! The theme filename can only contain letters, numbers - and _ for security reasons!\nThe bot has been shutdown.\n");
         }
-        $theme_file_name = $theme_dir . $this->bot->core("settings")
-            ->get("Color", "Theme") . ".colors.xml";
+        $theme_file_name = $theme_dir . 'Default' . 'colors.xml';
         // If theme file doesn't exist try to create it
         if (!is_file($theme_file_name)) {
             $theme_file = $this->create_theme_file($theme_file_name);
@@ -500,3 +498,4 @@ class Colors_Core extends BasePassiveModule
         return isset($this->theme[strtolower($col)]);
     }
 }
+$colors_core = new Colors_Core($bot);

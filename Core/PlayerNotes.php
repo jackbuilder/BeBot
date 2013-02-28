@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * PlayerNotes.php - Player Notes Module.
 *

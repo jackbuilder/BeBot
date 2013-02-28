@@ -32,15 +32,19 @@ namespace Commodities;
 */
 class BasePassiveModule
 {
+	/**
+	 * \Bot
+	 * @var unknown_type
+	 */
     protected $bot; // A reference to the bot
     public $module_name; //Name of the module extending this class.
     protected $error; //This holds an error class.
     protected $link_name;
 
-    public function __construct($bot, $module_name)
+    public function __construct(\Bot $bot, $module_name)
     {
         //Save reference to bot
-        $this->bot = &$bot;
+        $this->bot = $bot;
         $this->module_name = $module_name;
         $this->link_name = NULL;
         $this->error = new BotError($bot, $module_name);

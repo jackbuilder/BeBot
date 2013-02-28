@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Global shortcut handling.
 * Written by Alreadythere (RK2).

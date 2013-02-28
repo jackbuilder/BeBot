@@ -33,8 +33,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$tools = new tools($bot);
-class Tools extends BasePassiveModule
+
+class Tools extends \Commodities\BasePassiveModule
 {
 
     public function __construct(&$bot)
@@ -474,3 +474,4 @@ class Tools extends BasePassiveModule
         }
     }
 }
+$tools = new tools($bot);

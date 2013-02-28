@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Alias.php
 *
@@ -31,8 +32,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$alias = new Alias($bot);
-class Alias extends BaseActiveModule
+
+class Alias extends \Commodities\BaseActiveModule
 {
 
     /*
@@ -278,3 +279,4 @@ class Alias extends BaseActiveModule
         }
     }
 }
+$alias = new Alias($bot);

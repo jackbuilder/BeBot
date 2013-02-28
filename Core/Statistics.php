@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Statistics.php - Statistics Module.
 * Displays statistics and provides statistics and debugging related functions.

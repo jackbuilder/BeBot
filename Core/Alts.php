@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Alts.php - Alternative character management
 *
@@ -34,11 +35,11 @@
 /*
 Prepare MySQL database
 */
-$alts_core = new Alts_Core($bot);
+
 /*
 The Class itself...
 */
-class Alts_Core extends BasePassiveModule
+class Alts_Core extends \Commodities\BasePassiveModule
 {
     private $mains;
     private $alts;
@@ -323,3 +324,4 @@ class Alts_Core extends BasePassiveModule
         }
     }
 }
+$alts_core = new Alts_Core($bot);

@@ -31,20 +31,21 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$log = new Log($bot);
+
 /*
 The Class itself...
 */
-class Log extends BaseActiveModule
+class Log extends \Commodities\BaseActiveModule
 {
 
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
     */
-    public function __construct(&$bot)
+    public function __construct(\Bot $bot)
     {
-        parent::__construct($bot, get_class($this));
+
+    	parent::__construct($bot, get_class($this));
         $this->bot->db->query(
             "CREATE TABLE IF NOT EXISTS " . $this->bot->db->define_tablename("log_message", "true") . "
                 (id INTEGER UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -140,3 +141,4 @@ class Log extends BaseActiveModule
         }
     }
 }
+$log = new Log($bot);

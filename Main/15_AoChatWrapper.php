@@ -31,11 +31,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$aochat_wrapper_core = new AOChatWrapper_Core($bot);
+
 /*
 The Class itself...
 */
-class AOChatWrapper_Core extends BasePassiveModule
+class AOChatWrapper_Core extends \Commodities\BasePassiveModule
 {
 
     /*
@@ -247,3 +247,4 @@ class AOChatWrapper_Core extends BasePassiveModule
         return $this->bot->aoc->get_gname($g);
     }
 }
+$aochat_wrapper_core = new AOChatWrapper_Core($bot);

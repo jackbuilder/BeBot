@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * StringFilter.php - Performs some common text filtering.
 * Can be used as a word censor. This functionality is not enabled by default.

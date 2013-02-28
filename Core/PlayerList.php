@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * BeBot - An Anarchy Online & Age of Conan Chat Automaton
 * Copyright (C) 2004 Jonas Jax

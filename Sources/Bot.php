@@ -1281,7 +1281,7 @@ class Bot
             fputs($log, $line);
             fclose($log);
         }
-        if ($write_to_db) {
+        if ($write_to_db && !empty($msg) && is_string($msg)) {
             $logmsg = substr($msg, 0, 500);
             $this->db->query(
                 "INSERT INTO #___log_message (message, first, second, timestamp) VALUES ('" . mysql_real_escape_string($logmsg) . "','" . $first . "','" . $second . "','" . time()

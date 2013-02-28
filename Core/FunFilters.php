@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * FunFilters.php - Fun Text Filters based on http://kitenet.net/~joey/code/filters/
 *

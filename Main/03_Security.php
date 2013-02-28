@@ -46,12 +46,12 @@ define("GUEST", 1);
 define("ANONYMOUS", 0);
 define("BANNED", -1); // Outside range of MySQL TINYINT UNSIGNED
 
-$security = new Security_Core($bot);
+
 
 /*
 The Class itself...
 */
-class Security_Core extends BaseActiveModule
+class Security_Core extends \Commodities\BaseActiveModule
 { // Start Class
     public $enabled; // Set to true when the security subsystem is ready.
     /*
@@ -2131,3 +2131,4 @@ class Security_Core extends BaseActiveModule
     } // End function get_access_name()
 
 } // End of Class
+$security = new Security_Core($bot);

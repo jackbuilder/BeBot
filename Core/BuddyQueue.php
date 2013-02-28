@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Buddy_Queue.php - Queue plugin to prevent flooding
 *
@@ -31,11 +32,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$buddy_queue_core = new Buddy_Queue_Core($bot);
+$buddy_queue_core = new BuddyQueue($bot);
 /*
 The Class itself...
 */
-class Buddy_Queue_Core extends BasePassiveModule
+class BuddyQueue extends BasePassiveModule
 {
 
     /*

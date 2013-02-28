@@ -34,8 +34,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$commandalias_core = new CommandAlias_Core($bot);
-class CommandAlias_Core extends BasePassiveModule
+
+class CommandAlias_Core extends \Commodities\BasePassiveModule
 {
     private $alias;
 
@@ -176,3 +176,4 @@ class CommandAlias_Core extends BasePassiveModule
         }
     }
 }
+$commandalias_core = new CommandAlias_Core($bot);

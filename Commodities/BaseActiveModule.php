@@ -35,7 +35,7 @@ abstract class BaseActiveModule extends BasePassiveModule
     public $help; //A window containing help text for this module
     protected $source;
 
-    public function __construct(&$bot, $module_name)
+    public function __construct(\Bot $bot, $module_name)
     {
         //Save reference to bot
         parent::__construct($bot, $module_name);

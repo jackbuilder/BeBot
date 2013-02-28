@@ -31,11 +31,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$chat_queue_core = new Chat_Queue_Core($bot);
+
 /*
 The Class itself...
 */
-class Chat_Queue_Core extends BasePassiveModule
+class Chat_Queue_Core extends \Commodities\BasePassiveModule
 {
     private $que;
     private $que_low;
@@ -96,3 +96,4 @@ class Chat_Queue_Core extends BasePassiveModule
         $this->bot->core("queue")->into_queue("chat", $info, $priority);
     }
 }
+$chat_queue_core = new Chat_Queue_Core($bot);

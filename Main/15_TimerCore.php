@@ -77,8 +77,8 @@
 * To create a timed event you have to call the add_timer() function with $channel set to 'internal' and $owner set to the
 * module name used to register the callback.
 */
-$timer_core = new Timer_Core($bot);
-class Timer_Core extends BasePassiveModule
+
+class Timer_Core extends \Commodities\BasePassiveModule
 {
     private $next_timer;
     private $class_cache;
@@ -644,3 +644,4 @@ class Timer_Core extends BasePassiveModule
         return $cname[0]['name'];
     }
 }
+$timer_core = new Timer_Core($bot);

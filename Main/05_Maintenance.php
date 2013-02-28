@@ -31,11 +31,11 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$maintenance = new Maintenance($bot);
+
 /*
 The Class itself...
 */
-class Maintenance extends BaseActiveModule
+class Maintenance extends \Commodities\BaseActiveModule
 {
 
     /*
@@ -337,3 +337,4 @@ class Maintenance extends BaseActiveModule
         }
     }
 }
+$maintenance = new Maintenance($bot);

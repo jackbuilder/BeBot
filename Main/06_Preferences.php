@@ -29,8 +29,8 @@
 *  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 *  USA
 */
-$preferences_core = new Preferences_core($bot);
-class Preferences_core extends BasePassiveModule
+
+class Preferences_core extends \Commodities\BasePassiveModule
 {
     private $cache;
 
@@ -361,3 +361,4 @@ class Preferences_core extends BasePassiveModule
             ->make_blob($module, $window));
     }
 }
+$preferences_core = new Preferences_core($bot);

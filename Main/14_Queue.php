@@ -32,12 +32,12 @@
 *  USA
 */
 
-$queue_core = new Queue_Core($bot);
+
 
 /*
 The Class itself...
 */
-class Queue_Core extends BasePassiveModule
+class Queue_Core extends \Commodities\BasePassiveModule
 {
     private $que;
     private $que_low;
@@ -172,3 +172,4 @@ class Queue_Core extends BasePassiveModule
         }
     }
 }
+$queue_core = new Queue_Core($bot);

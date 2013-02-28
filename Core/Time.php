@@ -1,4 +1,5 @@
 <?php
+namespace Core;
 /*
 * Time.php - Time Module.
 * Displays current time and provides time related functions.

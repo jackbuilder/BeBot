@@ -1,4 +1,5 @@
 <?php
+namespace Main;
 /*
 * Settings_Core.php - Settings Management Functions.
 * Version: 1.5
@@ -79,16 +80,19 @@ string2array($string)
 Converts a string to an array. Array elements should be seperated by a
 semicolon. Returns an array.
 */
-$settings = new Settings_Core($bot);
+
 /*
 The Class itself...
 */
-class Settings_Core extends BasePassiveModule
+class Settings extends \Commodities\BasePassiveModule
 { // Start Class
     private $settings_cache;
     private $callbacks;
     private $change_user;
 
+    // TODO: no idea what is this.
+    protected $error;
+	
     /*
     Constructor:
     Hands over a reference to the "Bot" class.
@@ -156,7 +160,9 @@ class Settings_Core extends BasePassiveModule
     { // Start function get()
         $module = strtolower($module);
         $setting = strtolower($setting);
+
         if (isset($this->settings_cache[$module][$setting])) {
+        	
             return $this->settings_cache[$module][$setting];
         } else {
             $this->error->set("The setting named " . $setting . " for setting group " . $module . " does not exisit.");
@@ -190,14 +196,13 @@ class Settings_Core extends BasePassiveModule
         if (empty($result)) {
             $this->settings_cache = array();
             $this->error->set("No settings loaded from database. It's possible that no settings exisit.");
-
             return $this->error;
         } else {
             foreach ($result as $data) {
-                $module = strtolower($data[0]);
-                $setting = strtolower($data[1]);
-                $value = $data[2];
-                $datatype = $data[3];
+                $module = strtolower($data['module']);
+                $setting = strtolower($data['setting']);
+                $value = $data['value'];
+                $datatype = $data['datatype'];
                 if ($datatype == "array") {
                     $value = $this->string2array($value);
                 } else {
@@ -689,3 +694,4 @@ class Settings_Core extends BasePassiveModule
         return FALSE;
     }
 } // End of Class
+$settings = new Settings($bot);
