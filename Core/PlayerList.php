@@ -40,9 +40,9 @@ class PlayerList extends \Commodities\BasePassiveModule
     {
         parent::__construct($bot, get_class($this));
         $this->register_module('player');
-        //$dispatcher = Event_Dispatcher2::getInstance();
-        //$dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
-     /*   $this->bot->dispatcher->connect(
+#        $dispatcher = Event_Dispatcher::getInstance();
+#        $dispatcher->addObserver(array($this , 'signal_handle'), 'onPlayerName');
+        $this->bot->dispatcher->connect(
             'core.on_player_name', array(
                 $this,
                 'signal_handle'
@@ -53,7 +53,7 @@ class PlayerList extends \Commodities\BasePassiveModule
                 $this,
                 'signal_handle'
             )
-        );*/
+        );
     }
 
     public function signal_handle($data)
@@ -61,12 +61,11 @@ class PlayerList extends \Commodities\BasePassiveModule
         //$data = $signal->getNotificationObject();
         //list ($uid, $uname) = $data->message;
 
-        /*
         echo "Debug core.on_player_name and on_player_id ";
         var_dump($data['id']);
         echo " " . $data['name'];
         echo "\n";
-        */
+
         if ((!$data['id'] < 1) && !empty($data['name'])) {
             $this->add($data['id'], $data['name']);
         } else {
@@ -123,7 +122,8 @@ class PlayerList extends \Commodities\BasePassiveModule
         // Check if we have not the player in cache.
         if (!isset($this->namecache[$uname])) {
             // Lookup user from Funcom server first
-            $this->bot->aoc->lookup_user($uname);
+            $lookupUser = $this->bot->aoc->lookup_user($uname);
+            
             // We should have the user in cache if we got a response from FC server
             if (isset($this->namecache[$uname])) {
                 return $this->namecache[$uname]['id'];
@@ -150,7 +150,13 @@ class PlayerList extends \Commodities\BasePassiveModule
                 return $this->namecache[$uname]['id'];
             }
         }
-
+		/**
+		 * @var $whois \Core\Whois
+		 */
+        $whois = $this->bot->core('whois');
+        if ($whois instanceof \Core\Whois) {
+        	
+        }
         $this->error->set("Unable to find player '$uname' and all lookups have failed. The player might have been deleted.");
 
         return $this->error;
@@ -179,11 +185,11 @@ class PlayerList extends \Commodities\BasePassiveModule
         }
         //Check if we need to ask the server about the user
         if (!isset($this->uidcache[$uid])) {
-            $this->bot->aoc->lookup_user($uid);
+            $user = $this->bot->aoc->lookup_user($uid);
+
             //The user should now definitively be in the cache if it exists.
             if (isset($this->uidcache[$uid])) {
                 $return = $this->uidcache[$uid]['name'];
-
                 return $return;
             } else {
                 // If we we didn't get a responce from funcom, it's possible it was just a fluke, so try to get nickname from whois
@@ -198,7 +204,7 @@ class PlayerList extends \Commodities\BasePassiveModule
                         $this->bot->log("PLAYERLIST", "WARN", "Username lookup for $uid failed, but using whois info that is $age hours old.");
                         //cache in memory for future reference.
                         $this->add($uid, $result[0]['NICKNAME']);
-
+						
                         return $result[0]['NICKNAME'];
                     }
                 }
@@ -210,7 +216,6 @@ class PlayerList extends \Commodities\BasePassiveModule
                 return $return;
             }
         }
-
         $this->error->set("name() unable to find player '$uid'");
 
         return ($this->error);

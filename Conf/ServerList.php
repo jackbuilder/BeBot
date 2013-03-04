@@ -10,6 +10,7 @@ $server_list['ao']['Rubi-Ka'] = array(
         'port' => 7105
 );
 $server_list['ao']['1'] = $server_list['ao']['Rubi-Ka'];
+$server_list['ao']['5'] = $server_list['ao']['Rubi-Ka'];
 
 // AOC
 $server_list['Aoc']['EU'] = array(

@@ -59,7 +59,7 @@ $array["pictureurl"] - URL to character picture
 class Whois extends \Commodities\BasePassiveModule
 {
 
-    public function __construct(&$bot)
+    public function __construct($bot)
     {
         parent::__construct($bot, get_class($this));
         /*
@@ -448,6 +448,8 @@ class Whois extends \Commodities\BasePassiveModule
     { // Start function get_playerxml()
         $name = strtolower($name);
         $fcurl = "http://people.anarchy-online.com/character/bio/d/" . $this->bot->dimension . "/name/" . strtolower($name) . "/bio.xml";
+        print "$fcurl";
+        print "$aunourl";
         $aunourl = "http://auno.org/ao/char.php?output=xml&dimension=" . $this->bot->dimension . "&name=" . strtolower($name);
         if ($this->bot->core("settings")
             ->get("Whois", "LookupOrder") == "funcom_auno"

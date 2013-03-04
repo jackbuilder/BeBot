@@ -60,7 +60,7 @@ if (PHP_INT_SIZE != 8) {
         if (!ini_set('precision', 16)) {
             die("On 32bit systems we need precision of 16 or greater and we where unable to raise the limit.\nPlease set precision in php.ini to 16.");
         }
-
+		
         echo "Debug: Setting precision to 16...";
         $precision = ini_get('precision');
 
@@ -174,6 +174,7 @@ class AoChat
         } else {
             $phpbit = "64 bit";
             $this->sixtyfourbit = true;
+            
         }
         $this->bot->log("MAIN", "START", "PHP install detected as being $phpbit");
     }
@@ -261,7 +262,7 @@ class AoChat
     */
     public function authenticateConan(
         $serverAddress, $serverPort, $username,
-        $password, $character, $sixtyfourbit
+        $password, $character
     )
     {
         $this->accountid = 0;
@@ -271,7 +272,7 @@ class AoChat
         $this->username = $username;
         $this->character = $character;
         $this->password = $password;
-        $this->sixtyfourbit = $sixtyfourbit;
+        #$this->sixtyfourbit = $sixtyfourbit;
         //
         // Connect to the login server and log in with the username and password
         //
@@ -664,6 +665,7 @@ class AoChat
         }
         list (, $type, $len) = unpack("n2", $head);
         $data = $this->read_data($len);
+        
         // For AOC they are not sending the OK packet anymore
         // So when you receive the first packet, you are logged in
         if (strtolower(AOCHAT_GAME) == "aoc" && $this->state != "ok") {
@@ -678,7 +680,7 @@ class AoChat
         }
         $packet = new AoChatPacket("in", $type, $data);
         $bot->cron();
-        switch ($type) {
+        switch ($packet->type) {
             // system
         case AOCP_LOGIN_SEED:
             $this->serverseed = $packet->args[0];
@@ -744,16 +746,14 @@ class AoChat
             break;
         case AOCP_CLIENT_LOOKUP:
             list ($id, $name) = $packet->args;
+            $data = $packet->data;
+            var_dump($packet->args, $data);
+            $id = ''.$id;
             $name = ucfirst(strtolower($name));
-
-            //$signal = new signal_message('aochat', 'bot', array($id , $name));
-            //$dispatcher->post($signal, 'onPlayerName');
-            //unset($signal);
-
-            // We need to make sure we catch 4294967295
-            if ($id > 4294967294 && $id < 4294967296) {
+           // We need to make sure we catch 4294967295
+         	if ($id == 4294967295) {
                 $id = -1;
-            }
+            } 
 
             echo "Debug: Firing event Core.on_player_id ($id, $name)\n";
 
@@ -997,6 +997,7 @@ class AoChat
         $i = 0;
         $timeout = time() + 15;
         $p = FALSE;
+        $pr = null;
         // put the user on the call stack.
         $u = ucfirst(strtolower($u));
         //		$timelimit = time() + $timeout;
@@ -1004,10 +1005,10 @@ class AoChat
         $pq = new AoChatPacket("out", AOCP_CLIENT_LOOKUP, $u);
         $this->send_packet($pq);
 
-        while ($p == FALSE) {
+        while ($p === FALSE) {
             $i++;
             $pr = $this->get_packet();
-            if ($pr->type == AOCP_CLIENT_LOOKUP) {
+            if ($pr->type == AOCP_CLIENT_LOOKUP && $pr->args[0] != 4294967295) {
                 $p = TRUE;
             }
             if ($timeout <= time()) {
@@ -1015,7 +1016,9 @@ class AoChat
                 $p = TRUE;
             }
         }
-
+        if ($p) {
+			$u = $pr->args[0];
+        }
         echo "Debug: lookup_user for $u completed in $i iterations\n";
 
         /*** FIXME ***/
@@ -1025,7 +1028,6 @@ class AoChat
         /*** FIXME no. 2 ***/
         // Maybe the new function $this->wait_for_lookup_user(...) could be used.
         // But its still untested and forbidden recursive calls are likely!
-
         /*
         for ($i = 0; ($i < 200) && (!$this->bot->Core('player')->exists($stack[0]['user'])) && ($stack[0]['timeout'] > time()) && (!$p); $i ++) {
             $pr = $this->get_packet();
@@ -1041,6 +1043,26 @@ class AoChat
         }
     }
 
+    /* User and group lookup functions */
+    function legacy_lookup_user($u)
+    {
+    	$u = ucfirst(strtolower($u));
+    
+    	if(isset($this->id[$u]))
+    	{
+    		return $this->id[$u];
+    	}
+    
+    	$pq = new AOChatPacket("out", AOCP_CLIENT_LOOKUP, $u);
+    	$this->send_packet($pq);
+    		for($i=0; $i<100 && !isset($this->id[$u]); $i++)
+    		{
+    		$this->get_packet();
+    		}
+    
+		return isset($this->id[$u]) ? $this->id[$u] : false;
+    }
+    
     public function lookup_group($arg, $type = 0)
     {
         $is_gid = false;

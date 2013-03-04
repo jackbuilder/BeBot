@@ -247,7 +247,7 @@ class Bot
         self::$instance[$bothandle]->register_module(self::$instance[$bothandle]->ini, 'ini');
         //Instantiate singletons
         self::$instance[$bothandle]->irc = &$irc; //To do: This should probably be a singleton aswell.
-        self::$instance[$bothandle]->aoc = AoChat::get_instance($bothandle);
+        self::$instance[$bothandle]->aoc = AoOldChat::get_instance($bothandle);
         self::$instance[$bothandle]->db = \Database\MyPdo::get_instance($bothandle, $database);
         //Pass back the handle of the bot for future reference.
         return ($bothandle);
@@ -311,6 +311,10 @@ class Bot
         case "1":
             $dimension = "Rubi-Ka";
             break;
+		case "5":
+            $dimension = "Rubi-Ka";
+            break;
+            
         Default:
             $dimension = ucfirst(strtolower($this->dimension));
         }
@@ -935,7 +939,13 @@ class Bot
     {
         //Get the name of the user. It's easier to handle... or is it?
         $user = $this->core("player")->name($args[0]);
+        var_dump(get_class($user), $args);
         $found = FALSE;
+        
+        if (! $user instanceof \Core\PlayerList) {
+        	$this->log("CORE", "INC_TELL", "Not able to find player ".$args[0]);
+        	return; 
+        }
         // Ignore bot chat, no need to handle it's own output as input again
         if ($user == 'BOTNAME') {
             // Danger will robinson. We just sent a tell to ourselves!!!!!!!!!
@@ -946,7 +956,7 @@ class Bot
         //Silently ignore tells from other bots.
         if (isset($this->other_bots[$user])) {
 
-            return;
+        	return;
         }
         if (preg_match("/is AFK .Away from keyboard./i", $args[1]) 
 	    || preg_match("/.tell (.+)help/i", $args[1])

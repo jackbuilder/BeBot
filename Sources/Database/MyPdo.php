@@ -191,7 +191,9 @@ class MyPdo
             $this->error($sql);
             return false;
         }
+
         $return = $result->fetchAll(\PDO::FETCH_ASSOC);
+
         if (empty($result)) {
             return false;
         }

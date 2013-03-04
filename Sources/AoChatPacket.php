@@ -19,7 +19,7 @@ class AoChatPacket
 {
     public $args, $type, $dir, $data;
 
-    public function AOChatPacket($dir, $type, $data)
+    public function __construct($dir, $type, $data)
     {
 //This is a hack that should be done better. I'm just not sure how.
         if (strtolower(AOCHAT_GAME) == "ao") {
